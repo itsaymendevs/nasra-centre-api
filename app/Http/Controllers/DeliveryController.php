@@ -63,7 +63,7 @@ class DeliveryController extends Controller {
 
         // :: validator
         $validator = $this->validationTrait($request, 
-        ['name' => 'required', 'nameAr' => 'required', 'price' => 'required', 'state_id' => 'required', 'district_id' => 'required']);
+        ['name' => 'required', 'nameAr' => 'required', 'price' => 'required', 'stateId' => 'required', 'districtId' => 'required']);
         
         // ! if validation not passed
         if ($validator != false) {
@@ -82,9 +82,9 @@ class DeliveryController extends Controller {
         $area->nameAr = $request->nameAr;
         $area->price = $request->price;
 
-        $area->state_id = $request->state_id;
-        $area->district_id = $request->district_id;
-        $area->delivery_time_id = $request->delivery_time_id;
+        $area->stateId = $request->stateId;
+        $area->districtId = $request->districtId;
+        $area->deliveryTimeId = $request->deliveryTimeId;
 
         $area->isActive = $request->isActive ? false : true;
 
@@ -126,7 +126,7 @@ class DeliveryController extends Controller {
 
         // :: validator
         $validator = $this->validationTrait($request, 
-        ['name' => 'required', 'nameAr' => 'required', 'price' => 'required', 'state_id' => 'required', 'district_id' => 'required']);
+        ['name' => 'required', 'nameAr' => 'required', 'price' => 'required', 'stateId' => 'required', 'districtId' => 'required']);
         
         // ! if validation not passed
         if ($validator != false) {
@@ -144,9 +144,9 @@ class DeliveryController extends Controller {
         $area->nameAr = $request->nameAr;
         $area->price = $request->price;
 
-        $area->state_id = $request->state_id;
-        $area->district_id = $request->district_id;
-        $area->delivery_time_id = $request->delivery_time_id;
+        $area->stateId = $request->stateId;
+        $area->districtId = $request->districtId;
+        $area->deliveryTimeId = $request->deliveryTimeId;
 
         $area->isActive = $request->isActive ? false : true;
 

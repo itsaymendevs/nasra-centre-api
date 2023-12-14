@@ -19,9 +19,9 @@ class ContactController extends Controller {
     public function index(Request $request) {
 
         // ::get items
-        $contact = Contact::where('country_id', $request->countryId)->first();
-        $phones = ContactPhone::where('country_id', $request->countryId)->get();
-        $terms = Term::where('country_id', $request->countryId)->get();
+        $contact = Contact::where('countryId', $request->countryId)->first();
+        $phones = ContactPhone::where('countryId', $request->countryId)->get();
+        $terms = Term::where('countryId', $request->countryId)->get();
 
         // 1: combine into one object
         $combine = new stdClass();
@@ -104,10 +104,10 @@ class ContactController extends Controller {
         // 1: create item
         $phone = new ContactPhone();
 
-        $phone->serial = $this->createSerial('PH', ContactPhone::where('country_id', $request->countryId)->count());
+        $phone->serial = $this->createSerial('PH', ContactPhone::where('countryId', $request->countryId)->count());
 
         $phone->phone = $request->phone;
-        $phone->country_id = $request->countryId;
+        $phone->countryId = $request->countryId;
         
         $phone->save();
 
@@ -206,14 +206,14 @@ class ContactController extends Controller {
         // 1: create item
         $term = new Term();
 
-        $term->serial = $this->createSerial('TR', Term::where('country_id', $request->countryId)->count());
+        $term->serial = $this->createSerial('TR', Term::where('countryId', $request->countryId)->count());
         $term->title = $request->title;
         $term->titleAr = $request->titleAr;
 
         $term->content = $request->content;
         $term->contentAr = $request->contentAr;
 
-        $term->country_id = $request->countryId;
+        $term->countryId = $request->countryId;
 
         $term->save();
 

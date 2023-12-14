@@ -19,7 +19,7 @@ return new class extends Migration
             $table->text('latitude')->nullable();
 
             $table->text('image')->nullable();
-            $table->string('isShown')->nullable()->default('true');
+            $table->boolean('isShown')->nullable()->default(1);
             
             $table->timestamps();
         });

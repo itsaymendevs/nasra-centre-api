@@ -17,7 +17,7 @@ class TypeController extends Controller {
 
         // ::get items
         $types = Type::all();
-
+        
         return response()->json($types, 200);
 
     } // end function
@@ -41,7 +41,6 @@ class TypeController extends Controller {
         // ------------------------------------
         // ------------------------------------
 
-
         // 1: create item
         $type = new Type();
 
@@ -50,8 +49,8 @@ class TypeController extends Controller {
         $type->nameAr = $request->nameAr;
         $type->index = Type::count() + 1;
         
-        $type->maincategory_id = $request->mainCategoryId;
-        $type->subcategory_id = $request->subCategoryId;
+        $type->mainCategoryId = $request->mainCategoryId;
+        $type->subCategoryId = $request->subCategoryId;
         
 
         $type->save();
@@ -93,8 +92,8 @@ class TypeController extends Controller {
         $type->name = $request->name;
         $type->nameAr = $request->nameAr;
         
-        $type->maincategory_id = $request->mainCategoryId;
-        $type->subcategory_id = $request->subCategoryId;
+        $type->mainCategoryId = $request->mainCategoryId;
+        $type->subCategoryId = $request->subCategoryId;
 
         $type->save();
 
@@ -133,7 +132,7 @@ class TypeController extends Controller {
     public function sort($mainCategoryId, $subCategoryId) {
 
         // 1: get sorted items
-        $types = Type::where('subcategory_id', $subCategoryId)->orderBy('index','asc')->get();
+        $types = Type::where('subCategoryId', $subCategoryId)->orderBy('index','asc')->get();
 
         return response()->json($types, 200);
 
@@ -147,6 +146,23 @@ class TypeController extends Controller {
 
 
     public function updateSort(Request $request, $mainCategoryId, $subCategoryId) {
+
+
+        // 1: get sortedItems => Ids
+        $sortedItems = $request->sortedItems;
+        $indexCounter = 1;
+
+        // 1.2: loop thru
+        foreach ($sortedItems as $item) {
+
+            $mainCategory = Type::find($item);
+            $mainCategory->index = $indexCounter;
+            $mainCategory->save();
+
+            $indexCounter++;
+        } // end loop
+
+
 
         return response()->json(['message' => 'Types has been sorted!'], 200);
 

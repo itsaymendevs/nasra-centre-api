@@ -22,20 +22,20 @@ return new class extends Migration
             // ::Address
             $table->text('address')->nullable();
 
-            $table->bigInteger('state_id')->unsigned()->nullable();
-            $table->foreign('state_id')->references('id')->on('states')->onDelete('set null');
+            $table->bigInteger('stateId')->unsigned()->nullable();
+            $table->foreign('stateId')->references('id')->on('states')->onDelete('set null');
 
-            $table->bigInteger('district_id')->unsigned()->nullable();
-            $table->foreign('district_id')->references('id')->on('districts')->onDelete('set null');
+            $table->bigInteger('districtId')->unsigned()->nullable();
+            $table->foreign('districtId')->references('id')->on('districts')->onDelete('set null');
 
-            $table->bigInteger('delivery_area_id')->unsigned()->nullable();
-            $table->foreign('delivery_area_id')->references('id')->on('delivery_areas')->onDelete('set null');
+            $table->bigInteger('deliveryAreaId')->unsigned()->nullable();
+            $table->foreign('deliveryAreaId')->references('id')->on('delivery_areas')->onDelete('set null');
 
 
             
             // ::Foreign keys
-            $table->bigInteger('user_id')->unsigned()->nullable();
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->bigInteger('userId')->unsigned()->nullable();
+            $table->foreign('userId')->references('id')->on('users')->onDelete('cascade');
 
 
             $table->timestamps();

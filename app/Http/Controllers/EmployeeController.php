@@ -118,7 +118,7 @@ class EmployeeController extends Controller {
 
         // :: validator
         $validator = $this->validationTrait($request, 
-        ['adminPassword' => 'required', 'password' => 'required']);
+        ['password' => 'required']);
         
         // ! if validation not passed
         if ($validator != false) {

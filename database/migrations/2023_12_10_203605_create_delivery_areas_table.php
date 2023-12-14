@@ -18,18 +18,18 @@ return new class extends Migration
             $table->string('name', 255);
             $table->string('nameAr', 255);
             $table->double('price', 10, 2);
-            $table->string('isActive')->nullable()->default('true');
+            $table->boolean('isActive')->nullable()->default(1);
 
 
             // ::foreign keys
-            $table->bigInteger('state_id')->unsigned()->nullable();
-            $table->foreign('state_id')->references('id')->on('states')->onDelete('cascade');
+            $table->bigInteger('stateId')->unsigned()->nullable();
+            $table->foreign('stateId')->references('id')->on('states')->onDelete('cascade');
 
-            $table->bigInteger('district_id')->unsigned()->nullable();
-            $table->foreign('district_id')->references('id')->on('districts')->onDelete('cascade');
+            $table->bigInteger('districtId')->unsigned()->nullable();
+            $table->foreign('districtId')->references('id')->on('districts')->onDelete('cascade');
 
-            $table->bigInteger('delivery_time_id')->unsigned()->nullable();
-            $table->foreign('delivery_time_id')->references('id')->on('delivery_times')->onDelete('cascade');
+            $table->bigInteger('deliveryTimeId')->unsigned()->nullable();
+            $table->foreign('deliveryTimeId')->references('id')->on('delivery_times')->onDelete('cascade');
 
 
             $table->timestamps();

@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('general_blocks', function (Blueprint $table) {
             $table->id();
 
-            $table->string('stopPickup', 100)->nullable()->default('false');
-            $table->string('stopDelivery', 100)->nullable()->default('false');
-            $table->string('stopOrders', 100)->nullable()->default('false');
+            $table->boolean('stopPickup')->nullable()->default(0);
+            $table->boolean('stopDelivery')->nullable()->default(0);
+            $table->boolean('stopOrders')->nullable()->default(0);
 
             $table->timestamps();
         });

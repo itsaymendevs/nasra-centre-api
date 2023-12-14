@@ -20,11 +20,11 @@ return new class extends Migration
             $table->integer('index'); // :: sort related
 
             // ::foreign keys
-            $table->bigInteger('maincategory_id')->unsigned()->nullable();
-            $table->foreign('maincategory_id')->references('id')->on('maincategories')->onDelete('cascade');
+            $table->bigInteger('mainCategoryId')->unsigned()->nullable();
+            $table->foreign('mainCategoryId')->references('id')->on('main_categories')->onDelete('cascade');
 
-            $table->bigInteger('subcategory_id')->unsigned()->nullable();
-            $table->foreign('subcategory_id')->references('id')->on('subcategories')->onDelete('cascade');
+            $table->bigInteger('subCategoryId')->unsigned()->nullable();
+            $table->foreign('subCategoryId')->references('id')->on('sub_categories')->onDelete('cascade');
 
             $table->timestamps();
         });

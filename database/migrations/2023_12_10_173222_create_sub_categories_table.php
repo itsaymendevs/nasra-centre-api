@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('subcategories', function (Blueprint $table) {
+        Schema::create('sub_categories', function (Blueprint $table) {
             $table->id();
 
             $table->string('serial', 255)->nullable();
@@ -20,8 +20,8 @@ return new class extends Migration
             $table->integer('index'); // :: sort related
 
             // ::foreign keys
-            $table->bigInteger('maincategory_id')->unsigned()->nullable();
-            $table->foreign('maincategory_id')->references('id')->on('maincategories')->onDelete('cascade');
+            $table->bigInteger('mainCategoryId')->unsigned()->nullable();
+            $table->foreign('mainCategoryId')->references('id')->on('main_categories')->onDelete('cascade');
             
             $table->timestamps();
         });
@@ -32,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('subcategories');
+        Schema::dropIfExists('sub_categories');
     }
 };

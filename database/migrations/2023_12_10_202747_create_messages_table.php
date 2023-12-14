@@ -18,7 +18,7 @@ return new class extends Migration
             $table->text('type')->nullable(); // pending / processing etc
             $table->text('content')->nullable();
             $table->text('contentAr')->nullable();
-            $table->string('isActive')->nullable()->default('true');
+            $table->boolean('isActive')->nullable()->default(1);
 
             $table->timestamps();
         });

@@ -37,26 +37,6 @@ Route::group(['middleware' => 'cors'], function () {
 
 
 
-    // ========================================================
-    // ========================================================
-
-
-    // 2: sub-category
-    Route::get("/sub-categories", [SubCategoryController::class, 'index'])->name('subCategory.index');
-
-    // store - update
-    Route::post("/sub-categories/store", [SubCategoryController::class, 'store'])->name('subCategory.store');
-    Route::patch("/sub-categories/update", [SubCategoryController::class, 'update'])->name('subCategory.update');
-    Route::delete("/sub-categories/{id}/delete", [SubCategoryController::class, 'delete'])->name('subCategory.delete');
-
-    // sort - updateSort
-    Route::get("/sub-categories/sort", [SubCategoryController::class, 'sort'])->name('subCategory.sort');
-    Route::patch("/sub-categories/sort/update", [SubCategoryController::class, 'updateSort'])->name('subCategory.updateSort');
-
-
-
-
-
 
     // ========================================================
     // ========================================================
@@ -139,10 +119,11 @@ Route::group(['middleware' => 'cors'], function () {
     // store - update
     Route::post("/employees/store", [EmployeeController::class, 'store'])->name('employee.store');
     Route::patch("/employees/update", [EmployeeController::class, 'update'])->name('employee.update');
+    Route::patch("/employees/reset-password", [EmployeeController::class, 'resetPassword'])->name('employee.resetPassword');
+
     Route::delete("/employees/{id}/delete", [EmployeeController::class, 'delete'])->name('employee.delete');
 
-    // reset password - toggle active
-    Route::patch("/employees/{id}/reset-password", [EmployeeController::class, 'resetPassword'])->name('employee.resetPassword');
+    // toggle active
     Route::patch("/employees/{id}/toggle-active", [EmployeeController::class, 'toggleActive'])->name('employee.toggleActive');
 
 

@@ -31,10 +31,10 @@ return new class extends Migration
             $table->text('desc')->nullable();
             $table->text('descAr')->nullable();
 
-            // ::unit_id (null when byName is selected)
+            // ::unitId (null when byName is selected)
             $table->double('weight', 10,2)->nullable();
-            $table->bigInteger('unit_id')->unsigned()->nullable();
-            $table->foreign('unit_id')->references('id')->on('units')->onDelete('set null');
+            $table->bigInteger('unitId')->unsigned()->nullable();
+            $table->foreign('unitId')->references('id')->on('units')->onDelete('set null');
 
 
             $table->integer('units')->nullable()->default(0);
@@ -42,8 +42,8 @@ return new class extends Migration
             $table->integer('quantity')->nullable()->default(0);
             $table->integer('maxQuantityPerOrder')->nullable()->default(0);
 
-            $table->string('isHidden')->nullable()->default('false');
-            $table->string('isMainPage')->nullable()->default('false');
+            $table->boolean('isHidden')->nullable()->default(0);
+            $table->boolean('isMainPage')->nullable()->default(0);
 
 
             // ::images + extras
@@ -55,17 +55,17 @@ return new class extends Migration
 
 
             // ::foreign keys
-            $table->bigInteger('company_id')->unsigned()->nullable();
-            $table->foreign('company_id')->references('id')->on('companies')->onDelete('set null');
+            $table->bigInteger('companyId')->unsigned()->nullable();
+            $table->foreign('companyId')->references('id')->on('companies')->onDelete('set null');
 
-            $table->bigInteger('maincategory_id')->unsigned()->nullable();
-            $table->foreign('maincategory_id')->references('id')->on('maincategories')->onDelete('cascade');
+            $table->bigInteger('mainCategoryId')->unsigned()->nullable();
+            $table->foreign('mainCategoryId')->references('id')->on('main_categories')->onDelete('cascade');
 
-            $table->bigInteger('subcategory_id')->unsigned()->nullable();
-            $table->foreign('subcategory_id')->references('id')->on('subcategories')->onDelete('cascade');
+            $table->bigInteger('subCategoryId')->unsigned()->nullable();
+            $table->foreign('subCategoryId')->references('id')->on('sub_categories')->onDelete('cascade');
 
-            $table->bigInteger('type_id')->unsigned()->nullable();
-            $table->foreign('type_id')->references('id')->on('types')->onDelete('cascade');
+            $table->bigInteger('typeId')->unsigned()->nullable();
+            $table->foreign('typeId')->references('id')->on('types')->onDelete('cascade');
 
 
             $table->timestamps();

@@ -19,11 +19,11 @@ return new class extends Migration
             $table->string('nameAr', 255);
 
             // ::foreign keys
-            $table->bigInteger('country_id')->unsigned()->nullable();
-            $table->foreign('country_id')->references('id')->on('countries')->onDelete('cascade');
+            $table->bigInteger('countryId')->unsigned()->nullable();
+            $table->foreign('countryId')->references('id')->on('countries')->onDelete('cascade');
 
-            $table->bigInteger('state_id')->unsigned()->nullable();
-            $table->foreign('state_id')->references('id')->on('states')->onDelete('cascade');
+            $table->bigInteger('stateId')->unsigned()->nullable();
+            $table->foreign('stateId')->references('id')->on('states')->onDelete('cascade');
 
             $table->timestamps();
         });

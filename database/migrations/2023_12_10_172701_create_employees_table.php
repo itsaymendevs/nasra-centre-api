@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('name', 255);
             $table->string('nameAr', 255);
             $table->text('password');
-            $table->string('permission', 100)->nullable()->default('low');
-            $table->string('isActive', 100)->nullable()->default('true');
+            $table->string('permission')->nullable()->default('Low');
+            $table->boolean('isActive')->nullable()->default(1);
 
             $table->timestamps();
         });

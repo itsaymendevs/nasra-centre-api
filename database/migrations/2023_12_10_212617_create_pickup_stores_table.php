@@ -26,8 +26,8 @@ return new class extends Migration
             $table->text('latitude')->nullable();
             $table->text('longitude')->nullable();
 
-            $table->string('isMainStore')->nullable()->default('false');
-            $table->string('isActive')->nullable()->default('true');
+            $table->boolean('isMainStore')->nullable()->default(0);
+            $table->boolean('isActive')->nullable()->default(1);
             
             $table->text('image')->nullable();
 

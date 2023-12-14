@@ -15,11 +15,11 @@ return new class extends Migration
             $table->id();
 
             // ::Foreign keys
-            $table->bigInteger('user_id')->unsigned()->nullable();
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->bigInteger('userId')->unsigned()->nullable();
+            $table->foreign('userId')->references('id')->on('users')->onDelete('cascade');
 
-            $table->bigInteger('product_id')->unsigned()->nullable();
-            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
+            $table->bigInteger('productId')->unsigned()->nullable();
+            $table->foreign('productId')->references('id')->on('products')->onDelete('cascade');
 
             $table->timestamps();
         });

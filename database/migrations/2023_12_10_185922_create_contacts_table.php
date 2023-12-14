@@ -19,8 +19,8 @@ return new class extends Migration
             $table->text('whatsappURL')->nullable();
 
             // ::foreign keys
-            $table->bigInteger('country_id')->unsigned()->nullable();
-            $table->foreign('country_id')->references('id')->on('countries')->onDelete('cascade');
+            $table->bigInteger('countryId')->unsigned()->nullable();
+            $table->foreign('countryId')->references('id')->on('countries')->onDelete('cascade');
 
             $table->timestamps();
         });

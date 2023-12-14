@@ -21,8 +21,8 @@ return new class extends Migration
             $table->string('currency', 255);
             $table->string('toSDG', 255);
 
-            $table->string('isServiceActive', 255)->nullable()->default('true');
-            $table->string('isOrderingActive', 255)->nullable()->default('true');
+            $table->boolean('isServiceActive')->nullable()->default(1);
+            $table->boolean('isOrderingActive')->nullable()->default(1);
 
             $table->timestamps();
         });

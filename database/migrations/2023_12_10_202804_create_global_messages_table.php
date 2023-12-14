@@ -20,7 +20,7 @@ return new class extends Migration
             $table->text('contentAr')->nullable();
             $table->string('target', 100)->nullable(); // customer or receiver
 
-            $table->string('isActive')->nullable()->default('true');
+            $table->boolean('isActive')->nullable()->default(1);
 
             $table->timestamps();
         });
