@@ -20,7 +20,7 @@ return new class extends Migration
             $table->text('password');
             $table->string('permission')->nullable()->default('Low');
             $table->boolean('isActive')->nullable()->default(1);
-
+            $table->rememberToken();
             $table->timestamps();
         });
     }

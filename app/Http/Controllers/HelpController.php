@@ -26,7 +26,7 @@ class HelpController extends Controller {
 
         // 1: combine into one object
         $combine = new stdClass();
-        $combine->address = $address;
+        $combine->media = $media;
         $combine->aboutParagraphs = $aboutParagraphs;
         $combine->address = $address;
 
@@ -51,8 +51,21 @@ class HelpController extends Controller {
 
 
         // 2: update
-        $media->update($request->all());
+        $media->websiteURL = $request->websiteURL;
+        $media->facebookID = $request->facebookID;
+        $media->facebookURL = $request->facebookURL;
+        $media->linkedinID = $request->linkedinID;
+        $media->linkedinURL = $request->linkedinURL;
+        $media->twitterID = $request->twitterID;
+        $media->twitterURL = $request->twitterURL;
+        $media->instagramID = $request->instagramID;
+        $media->instagramURL = $request->instagramURL;
+        $media->videoTitle = $request->videoTitle;
+        $media->videoTitleAr = $request->videoTitleAr;
+        $media->videoURL = $request->videoURL;
 
+        $media->save();        
+        
         return response()->json(['status' => true, 'message' => 'Media has been updated!'], 200);
 
     } // end function
@@ -75,7 +88,7 @@ class HelpController extends Controller {
         $address->address = $request->address;
         $address->longitude = $request->longitude;
         $address->latitude = $request->latitude;
-        $address->isShown = $request->isShown ? false : true;
+        $address->isHidden = $request->isHidden;
 
 
         if ($request->hasFile('image')) {

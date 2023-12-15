@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Contact;
 use App\Models\ContactPhone;
+use App\Models\Country;
 use App\Models\Term;
 use Illuminate\Http\Request;
 use App\Traits\AppTrait;
@@ -16,18 +17,21 @@ class ContactController extends Controller {
 
     
 
-    public function index(Request $request) {
+    public function index(Request $request, $countryId) {
 
         // ::get items
-        $contact = Contact::where('countryId', $request->countryId)->first();
-        $phones = ContactPhone::where('countryId', $request->countryId)->get();
-        $terms = Term::where('countryId', $request->countryId)->get();
+        $contact = Contact::where('countryId', $countryId)->first();
+        $phones = ContactPhone::where('countryId', $countryId)->get();
+        $terms = Term::where('countryId', $countryId)->get();
+        $country = Country::find($countryId);
 
+        
         // 1: combine into one object
         $combine = new stdClass();
         $combine->contact = $contact;
         $combine->phones = $phones;
         $combine->terms = $terms;
+        $combine->country = $country;
 
         return response()->json($combine, 200);
 
@@ -42,24 +46,10 @@ class ContactController extends Controller {
 
 
 
-    public function update(Request $request) {
+    public function update(Request $request, $countryId) {
 
-        // :: validator
-        $validator = $this->validationTrait($request, 
-        ['email' => 'required', 'whatsapp' => 'required', 'whatsappURL' => 'required']);
-        
-
-        // ! if validation not passed
-        if ($validator != false) {
-            return response()->json($validator->original);
-        } // end if
-
-        // ------------------------------------
-        // ------------------------------------
-
-
-        // 1: create item
-        $contact = Contact::find($request->id);
+        // 1: update item
+        $contact = Contact::where('countryId', $countryId)->first();
 
         $contact->email = $request->email;
         $contact->whatsapp = $request->whatsapp;
@@ -77,6 +67,28 @@ class ContactController extends Controller {
 
 
 
+    // ----------------------------------------------------------
+
+
+
+    public function updateService(Request $request, $countryId) {
+
+
+        // 1: update country
+        $contact = Country::find($countryId);
+
+        $contact->isServiceActive = $request->isServiceActive;
+        $contact->toSDG = $request->toSDG > 0 ? $request->toSDG : 0;
+
+        $contact->save();
+
+        return response()->json(['status' => true, 'message' => 'Info has been updated!'], 200);
+
+    } // end function
+
+
+
+
 
     // ----------------------------------------------------------
     // ----------------------------------------------------------
@@ -86,7 +98,7 @@ class ContactController extends Controller {
 
 
 
-    public function storePhone(Request $request) {
+    public function storePhone(Request $request, $countryId) {
 
         // :: validator
         $validator = $this->validationTrait($request, 
@@ -104,10 +116,10 @@ class ContactController extends Controller {
         // 1: create item
         $phone = new ContactPhone();
 
-        $phone->serial = $this->createSerial('PH', ContactPhone::where('countryId', $request->countryId)->count());
+        $phone->serial = $this->createSerial('PH', ContactPhone::where('countryId', $countryId)->count());
 
         $phone->phone = $request->phone;
-        $phone->countryId = $request->countryId;
+        $phone->countryId = $countryId;
         
         $phone->save();
 
@@ -126,7 +138,7 @@ class ContactController extends Controller {
 
 
 
-    public function updatePhone(Request $request) {
+    public function updatePhone(Request $request, $countryId) {
 
         // :: validator
         $validator = $this->validationTrait($request, 
@@ -161,7 +173,7 @@ class ContactController extends Controller {
 
 
 
-    public function deletePhone(Request $request, $id) {
+    public function deletePhone(Request $request, $countryId, $id) {
 
         // 1: delete item / image
         $phone = ContactPhone::find($id);
@@ -188,11 +200,11 @@ class ContactController extends Controller {
 
 
 
-    public function storeTerm(Request $request) {
+    public function storeTerm(Request $request, $countryId) {
 
         // :: validator
         $validator = $this->validationTrait($request, 
-        ['title' => 'required', 'titleAr' => 'required', 'content' => 'required', 'contentAr' => 'required', 'countryId' => 'required']);
+        ['title' => 'required', 'titleAr' => 'required', 'content' => 'required', 'contentAr' => 'required']);
 
         // ! if validation not passed
         if ($validator != false) {
@@ -206,14 +218,14 @@ class ContactController extends Controller {
         // 1: create item
         $term = new Term();
 
-        $term->serial = $this->createSerial('TR', Term::where('countryId', $request->countryId)->count());
+        $term->serial = $this->createSerial('TR', Term::where('countryId', $countryId)->count());
         $term->title = $request->title;
         $term->titleAr = $request->titleAr;
 
         $term->content = $request->content;
         $term->contentAr = $request->contentAr;
 
-        $term->countryId = $request->countryId;
+        $term->countryId = $countryId;
 
         $term->save();
 
@@ -232,7 +244,7 @@ class ContactController extends Controller {
 
 
 
-    public function updateTerm(Request $request) {
+    public function updateTerm(Request $request, $countryId) {
 
         // :: validator
         $validator = $this->validationTrait($request, 
@@ -272,7 +284,7 @@ class ContactController extends Controller {
 
 
 
-    public function deleteTerm(Request $request, $id) {
+    public function deleteTerm(Request $request, $countryId, $id) {
 
         // 1: delete item / image
         $term = Term::find($id);

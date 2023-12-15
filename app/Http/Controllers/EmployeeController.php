@@ -206,4 +206,41 @@ class EmployeeController extends Controller {
 
 
 
+    // ----------------------------------------------------------
+    // ----------------------------------------------------------
+    // ----------------------------------------------------------
+    // ----------------------------------------------------------
+    // ----------------------------------------------------------
+
+
+
+
+    public function login(Request $request) {
+
+
+        // 1: remove employee
+        $employee = Employee::where('name', $request->name)->first();
+
+
+        // 1.2: correct
+        if ($employee && Hash::check($request->password, $employee->password)) {
+
+            return response()->json([
+                'employee' => $employee,
+                'token' => $employee->createToken('desktop', ['role:employee'])->plainTextToken
+            ]);
+
+        } // end if
+
+
+        // 1.3: incorrect
+        return response()->json(['error' => 'Incorrect Credit'], 200);
+
+        
+    } // end function
+
+
+
+
+
 } // end function

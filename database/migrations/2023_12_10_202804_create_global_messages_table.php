@@ -16,8 +16,8 @@ return new class extends Migration
 
             $table->text('isFor')->nullable(); // delivery / pickup
             $table->text('type')->nullable(); // pending / processing etc
-            $table->text('content')->nullable();
-            $table->text('contentAr')->nullable();
+            $table->text('content')->nullable()->default("");
+            $table->text('contentAr')->nullable()->default("");
             $table->string('target', 100)->nullable(); // customer or receiver
 
             $table->boolean('isActive')->nullable()->default(1);
