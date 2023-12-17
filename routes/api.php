@@ -204,13 +204,12 @@ Route::group(['middleware' => 'cors'], function () {
     Route::get("/products/{id}/edit", [ProductController::class, 'edit']);
 
 
-    // 12.1: sort - updateSort (based on type)
+    // 12.1: sort - updateSort (based on typeId)
+    Route::get("/products/main-page/sort", [ProductController::class, 'mainPageSort']);
+
     Route::get("/products/{type}/sort", [ProductController::class, 'typeSort']);
     
-    // 12.2: sort - updateSort (based on category)
-    Route::get("/products/{mainCategoryId}/{subCategoryId}/{typeId}/sort", [ProductController::class, 'sort']);
-  
-
+   
 
 
 
@@ -501,11 +500,14 @@ Route::group(['middleware' => 'cors'], function () {
 
 
         // 12.1: sort - updateSort (based on type)
+        Route::patch("/products/main-page/sort/update", [ProductController::class, 'updateMainPageSort']);
+
+
         Route::patch("/products/{type}/sort/update", [ProductController::class, 'updateTypeSort']);
+
+
         
 
-        // 12.2: sort - updateSort (based on category)
-        Route::patch("/products/{mainCategoryId}/{subCategoryId}/{typeId}/sort/update", [ProductController::class, 'updateSort']);
 
 
     }); // end sanctum middleware - Employee

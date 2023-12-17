@@ -147,7 +147,7 @@ class MainCategoryController extends Controller {
     public function sort() {
 
         // 1: get sorted items
-        $mainCategories = MainCategory::orderBy('index','asc')->get();
+        $mainCategories = MainCategory::orderBy('index','desc')->get();
 
         return response()->json($mainCategories, 200);
 

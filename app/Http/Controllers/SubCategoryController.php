@@ -118,7 +118,7 @@ class SubCategoryController extends Controller {
 
         // 1: get sorted items
         $subCategories = SubCategory::where('mainCategoryId', $mainCategoryId)
-        ->orderBy('index','asc')->get();
+        ->orderBy('index','desc')->get();
 
         return response()->json($subCategories, 200);
 

@@ -279,7 +279,41 @@ class ProductController extends Controller {
         $product = Product::find($id);
         
         $product->isMainPage = !boolval($product->isMainPage);
+
+
+        // reindex items / reset to null
+        if ($product->isMainPage == true) {
+
+
+            // 1.3: loop thru to sort all again
+            $indexCounter = 1;
+            $sortProducts = Product::where('isMainPage', true)
+            ->orderBy('indexMainPage','desc')->get();
+
+            foreach ($sortProducts as $item) {
+
+                $item->indexMainPage = $indexCounter;
+                $item->save();
+
+                $indexCounter++;
+
+            } // end loop
+
+
+            // 1.2: sort recent one
+            $product->indexMainPage = Product::where('isMainPage', true)->count() + 1;
+
+        } else {
+
+            $product->indexMainPage = null;
+            
+        } // end if
+
+
+
+        // update in database
         $product->save();
+
 
 
         return response()->json(['status' => true, 'message' => 'Status has been updated!'], 200);
@@ -315,6 +349,21 @@ class ProductController extends Controller {
 
 
 
+    // ----------------------------------------------------------
+
+
+
+    public function mainPageSort() {
+
+        // 1: get sorted items
+        $product = Product::where('isMainPage', true)->orderBy('indexMainPage','desc')->get();
+
+        return response()->json($product, 200);
+
+    } // end function
+
+
+
 
 
 
@@ -324,11 +373,44 @@ class ProductController extends Controller {
 
 
 
+    public function updateMainPageSort(Request $request) {
+
+        // 1: get sortedItems => Ids
+        $sortedItems = $request->sortedItems;
+        $indexCounter = 1;
+
+        // 1.2: loop thru
+        foreach ($sortedItems as $item) {
+
+            $product = Product::find($item);
+            $product->indexMainPage = $indexCounter;
+            $product->save();
+
+            $indexCounter++;
+        } // end loop
+
+
+        return response()->json(['message' => 'Items has been sorted!'], 200);
+
+        
+    } // end function
+
+
+
+
+
+
+    
+
+    // ----------------------------------------------------------
+
+
+
     public function typeSort($typeId) {
 
         // 1: get sorted items
         $product = Product::where('typeId', $typeId)
-        ->orderBy('index','asc')->get();
+        ->orderBy('index','desc')->get();
 
         return response()->json($product, 200);
 

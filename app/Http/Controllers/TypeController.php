@@ -131,7 +131,7 @@ class TypeController extends Controller {
     public function sort($mainCategoryId, $subCategoryId) {
 
         // 1: get sorted items
-        $types = Type::where('subCategoryId', $subCategoryId)->orderBy('index','asc')->get();
+        $types = Type::where('subCategoryId', $subCategoryId)->orderBy('index','desc')->get();
 
         return response()->json($types, 200);
 
