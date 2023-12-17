@@ -186,6 +186,30 @@ class ProductController extends Controller {
 
 
 
+    // ----------------------------------------------------------
+
+
+
+    public function updateShorthand(Request $request) {
+
+
+        // 1: create item
+
+        $product = Product::find($request[0]['id']);
+
+        $product->sellPrice = !empty($request[0]['sellPrice']) ? $request[0]['sellPrice'] : 1;
+        $product->offerPrice = !empty($request[0]['offerPrice']) ? $request[0]['offerPrice'] : null;
+        $product->quantity =  !empty($request[0]['quantity']) ? $request[0]['quantity'] : 0;
+
+        $product->save();
+
+        return response()->json(['status' => true, 'message' => 'Product has been updated!'], 200);
+
+
+    } //end function
+    
+
+
 
     // ----------------------------------------------------------
 
