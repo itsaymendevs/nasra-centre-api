@@ -49,7 +49,7 @@ class SubCategoryController extends Controller {
         $subCategory->serial = $this->createSerial('SC', SubCategory::count());
         $subCategory->name = $request->name;
         $subCategory->nameAr = $request->nameAr;
-        $subCategory->index = SubCategory::count() + 1;
+        $subCategory->index = SubCategory::where('mainCategoryId', $request->mainCategoryId)->count() + 1;
 
         $subCategory->mainCategoryId = $request->mainCategoryId;
 

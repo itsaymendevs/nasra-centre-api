@@ -14,13 +14,15 @@ class DatabaseSeeder extends Seeder
     {
 
         // 1: class seeders
-        $this->call(HelpSeeder::class);
-        $this->call(GeneralBlockSeeder::class);
-        $this->call(CountrySeeder::class);
-        $this->call(ContactSeeder::class);
-        $this->call(EmployeeSeeder::class);
-        $this->call(MessageSeeder::class);
-        $this->call(GlobalMessageSeeder::class);
+        // $this->call(HelpSeeder::class);
+        // $this->call(GeneralBlockSeeder::class);
+        // $this->call(CountrySeeder::class);
+        // $this->call(StateSeeder::class);
+        // $this->call(ContactSeeder::class);
+        // $this->call(EmployeeSeeder::class);
+        // $this->call(MessageSeeder::class);
+        // $this->call(GlobalMessageSeeder::class);
+
         
     }
 }

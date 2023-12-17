@@ -401,7 +401,7 @@ Route::group(['middleware' => 'cors'], function () {
         // 9.1: pickup conditions
 
         Route::post("/pickup/conditions/store", [PickupController::class, 'storeCondition'])->name('pickup.storeCondition');
-        Route::patch("/pickup/conditions/update", [PickupController::class, 'updateCondition'])->name('pickup.updateCondition');
+        Route::post("/pickup/conditions/update", [PickupController::class, 'updateCondition'])->name('pickup.updateCondition');
         Route::delete("/pickup/conditions/{id}/delete", [PickupController::class, 'deleteCondition'])->name('pickup.deleteCondition');
 
 
@@ -437,9 +437,10 @@ Route::group(['middleware' => 'cors'], function () {
 
         // 10.1: delivery conditions
 
-        Route::post("/delivery/conditions/store", [DeliveryController::class, 'storeCondition'])->name('delivery.storeCondition');
-        Route::patch("/delivery/conditions/update", [DeliveryController::class, 'updateCondition'])->name('delivery.updateCondition');
-        Route::delete("/delivery/conditions/{id}/delete", [DeliveryController::class, 'deleteCondition'])->name('delivery.deleteCondition');
+        Route::post("/delivery/conditions/store", [DeliveryController::class, 'storeCondition']);
+        
+        Route::post("/delivery/conditions/update", [DeliveryController::class, 'updateCondition']);
+        Route::delete("/delivery/conditions/{id}/delete", [DeliveryController::class, 'deleteCondition']);
 
 
 
@@ -495,7 +496,7 @@ Route::group(['middleware' => 'cors'], function () {
         // toggle show / home
         Route::patch("/products/{id}/toggle-home", [ProductController::class, 'toggleHome']);
 
-        Route::patch("/products/{id}/toggle-show", [ProductController::class, 'toggleShow']);
+        Route::patch("/products/{id}/toggle-hidden", [ProductController::class, 'toggleHidden']);
 
 
 

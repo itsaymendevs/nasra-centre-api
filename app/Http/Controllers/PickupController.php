@@ -7,6 +7,7 @@ use App\Models\PickupCondition;
 use App\Models\PickupStore;
 use Illuminate\Http\Request;
 use App\Traits\AppTrait;
+use stdClass;
 
 
 class PickupController extends Controller {
@@ -20,8 +21,13 @@ class PickupController extends Controller {
 
         // ::get items
         $pickups = PickupStore::all();
-        
-        return response()->json($pickups, 200);
+        $stopPickup = GeneralBlock::all()->first()->stopPickup;
+
+        $combine = new stdClass();
+        $combine->stopPickup = $stopPickup;
+        $combine->pickups = $pickups;
+
+        return response()->json($combine, 200);
 
     } // end function
 
@@ -35,13 +41,13 @@ class PickupController extends Controller {
 
 
 
-    public function toggleReceiving() {
+    public function toggleReceiving(Request $request) {
 
 
         // 1: toggle Receiving pickups
         $generalBlock = GeneralBlock::all()->first();
         
-        $generalBlock->stopPickup = !boolval($generalBlock->stopPickup);
+        $generalBlock->stopPickup = boolval($request->stopPickup);
         $generalBlock->save();
 
 
@@ -61,25 +67,13 @@ class PickupController extends Controller {
 
     public function store(Request $request) {
 
-        // :: validator
-        $validator = $this->validationTrait($request, 
-        ['name' => 'required', 'nameAr' => 'required', 'desc' => 'required', 'descAr' => 'required', 'latitude' => 'required', 'longitude' => 'required']);
-
-        // ! if validation not passed
-        if ($validator != false) {
-            return response()->json($validator->original);
-        } // end if
-
-        // ------------------------------------
-        // ------------------------------------
-
 
         // 1: create item
         $pickup = new PickupStore();
 
         $pickup->serial = $this->createSerial('PS', PickupStore::count());
-        $pickup->name = $request->name;
-        $pickup->nameAr = $request->nameAr;
+        $pickup->title = $request->title;
+        $pickup->titleAr = $request->titleAr;
         
         $pickup->desc = $request->desc;
         $pickup->descAr = $request->descAr;
@@ -89,10 +83,8 @@ class PickupController extends Controller {
         $pickup->latitude = $request->latitude;
         $pickup->longitude = $request->longitude;
 
-        $pickup->isMainStore = $request->isMainStore ? true : false;
-        $pickup->isActive = $request->isActive ? false : true;
-
-
+        $pickup->isMainStore = $request->isMainStore;
+        $pickup->isActive = !boolval($request->isActive);
 
         // 1.2: upload image if exits
         if ($request->hasFile('image')) {
@@ -141,7 +133,7 @@ class PickupController extends Controller {
 
         // :: validator
         $validator = $this->validationTrait($request, 
-        ['name' => 'required', 'nameAr' => 'required', 'desc' => 'required', 'descAr' => 'required', 'latitude' => 'required', 'longitude' => 'required']);
+        ['title' => 'required', 'titleAr' => 'required', 'desc' => 'required', 'descAr' => 'required', 'latitude' => 'required', 'longitude' => 'required']);
 
         // ! if validation not passed
         if ($validator != false) {
@@ -155,8 +147,8 @@ class PickupController extends Controller {
         // 1: update item
         $pickup = PickupStore::find($id);
 
-        $pickup->name = $request->name;
-        $pickup->nameAr = $request->nameAr;
+        $pickup->title = $request->title;
+        $pickup->titleAr = $request->titleAr;
         
         $pickup->desc = $request->desc;
         $pickup->descAr = $request->descAr;
@@ -166,8 +158,8 @@ class PickupController extends Controller {
         $pickup->latitude = $request->latitude;
         $pickup->longitude = $request->longitude;
 
-        $pickup->isMainStore = $request->isMainStore ? true : false;
-        $pickup->isActive = $request->isActive ? false : true;
+        $pickup->isMainStore = $request->isMainStore;
+        $pickup->isActive = !boolval($request->isActive);
 
 
 
@@ -205,7 +197,7 @@ class PickupController extends Controller {
         // 1: get pickup
         $pickup = PickupStore::find($id);
         
-        $pickup->isActive = !boolval($request->isActive);
+        $pickup->isActive = !boolval($pickup->isActive);
         $pickup->save();
 
 

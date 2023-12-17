@@ -32,6 +32,7 @@ return new class extends Migration
             $table->text('descAr')->nullable();
 
             // ::unitId (null when byName is selected)
+            $table->string('weightOption', 100)->nullable();
             $table->double('weight', 10,2)->nullable();
             $table->bigInteger('unitId')->unsigned()->nullable();
             $table->foreign('unitId')->references('id')->on('units')->onDelete('set null');

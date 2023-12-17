@@ -4,9 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\DeliveryArea;
 use App\Models\DeliveryCondition;
+use App\Models\DeliveryTime;
+use App\Models\District;
 use App\Models\GeneralBlock;
+use App\Models\State;
 use Illuminate\Http\Request;
 use App\Traits\AppTrait;
+use stdClass;
 
 class DeliveryController extends Controller {
 
@@ -18,10 +22,22 @@ class DeliveryController extends Controller {
 
     public function index() {
 
+
         // ::get items
         $areas = DeliveryArea::all();
-        
-        return response()->json($areas, 200);
+        $stopDelivery = GeneralBlock::all()->first()->stopDelivery;
+        $states = State::all();
+        $districts = District::all();
+        $deliveryTimes = DeliveryTime::all();
+
+        $combine = new stdClass();
+        $combine->stopDelivery = $stopDelivery;
+        $combine->areas = $areas;
+        $combine->states = $states;
+        $combine->districts = $districts;
+        $combine->deliveryTimes = $deliveryTimes;
+
+        return response()->json($combine, 200);
 
     } // end function
 
@@ -35,13 +51,13 @@ class DeliveryController extends Controller {
 
 
 
-    public function toggleDelivery() {
+    public function toggleDelivery(Request $request) {
 
 
         // 1: toggle Receiving pickups
         $generalBlock = GeneralBlock::all()->first();
         
-        $generalBlock->stopDelivery = !boolval($generalBlock->stopDelivery);
+        $generalBlock->stopDelivery = boolval($request->stopDelivery);
         $generalBlock->save();
 
 
@@ -61,18 +77,6 @@ class DeliveryController extends Controller {
 
     public function store(Request $request) {
 
-        // :: validator
-        $validator = $this->validationTrait($request, 
-        ['name' => 'required', 'nameAr' => 'required', 'price' => 'required', 'stateId' => 'required', 'districtId' => 'required']);
-        
-        // ! if validation not passed
-        if ($validator != false) {
-            return response()->json($validator->original);
-        } // end if
-
-        // ------------------------------------
-        // ------------------------------------
-
 
         // 1: create item
         $area = new DeliveryArea();
@@ -86,7 +90,7 @@ class DeliveryController extends Controller {
         $area->districtId = $request->districtId;
         $area->deliveryTimeId = $request->deliveryTimeId;
 
-        $area->isActive = $request->isActive ? false : true;
+        $area->isActive = !boolval($request->isActive);
 
         $area->save();
 
@@ -111,8 +115,18 @@ class DeliveryController extends Controller {
 
         // 1: get pickup
         $area = DeliveryArea::find($id);
+        $states = State::all();
+        $districts = District::all();
+        $deliveryTimes = DeliveryTime::all();
 
-        return response()->json($area, 200);
+        $combine = new stdClass();
+        $combine->area = $area;
+        $combine->states = $states;
+        $combine->districts = $districts;
+        $combine->deliveryTimes = $deliveryTimes;
+
+
+        return response()->json($combine, 200);
 
     } // end function
 
@@ -123,19 +137,6 @@ class DeliveryController extends Controller {
 
 
     public function update(Request $request, $id) {
-
-        // :: validator
-        $validator = $this->validationTrait($request, 
-        ['name' => 'required', 'nameAr' => 'required', 'price' => 'required', 'stateId' => 'required', 'districtId' => 'required']);
-        
-        // ! if validation not passed
-        if ($validator != false) {
-            return response()->json($validator->original);
-        } // end if
-
-        // ------------------------------------
-        // ------------------------------------
-
 
         // 1: create item
         $area = DeliveryArea::find($id);
@@ -148,7 +149,7 @@ class DeliveryController extends Controller {
         $area->districtId = $request->districtId;
         $area->deliveryTimeId = $request->deliveryTimeId;
 
-        $area->isActive = $request->isActive ? false : true;
+        $area->isActive = !boolval($request->isActive);
 
         $area->save();
 
@@ -174,7 +175,7 @@ class DeliveryController extends Controller {
         // 1: get area
         $area = DeliveryArea::find($id);
         
-        $area->isActive = !boolval($request->isActive);
+        $area->isActive = !boolval($area->isActive);
         $area->save();
 
 
@@ -280,18 +281,6 @@ class DeliveryController extends Controller {
 
     public function updateCondition(Request $request) {
 
-        // :: validator
-        $validator = $this->validationTrait($request, 
-        ['title' => 'required', 'titleAr' => 'required', 'content' => 'required', 'contentAr' => 'required']);
-
-        // ! if validation not passed
-        if ($validator != false) {
-            return response()->json($validator->original);
-        } // end if
-
-        // ------------------------------------
-        // ------------------------------------
-
 
         // 1: create item
         $condition = DeliveryCondition::find($request->id);
@@ -304,6 +293,7 @@ class DeliveryController extends Controller {
 
         $condition->save();
 
+        
         return response()->json(['status' => true, 'message' => 'Condition has been updated!'], 200);
 
     } // end function

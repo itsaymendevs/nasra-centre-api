@@ -47,8 +47,7 @@ class TypeController extends Controller {
         $type->serial = $this->createSerial('IT', Type::count());
         $type->name = $request->name;
         $type->nameAr = $request->nameAr;
-        $type->index = Type::count() + 1;
-        
+        $type->index = Type::where('subCategoryId', $request->subCategoryId)->count() + 1;
         $type->mainCategoryId = $request->mainCategoryId;
         $type->subCategoryId = $request->subCategoryId;
         
