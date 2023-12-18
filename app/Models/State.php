@@ -5,7 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class State extends Model
-{
+class State extends Model {
     use HasFactory;
-}
+
+
+    public function areas() {
+        return $this->hasMany(DeliveryArea::class, 'stateId');
+    }
+
+
+
+} // end modal

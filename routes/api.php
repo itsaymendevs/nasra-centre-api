@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\LaunchController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DeliveryController;
@@ -511,6 +512,34 @@ Route::group(['middleware' => 'cors'], function () {
 
 
     }); // end sanctum middleware - Employee
+
+
+
+
+
+
+
+
+
+
+
+
+    // ----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
+
+
+
+
+
+
+    // 1: Launch - First Action
+    Route::post("/app/launch", [LaunchController::class, 'launch']);
+
+
 
 }); // end cors middleware
 
