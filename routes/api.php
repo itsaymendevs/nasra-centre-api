@@ -1,6 +1,11 @@
 <?php
 
+use App\Http\Controllers\Api\InfoController;
 use App\Http\Controllers\Api\LaunchController;
+use App\Http\Controllers\Api\ProductController as ProductControllerApp;
+use App\Http\Controllers\Api\UserController as UserControllerApp;
+
+
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DeliveryController;
@@ -536,8 +541,81 @@ Route::group(['middleware' => 'cors'], function () {
 
 
 
-    // 1: Launch - First Action
+    // 1: Launch
     Route::post("/app/launch", [LaunchController::class, 'launch']);
+
+
+    // 1.2: Launch - subcategory products
+    Route::post("/app/launch/subCategoryProducts", [LaunchController::class, 'subCategoryProducts']);
+
+    // 1.3: Launch - offer products
+    Route::post("/app/launch/offerProducts", [LaunchController::class, 'offerProducts']);
+
+
+
+
+    // ========================================================
+    // ========================================================
+
+
+
+
+    // 2: Launch - help
+    Route::post("/app/launch/helpInfo", [InfoController::class, 'helpInfo']);
+
+
+    // 2.2: Launch - pdp
+    Route::post("/app/launch/pdp", [InfoController::class, 'pickupDeliveryInfo']);
+
+
+
+
+
+
+    // ========================================================
+    // ========================================================
+
+
+
+
+    // 3: Search Products
+    Route::post("/app/launch/searchProducts", [ProductControllerApp::class, 'searchProducts']);
+
+
+
+
+
+    // ========================================================
+    // ========================================================
+
+
+
+    // 3.5: Auth - Search Products
+    Route::post("/app/launch/searchProductsAuth", [ProductControllerApp::class, 'searchProductsAuth']);
+
+
+
+
+
+
+
+
+
+
+    // ========================================================
+    // ========================================================
+    
+
+    // 4: login
+    Route::post("/app/user/login", [UserControllerApp::class, 'login']);
+
+
+
+    // 4.1: register
+    Route::post("/app/user/register", [UserControllerApp::class, 'register']);
+    Route::post("/app/user/register/confirm", [UserControllerApp::class, 'confirmRegister']);
+    Route::post("/app/user/logout", [UserControllerApp::class, 'logout']);
+
 
 
 

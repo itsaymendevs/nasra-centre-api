@@ -121,7 +121,7 @@ class LaunchController extends Controller {
             $content->name = $mainCategory->name;
             $content->nameAr = $mainCategory->nameAr;
             $content->image = $mainCategory->image;
-            $content->subcategories = array();
+            $content->subCategories = array();
 
 
 
@@ -129,13 +129,13 @@ class LaunchController extends Controller {
             $counterOne = 0;
             foreach ($mainCategory->subCategories->sortBy('index') as $subCategory) {
 
-                $content->subcategories[$counterOne] = new stdClass();
+                $content->subCategories[$counterOne] = new stdClass();
 
-                $content->subcategories[$counterOne]->id = $subCategory->id;
-                $content->subcategories[$counterOne]->name = $subCategory->name;
-                $content->subcategories[$counterOne]->nameAr = $subCategory->nameAr;
+                $content->subCategories[$counterOne]->id = $subCategory->id;
+                $content->subCategories[$counterOne]->name = $subCategory->name;
+                $content->subCategories[$counterOne]->nameAr = $subCategory->nameAr;
 
-                $content->subcategories[$counterOne]->types = array();
+                $content->subCategories[$counterOne]->types = array();
                 
 
 
@@ -144,11 +144,11 @@ class LaunchController extends Controller {
                 $counterTwo = 0;
                 foreach ($subCategory->types->sortBy('index') as $type) {
 
-                    $content->subcategories[$counterOne]->types[$counterTwo] = new stdClass();
+                    $content->subCategories[$counterOne]->types[$counterTwo] = new stdClass();
 
-                    $content->subcategories[$counterOne]->types[$counterTwo]->id = $type->id;
-                    $content->subcategories[$counterOne]->types[$counterTwo]->name = $type->name;
-                    $content->subcategories[$counterOne]->types[$counterTwo]->nameAr = $type->nameAr;
+                    $content->subCategories[$counterOne]->types[$counterTwo]->id = $type->id;
+                    $content->subCategories[$counterOne]->types[$counterTwo]->name = $type->name;
+                    $content->subCategories[$counterOne]->types[$counterTwo]->nameAr = $type->nameAr;
 
                     // ::inc counterTwo
                     $counterTwo++;
@@ -354,6 +354,7 @@ class LaunchController extends Controller {
         foreach ($companies as $company) {
 
             $content = new stdClass();
+            $content->id = $company->id;
             $content->name = $company->name;
             $content->nameAr = $company->nameAr;
 
@@ -372,6 +373,7 @@ class LaunchController extends Controller {
         foreach ($units as $unit) {
 
             $content = new stdClass();
+            $content->id = $unit->id;
             $content->shortName = $unit->abbr;
             $content->shortNameAr = $unit->abbrAr;
 
@@ -645,6 +647,198 @@ class LaunchController extends Controller {
     } // end function
 
 
+
+
+
+
+
+
+
+
+    // -----------------------------------------------------------------
+    // -----------------------------------------------------------------
+    // -----------------------------------------------------------------
+    // -----------------------------------------------------------------
+    // -----------------------------------------------------------------
+
+
+
+
+
+
+
+
+    public function subCategoryProducts(Request $request) {
+
+        // 1: get data
+
+        // 1.1: home Products (with offers)
+        $products = Product::where('subCategoryId', $request->subCategoryId)
+        ->where('isMainPage', false)
+        ->where('isHidden', false)
+        ->whereNull('offerPrice')
+        ->orderBy('index')
+        ->get();
+
+
+
+        // 1.1: optional with offers
+        if (boolval($request->withOffers) === true) {
+
+            $products = Product::where('subCategoryId', $request->subCategoryId)
+            ->where('isMainPage', false)
+            ->where('isHidden', false)
+            ->orderBy('index')
+            ->get();
+
+        } // end if
+        
+
+        $contentArray = array();
+        foreach ($products as $product) {
+
+            $content = new stdClass();
+            $content->id = $product->id;
+            $content->categoryId = $product->mainCategoryId;
+            $content->subCategoryId = $product->subCategoryId;
+            $content->typeId = $product->typeId;
+            $content->companyId = $product->companyId;
+
+
+            $content->name = $product->name;
+            $content->nameAr = $product->nameAr;
+
+            $content->mainPic = $product->image;
+            $content->additionalPics = null;
+
+            
+            
+            
+            // ::determine productType (byName - fixedSize - dynamicSize)
+            if ($product->weightOption == 'byName')
+                $content->productType = 'NAMEFULL';
+
+            else if ($product->weightOption == 'fixedSize')
+                $content->productType = 'FIXED';
+
+            else
+                $content->productType = 'DYNAMIC';
+
+
+            $content->measuringUnitId = $product->unitId;
+            $content->minQuantityToOrder = $product->weight;
+
+            $content->quantityAvailable = $product->quantity;
+            $content->maxQuantityToOrder = $product->maxQuantityPerOrder;
+            $content->originalPrice = $product->sellPrice;
+            $content->offerPrice = $product->offerPrice;
+
+            $content->desc = $product->desc;
+            $content->descAr = $product->descAr;
+
+
+            array_push($contentArray, $content);
+
+        } // end loop
+
+
+        // ::prepare response
+        $response = new stdClass();
+        $response->subCategoryProducts = $contentArray;
+
+
+        return response()->json($response, 200);
+
+    } // end function
+
+
+
+
+
+
+
+
+    // -----------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+    public function offerProducts(Request $request) {
+
+        // 1: get data
+
+        // TODO: indexOffers
+        // 1.1: offer products
+        $products = Product::where('offerPrice', '>=', 0)
+        ->where('isHidden', false)
+        ->orderBy('index')
+        ->get();
+
+
+
+
+        $contentArray = array();
+        foreach ($products as $product) {
+
+            $content = new stdClass();
+            $content->id = $product->id;
+            $content->categoryId = $product->mainCategoryId;
+            $content->subCategoryId = $product->subCategoryId;
+            $content->typeId = $product->typeId;
+            $content->companyId = $product->companyId;
+
+
+            $content->name = $product->name;
+            $content->nameAr = $product->nameAr;
+
+            $content->mainPic = $product->image;
+            $content->additionalPics = null;
+
+            
+            
+            
+            // ::determine productType (byName - fixedSize - dynamicSize)
+            if ($product->weightOption == 'byName')
+                $content->productType = 'NAMEFULL';
+
+            else if ($product->weightOption == 'fixedSize')
+                $content->productType = 'FIXED';
+
+            else
+                $content->productType = 'DYNAMIC';
+
+
+            $content->measuringUnitId = $product->unitId;
+            $content->minQuantityToOrder = $product->weight;
+
+            $content->quantityAvailable = $product->quantity;
+            $content->maxQuantityToOrder = $product->maxQuantityPerOrder;
+            $content->originalPrice = $product->sellPrice;
+            $content->offerPrice = $product->offerPrice;
+
+            $content->desc = $product->desc;
+            $content->descAr = $product->descAr;
+
+
+            array_push($contentArray, $content);
+
+        } // end loop
+
+
+        // ::prepare response
+        $response = new stdClass();
+        $response->offersAndDiscountsProducts = $contentArray;
+
+
+        return response()->json($response, 200);
+
+    } // end function
 
 
 
