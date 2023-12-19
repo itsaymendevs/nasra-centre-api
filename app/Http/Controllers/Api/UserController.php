@@ -371,7 +371,7 @@ class UserController extends Controller {
         // ::root - convert array to objects
         $request = (object) $request->all();
         $request->newUserData = (object) $request->newUserData;
-        $request->isArSMS == "true" ? $lang = "arabic" : $lang = "english";
+        $request->isArSMS === true ? $lang = "arabic" : $lang = "english";
 
 
 
@@ -522,7 +522,7 @@ class UserController extends Controller {
  
         // ::root - convert array to objects
         $request = (object) $request->all();
-        $request->isArSMS == "true" ? $lang = "arabic" : $lang = "english";
+        $request->isArSMS === true ? $lang = "arabic" : $lang = "english";
 
 
 
@@ -955,11 +955,11 @@ class UserController extends Controller {
             $errorKeys->errors[$counter] = 3; $counter++;
 
 
-        } elseif ($isDuplicated == 1) {
+        } elseif ($isDuplicated >= 1) {
 
             $errorKeys->errors[$counter] = 4; $counter++;
 
-        } elseif ($isDuplicatedTemp == 1) {
+        } elseif ($isDuplicatedTemp >= 1) {
 
             $errorKeys->errors[$counter] = 14; $counter++;
 

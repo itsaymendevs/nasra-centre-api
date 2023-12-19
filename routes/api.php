@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\InfoController;
 use App\Http\Controllers\Api\LaunchController;
 use App\Http\Controllers\Api\ProductController as ProductControllerApp;
 use App\Http\Controllers\Api\UserController as UserControllerApp;
+use App\Http\Controllers\Api\UserEditController;
 
 
 use App\Http\Controllers\CompanyController;
@@ -613,6 +614,24 @@ Route::group(['middleware' => 'cors'], function () {
     Route::post("/app/user/register/confirm", [UserControllerApp::class, 'confirmRegister']);
     Route::post("/app/user/register/resend", [UserControllerApp::class, 'registerResend']);
 
+
+
+
+    // 4.2: reset-password
+    Route::post("/app/user/resetPassword/getOTP", [UserEditController::class, 'resetPasswordOTP']);
+    Route::post("/app/user/resetPassword/resendOTP", [UserEditController::class, 'resendResetPasswordOTP']);
+    Route::post("/app/user/resetPassword/confirmOTP",  [UserEditController::class, 'confirmResetPasswordOTP']);
+    Route::post("/app/user/resetPassword", [UserEditController::class, 'resetPassword']);
+
+
+
+
+
+
+    // 4.1 reset-phone (auth)
+    Route::post("/app/user/changeNumber/getOTP", [UserEditController::class, 'changeNumberOTP']);
+    Route::post("/app/user/changeNumber/resendOTP", [UserEditController::class, 'resendChangeNumberOTP']);
+    Route::post("/app/user/changeNumber/confirmOTP", [UserEditController::class, 'confirmChangeNumberOTP']);
 
 
 
