@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('name', 255);
             $table->string('nameAr', 255);
 
+            $table->string('code', 100)->nullable();
             $table->string('currency', 255);
             $table->string('toSDG', 255);
 

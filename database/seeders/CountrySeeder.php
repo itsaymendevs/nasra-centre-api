@@ -15,18 +15,21 @@ class CountrySeeder extends Seeder
             ["serial" => "CN-001",
             "name" => "Sudan",
             "nameAr" => "السودان",
+            "code" => "SD",
             "currency" => "SDN",
             "toSDG" => "1"],
 
             ["serial" => "CN-002",
             "name" => "United Kingdom",
             "nameAr" => "بريطانيا",
+            "code" => "UK",
             "currency" => "GBP",
             "toSDG" => "1"],
 
             ["serial" => "CN-003",
             "name" => "Ireland",
             "nameAr" => "إيرلندا",
+            "code" => "IRL",
             "currency" => "EUR",
             "toSDG" => "1"]
         ];

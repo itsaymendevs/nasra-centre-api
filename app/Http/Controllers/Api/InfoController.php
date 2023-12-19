@@ -8,6 +8,7 @@ use App\Models\AboutInfo;
 use App\Models\AddressInfo;
 use App\Models\Contact;
 use App\Models\ContactPhone;
+use App\Models\Country;
 use App\Models\DeliveryCondition;
 use App\Models\GeneralBlock;
 use App\Models\MediaInfo;
@@ -39,8 +40,8 @@ class InfoController extends Controller {
         // 1.1: contact
         $contact = Contact::where('countryId', 1)->first(); // SDN
 
-        $response->helpAndContactInfo->contactInfo->email = $contact->email;
-        $response->helpAndContactInfo->contactInfo->whatsapp = $contact->whatsapp;
+        $response->helpAndContactInfo->contactInfo->emailAddress = $contact->email;
+        $response->helpAndContactInfo->contactInfo->whatsappNum = intval($contact->whatsapp);
         $response->helpAndContactInfo->contactInfo->whatsappURL = $contact->whatsappURL;
 
 
@@ -51,7 +52,7 @@ class InfoController extends Controller {
         $contentArray = array();
         foreach ($phones as $phone) {
 
-            array_push($contentArray, $phone->phone);
+            array_push($contentArray, intval($phone->phone));
 
         } // end loop
 
@@ -121,16 +122,25 @@ class InfoController extends Controller {
         
 
 
-        // 2.3: address
-        $address = AddressInfo::all()->first();
+        // 2.3: interAddress
+        $interAddress = AddressInfo::all()->first();
 
-        $response->helpAndContactInfo->helpInfo->addressInfo = new stdClass();
+        if (boolval($interAddress->isHidden) === true) {
 
-        $response->helpAndContactInfo->helpInfo->addressInfo->address = $address->address;
-        $response->helpAndContactInfo->helpInfo->addressInfo->latitude = $address->latitude;
-        $response->helpAndContactInfo->helpInfo->addressInfo->longitude = $address->longitude;
-        $response->helpAndContactInfo->helpInfo->addressInfo->image = $address->image;
-        $response->helpAndContactInfo->helpInfo->addressInfo->isHidden = boolval($address->isHidden);
+            $response->helpAndContactInfo->helpInfo->interAddress = null;
+
+        } else {
+
+            $response->helpAndContactInfo->helpInfo->interAddress = new stdClass();
+            $response->helpAndContactInfo->helpInfo->interAddress->address = $interAddress->address;
+            $response->helpAndContactInfo->helpInfo->interAddress->addressImage = $interAddress->image;
+            $response->helpAndContactInfo->helpInfo->interAddress->latitude = $interAddress->latitude;
+            $response->helpAndContactInfo->helpInfo->interAddress->longitude = $interAddress->longitude;
+
+
+        } // end if
+
+        
 
 
 
@@ -358,7 +368,23 @@ class InfoController extends Controller {
         $response->PickupAndDeliveryAndPaymentInfo->isOrderingBlocked = boolval($stopOrders);
 
 
+
+
+
+        // 1.4: isSDNOrderingBlocked / isUKOrderingBlocked / isIRLOrderingBlocked
+        $country = Country::find(1);
+        $response->isSDNOrderingBlocked = !boolval($country->isOrderingActive);
+
+        $country = Country::find(2);
+        $response->isUKOrderingBlocked = !boolval($country->isOrderingActive);
+
+        $country = Country::find(3);
+        $response->isIRLOrderingBlocked = !boolval($country->isOrderingActive);
+
+
+
         
+
 
         return response()->json($response, 200);
         

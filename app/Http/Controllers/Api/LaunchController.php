@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
+use App\Models\Country;
 use App\Models\DeliveryArea;
 use App\Models\GeneralBlock;
 use App\Models\MainCategory;
@@ -497,8 +498,114 @@ class LaunchController extends Controller {
     public function fifthAction($response) {
 
         // 1: get data
+        $countries = Country::where('id', '>', 1)->get();
+        
 
-        // 1.1: states / regions (areas)
+
+        $contentArray = array();
+
+        // 1.2: loop foreign countries
+        foreach ($countries as $country) {
+
+            $content = new stdClass();
+
+            $content->lettersCode = $country->code;
+            $content->toSDG = doubleval($country->toSDG);
+            $content->isActive = boolval($country->isServiceActive);
+            $content->isCountryOrderingBlocked = !boolval($country->isOrderingActive);
+
+
+            // 1.3: terms / contacts / email / whatsapp
+            $content->contactInfo = new stdClass();
+
+
+            // 1.3.1: terms
+            $content->contactInfo->termsAndConditions = array();
+
+            foreach ($country->terms as $term) {
+
+                $contentTwo = new stdClass();
+
+                $contentTwo->title = $term->title;
+                $contentTwo->titleAr = $term->titleAr;
+                $contentTwo->content = $term->content;
+                $contentTwo->contentAr = $term->contentAr;
+
+                array_push($content->contactInfo->termsAndConditions, $contentTwo);
+
+            } // end loop
+
+
+
+
+            // 1.3.2: email / whatsapp
+            $content->contactInfo->whatsapp = new stdClass();
+            $content->contactInfo->whatsapp->whatsappNum = intval($country->contact->whatsapp);
+            $content->contactInfo->whatsapp->whatsappURL = $country->contact->whatsappURL;
+
+            $content->contactInfo->emailAddress = $country->contact->email;
+
+            
+
+
+
+            // 1.3.3: contactNumbers
+            $content->contactInfo->contactNumbers = array();
+
+            foreach ($country->contactPhones as $contactPhone) {
+
+                array_push($content->contactInfo->contactNumbers, intval($contactPhone->phone));
+
+            } // end loop
+
+
+
+
+
+            // ::push into array
+            array_push($contentArray, $content);
+
+
+        } // end loop
+
+
+
+        // ::prepare response
+        $response->foreignCountries = $contentArray;
+
+
+
+
+
+
+        // -----------------------------------------------------------------
+        // -----------------------------------------------------------------
+        // -----------------------------------------------------------------
+
+
+
+
+
+
+
+        // 2: isSDNOrderingBlocked
+        $country = Country::find(1);
+
+        $response->isSDNOrderingBlocked = !boolval($country->isOrderingActive);
+
+        
+
+
+
+        // -----------------------------------------------------------------
+        // -----------------------------------------------------------------
+        // -----------------------------------------------------------------
+
+
+
+
+
+        // 3.1: states / regions (areas)
         $states = State::all();
         
 
@@ -514,7 +621,7 @@ class LaunchController extends Controller {
 
 
 
-            // 1.2: insert regions (deliveryAreas)
+            // 3.2: insert regions (deliveryAreas)
             $counterOne = 0;
             foreach ($state->areas as $area) {
 
@@ -532,7 +639,7 @@ class LaunchController extends Controller {
 
 
 
-            // 1.3: push mainCategory into categories array
+            // 3.3: push mainCategory into categories array
             array_push($contentArray, $content);
 
         } // end loop
@@ -588,6 +695,13 @@ class LaunchController extends Controller {
         $response->companies = $contentArray;
 
 
+
+
+
+        // -----------------------------------------------------------------
+        // -----------------------------------------------------------------
+        // -----------------------------------------------------------------
+        
 
 
 
