@@ -781,8 +781,18 @@ class UserController extends Controller {
             $content->userAddress->userRegionId = $user->deliveryAreaId;
             
             $content->userAddress->addressDescription = $user->address;
-            $content->userAddress->deliveryEstimatedTime = $user->deliveryArea->deliveryTime->content;
-            $content->userAddress->deliveryEstimatedTimeAr = $user->deliveryArea->deliveryTime->contentAr;
+
+            
+            // ::deliveryTime Object
+            $content->userAddress->deliveryEstimatedTime = new stdClass();
+
+            $content->userAddress->deliveryEstimatedTime->title = $user->deliveryArea->deliveryTime->title;
+            $content->userAddress->deliveryEstimatedTime->titleAr = $user->deliveryArea->deliveryTime->titleAr;
+            $content->userAddress->deliveryEstimatedTime->content = $user->deliveryArea->deliveryTime->content;
+            $content->userAddress->deliveryEstimatedTime->contentAr = $user->deliveryArea->deliveryTime->contentAr;
+
+
+
 
             $content->userAddress->regionDeliveryPrice = intval($user->deliveryArea->price);
             $content->userAddress->isDeliveryBlocked = !boolval($user->deliveryArea->isActive);
@@ -976,7 +986,7 @@ class UserController extends Controller {
 
 
         // 5: Password + regionId + stateId
-        if (empty($request->newUserData->password) || empty($request->newUserData->userAddress->regionId) || empty($request->newUserData->userAddress->stateId)) {
+        if (empty($request->newUserData->password) || empty($request->newUserData->userAddress->userRegionId) || empty($request->newUserData->userAddress->userStateId)) {
 
             $errorKeys->errors[$counter] = 17; $counter++;
 
@@ -984,7 +994,7 @@ class UserController extends Controller {
 
 
         // 6: address description invalid
-        if (empty($request->newUserData->userAddress->address)) {
+        if (empty($request->newUserData->userAddress->addressDescription)) {
 
             $errorKeys->errors[$counter] = 9; $counter++;
 

@@ -1397,6 +1397,260 @@ class UserEditController extends Controller {
 
 
 
+    public function changeEmail(Request $request) {
+
+
+        // ::root
+        $response = new stdClass();
+        $response->errors = array();
+        
+
+
+        // ::root - convert array to objects
+        $request = (object) $request->all();
+
+
+        // 1: get user / email
+        $user = User::find(auth()->user()->id);
+        $newEmail = $request->newEmailAddress;
+
+
+
+
+
+
+
+        // 1.2: user not-active
+        if (boolval($user->isActive) === false) {
+
+            $response->errors[0] = 15;
+            return response()->json($response);
+
+        } // end if
+
+
+
+
+        // 1.3: same-email
+        if ($user->email == $newEmail) {
+
+            $response->errors[0] = 5;
+            return response()->json($response);
+
+        } // end if
+
+
+
+        
+
+
+
+        // 2: update Email
+        $user->email = $newEmail;
+        $user->save();
+
+
+
+
+        // ::prepare response
+        $response = new stdClass();
+        $response->newEmailAddress = $newEmail;
+
+
+
+        return response()->json($response);
+
+    } // end of function
+
+
+
+
+
+
+
+    // -----------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+    public function changePassword(Request $request) {
+
+
+
+        // ::root
+        $response = new stdClass();
+        $response->errors = array();
+        
+
+
+        // ::root - convert array to objects
+        $request = (object) $request->all();
+
+
+        // 1: get user / email
+        $user = User::find(auth()->user()->id);
+        $oldPassword = $request->password;
+        $newPassword = $request->newPassword;
+
+
+
+
+        // 1.2: user not-active
+        if (boolval($user->isActive) === false) {
+
+            $response->errors[0] = 15;
+            return response()->json($response);
+
+        } // end if
+
+
+
+
+        // 1.3: isPasswordMatched
+        if (Hash::check($oldPassword, $user->password)) {
+
+            
+            // 1.3.1: update user-password
+            $user->password = Hash::make($newPassword);
+            $user->save();
+
+
+            // ::prepare response
+            $response = new stdClass();
+            $response->validPassword = true;
+
+            return response()->json($response);
+
+
+
+        // 1.4: Not Matched
+        }  else {
+
+
+            $response->errors[0] = 21;
+            return response()->json($response);
+
+        } // end if
+
+
+
+
+    } // end function
+
+
+
+
+
+
+
+
+    // -----------------------------------------------------------------
+
+
+
+
+
+
+
+    public function changeAddress(Request $request) {
+
+
+        // ::root
+        $response = new stdClass();
+        $response->errors = array();
+        
+
+
+        // ::root - convert array to objects
+        $request = (object) $request->all();
+
+
+        // 1: get user / regionId + stateId + address
+        $user = User::find(auth()->user()->id);
+
+        $stateId = $request->userStateId;
+        $regionId = $request->userRegionId;
+        $address = $request->addressDescription;
+
+
+
+        // 1.2: is address available
+        if (empty($address)) {
+
+            $response->errors[0] = 9;
+            return response()->json($response);
+
+        } // end if
+
+
+
+
+
+        // 1.3: update DB
+        $user->stateId = $stateId;
+        $user->deliveryAreaId = $regionId;
+        $user->address = $address;
+
+        $user->save();
+
+
+
+
+
+
+
+
+
+
+        // ::prepare userModal
+        $content = new stdClass();
+        $content->userAddress = new stdClass();
+
+        $content->userAddress->userStateId = $user->stateId;
+        $content->userAddress->userRegionId = $user->deliveryAreaId;
+        $content->userAddress->addressDescription = $user->address;
+
+
+        // ::deliveryTime Object
+        $content->userAddress->deliveryEstimatedTime = new stdClass();
+        $content->userAddress->deliveryEstimatedTime->title = $user->deliveryArea->deliveryTime->title;
+        $content->userAddress->deliveryEstimatedTime->titleAr = $user->deliveryArea->deliveryTime->titleAr;
+        $content->userAddress->deliveryEstimatedTime->content = $user->deliveryArea->deliveryTime->content;
+        $content->userAddress->deliveryEstimatedTime->contentAr = $user->deliveryArea->deliveryTime->contentAr;
+
+
+
+        $content->userAddress->regionDeliveryPrice = intval($user->deliveryArea->price);
+        $content->userAddress->isDeliveryBlocked = !boolval($user->deliveryArea->isActive);
+
+
+
+        return response()->json($content);
+
+
+
+    } // end function
+
+
+
+
+
+    // -----------------------------------------------------------------
+    // -----------------------------------------------------------------
+    // -----------------------------------------------------------------
+    // -----------------------------------------------------------------
+    // -----------------------------------------------------------------
+    // -----------------------------------------------------------------
+
+
+
+
 
 
     protected function checkPhone($userPhone) {
@@ -1413,6 +1667,17 @@ class UserEditController extends Controller {
     } //end of check phone
 
 
+
+
+
+
+
+
+
+
+
+
+    
 
 
 

@@ -628,14 +628,22 @@ Route::group(['middleware' => 'cors'], function () {
 
 
 
-    // 4.1 reset-phone (auth)
+    // 4.1: reset-phone (auth)
     Route::post("/app/user/changeNumber/getOTP", [UserEditController::class, 'changeNumberOTP']);
     Route::post("/app/user/changeNumber/resendOTP", [UserEditController::class, 'resendChangeNumberOTP']);
     Route::post("/app/user/changeNumber/confirmOTP", [UserEditController::class, 'confirmChangeNumberOTP']);
 
 
 
-    // 4.2: logout (auth)
+    // 4.2: Change Email / Password / Address (auth)
+    Route::post("/app/user/changeEmail", [UserEditController::class, 'changeEmail']);
+    Route::post("/app/user/changePassword", [UserEditController::class, 'changePassword']);
+    Route::post("/app/user/changeAddress", [UserEditController::class, 'changeAddress']);
+
+
+
+
+    // 4.3: logout (auth)
     Route::post("/app/user/logout", [UserControllerApp::class, 'logout']);
 
 
