@@ -2,10 +2,15 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\UserHistory;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use stdClass;
+
+
+ini_set('max_execution_time', 180); // 180 (seconds) = 3 Minutes
+
 
 class ProductController extends Controller {
     
@@ -117,10 +122,34 @@ class ProductController extends Controller {
     public function searchProductsAuth(Request $request) {
 
 
-        // TODO: Make Authentication + Save History
-
-        // 1: get key
+        // ::root - get key / phoneId / userId
         $searchKey = $request->searchKey;
+        $deviceID = $request->deviceID;
+        $userId = auth()->user()->id;
+
+
+        // 0: create search-history
+        $userHistory = new UserHistory();
+
+        $userHistory->userId = $userId;
+        $userHistory->deviceID = $deviceID;
+        $userHistory->searchKey = $searchKey;
+
+        $userHistory->save();
+
+
+
+
+
+
+        // ================================
+        // ================================
+
+
+
+
+
+        // 1: content
         $contentArray = array();
 
 

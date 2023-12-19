@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\DeliveryArea;
@@ -10,8 +11,13 @@ use App\Models\MainCategory;
 use App\Models\Product;
 use App\Models\State;
 use App\Models\Unit;
+use App\Models\UserDevice;
 use Illuminate\Http\Request;
 use stdClass;
+
+ini_set('max_execution_time', 180); // 180 (seconds) = 3 Minutes
+
+
 
 class LaunchController extends Controller {
     
@@ -22,6 +28,8 @@ class LaunchController extends Controller {
         // :root
         $response = new stdClass();
         $batch = $request->batch;
+        $request->favData = (object) $request->favData;
+
 
         // 1: first action
         str_contains($batch, '1,') ? $response = $this->firstAction($response) : null;
@@ -50,6 +58,220 @@ class LaunchController extends Controller {
 
         // 7: seventh action
         str_contains($batch, '7,') ? $response = $this->seventhAction($response) : null;
+
+
+
+
+
+
+
+        // ======================================
+        // ======================================
+
+
+
+
+        
+
+
+        // 8: seventh action - favData
+        $products = Product::whereIn('id', $request->favData->productsID)->get();
+        $contentArray = array();
+
+
+
+
+        // 8.1: ProductsID is returned (in both options)
+        foreach ($products as $product) {
+
+            $content = new stdClass();
+            $content->id = $product->id;
+            $content->categoryId = $product->mainCategoryId;
+            $content->subCategoryId = $product->subCategoryId;
+            $content->typeId = $product->typeId;
+            $content->companyId = $product->companyId;
+
+
+            $content->name = $product->name;
+            $content->nameAr = $product->nameAr;
+
+            $content->mainPic = $product->image;
+            $content->additionalPics = null;
+
+            
+            
+            
+            // ::determine productType (byName - fixedSize - dynamicSize)
+            if ($product->weightOption == 'byName')
+                $content->productType = 'NAMEFULL';
+
+            else if ($product->weightOption == 'fixedSize')
+                $content->productType = 'FIXED';
+
+            else
+                $content->productType = 'DYNAMIC';
+
+
+            $content->measuringUnitId = $product->unitId;
+            $content->minQuantityToOrder = $product->weight;
+
+            $content->quantityAvailable = $product->quantity;
+            $content->maxQuantityToOrder = $product->maxQuantityPerOrder;
+            $content->originalPrice = $product->sellPrice;
+            $content->offerPrice = $product->offerPrice;
+
+            $content->desc = $product->desc;
+            $content->descAr = $product->descAr;
+
+
+            array_push($contentArray, $content);
+
+        } // end loop
+
+
+
+
+
+
+
+        // 8.2: auth
+        if (!empty(auth()->user())) {
+
+
+            // 8.2.1: check if device duplicated
+            $isDuplicated = UserDevice::where('userId', auth()->user()->id)
+            ->where('serial', $request->favData->deviceID)->count();
+
+
+
+
+
+
+
+
+            // 8.2.2: determine deviceID / FavoriteList actions
+            if ($isDuplicated > 0) {
+
+
+
+                // 8.2.3: remove previous favorites / update with ProductsIDs
+                UserFavorite::where('userId', auth()->user()->id)->delete();
+
+                foreach ($products as $product) {
+
+                    $userFavorite = new UserFavorite();
+                    $userFavorite->userId = auth()->user()->id;
+                    $userFavorite->productId = $product->id;
+
+                    $userFavorite->save();
+                    
+                } // end loop
+
+                
+
+
+            } else {
+
+
+                // ::root -> Save deviceID
+                $userDevice = new UserDevice();
+                $userDevice->userId = auth()->user()->id;
+                $userDevice->serial = $request->favData->deviceID;
+
+                $userDevice->save();
+
+
+
+
+
+                // 8.2.4: Favorites is returned / appended later on to returned
+                $favoritesID = UserFavorite::where('userId', auth()->user()->id)->get(['productId'])->toArray();
+                $favoriteProducts = Product::whereIn('id', $favoritesID)->get();
+
+
+                
+
+
+                // 4.2.5: ProductsIDs appended in favorites
+                foreach ($products->whereNotIn('id', $favoritesID) as $product) {
+
+                    $userFavorite = new UserFavorite();
+                    $userFavorite->userId = auth()->user()->id;
+                    $userFavorite->productId = $product->id;
+
+                    $userFavorite->save();
+                    
+                } // end loop
+
+
+
+
+
+
+
+                // 4.2.4: favorites appended in returned
+                foreach ($favoriteProducts as $product) {
+
+                    $content = new stdClass();
+                    $content->id = $product->id;
+                    $content->categoryId = $product->mainCategoryId;
+                    $content->subCategoryId = $product->subCategoryId;
+                    $content->typeId = $product->typeId;
+                    $content->companyId = $product->companyId;
+        
+        
+                    $content->name = $product->name;
+                    $content->nameAr = $product->nameAr;
+        
+                    $content->mainPic = $product->image;
+                    $content->additionalPics = null;
+        
+                    
+                    
+                    
+                    // ::determine productType (byName - fixedSize - dynamicSize)
+                    if ($product->weightOption == 'byName')
+                        $content->productType = 'NAMEFULL';
+        
+                    else if ($product->weightOption == 'fixedSize')
+                        $content->productType = 'FIXED';
+        
+                    else
+                        $content->productType = 'DYNAMIC';
+        
+        
+                    $content->measuringUnitId = $product->unitId;
+                    $content->minQuantityToOrder = $product->weight;
+        
+                    $content->quantityAvailable = $product->quantity;
+                    $content->maxQuantityToOrder = $product->maxQuantityPerOrder;
+                    $content->originalPrice = $product->sellPrice;
+                    $content->offerPrice = $product->offerPrice;
+        
+                    $content->desc = $product->desc;
+                    $content->descAr = $product->descAr;
+        
+        
+                    array_push($contentArray, $content);
+        
+                } // end loop
+
+
+
+            } // end else
+
+
+
+
+
+        } // end if
+
+
+
+
+
+        // :: prepare response
+        $response->favProducts = $contentArray;
 
 
 

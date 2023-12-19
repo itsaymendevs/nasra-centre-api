@@ -590,11 +590,8 @@ Route::group(['middleware' => 'cors'], function () {
 
 
 
-    // 3.5: Auth - Search Products
+    // 3.5: Auth - Search Products (auth)
     Route::post("/app/launch/searchProductsAuth", [ProductControllerApp::class, 'searchProductsAuth']);
-
-
-
 
 
 
@@ -614,6 +611,12 @@ Route::group(['middleware' => 'cors'], function () {
     // 4.1: register
     Route::post("/app/user/register", [UserControllerApp::class, 'register']);
     Route::post("/app/user/register/confirm", [UserControllerApp::class, 'confirmRegister']);
+    Route::post("/app/user/register/resend", [UserControllerApp::class, 'registerResend']);
+
+
+
+
+    // 4.2: logout (auth)
     Route::post("/app/user/logout", [UserControllerApp::class, 'logout']);
 
 

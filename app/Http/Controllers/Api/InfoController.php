@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+
 use App\Http\Controllers\Controller;
 use App\Models\AboutInfo;
 use App\Models\AddressInfo;
@@ -15,6 +16,11 @@ use App\Models\PickupStore;
 use App\Models\Term;
 use Illuminate\Http\Request;
 use stdClass;
+
+ini_set('max_execution_time', 180); // 180 (seconds) = 3 Minutes
+
+
+
 
 class InfoController extends Controller {
     

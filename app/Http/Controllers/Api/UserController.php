@@ -2,15 +2,25 @@
 
 namespace App\Http\Controllers\Api;
 
+
+use App\Models\Product;
+use App\Models\UserDevice;
+use App\Models\UserFavorite;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\UserLead;
-use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use stdClass;
 use Throwable;
+use DateTime;
+
+
+ini_set('max_execution_time', 180); // 180 (seconds) = 3 Minutes
+
+
+
 
 class UserController extends Controller {
     
@@ -24,7 +34,7 @@ class UserController extends Controller {
         $response = new stdClass();
         $response->errors = array();
 
-        $user = User::where('phone', $request->phone)->first();
+        $user = User::where('phone', $request->phoneNumber)->first();
 
 
 
@@ -34,7 +44,7 @@ class UserController extends Controller {
         // 2: Check For Errors
 
         // 2.1: Phone
-        if (empty($request->phone)) {
+        if (empty($request->phoneNumber)) {
 
             $response->errors[0] = 10;
             return response()->json($response);
@@ -97,30 +107,239 @@ class UserController extends Controller {
         $content = new stdClass();
         $content->id = $user->id;
 
+
+        
         $content->firstName = $user->firstName;
         $content->lastName = $user->lastName;
-        $content->email = $user->email;
-        $content->phone = intval($user->phone);
-        
-        $content->stateId = $user->stateId;
-        $content->regionId = $user->deliveryAreaId;
-        
-        $content->address = $user->address;
-        $content->deliveryPrice = $user->deliveryArea->price;
-        $content->deliveryBlocked = !boolval($user->deliveryArea->isActive);
-
-        $content->deliveryTime = $user->deliveryArea->deliveryTime->content;
-        $content->deliveryTimeAr = $user->deliveryArea->deliveryTime->contentAr;
+        $content->emailAddress = $user->email;
+        $content->phoneNumber = intval($user->phone);
         
 
+
+        $content->userAddress = new stdClass();
+
+        $content->userAddress->userStateId = $user->stateId;
+        $content->userAddress->userRegionId = $user->deliveryAreaId;
+        
+        $content->userAddress->addressDescription = $user->address;
+        $content->userAddress->deliveryEstimatedTime = $user->deliveryArea->deliveryTime->content;
+        $content->userAddress->deliveryEstimatedTimeAr = $user->deliveryArea->deliveryTime->contentAr;
+
+        $content->userAddress->regionDeliveryPrice = intval($user->deliveryArea->price);
+        $content->userAddress->isDeliveryBlocked = !boolval($user->deliveryArea->isActive);
+
+
+
+
+
+        // ::prepare response
         $response = new stdClass();
         $response->user = $content;
         $response->token = $token;
-   
 
-        // return response in json
+
+
+
+
+        // ==================================
+        // ==================================
+
+
+
+
+
+
+
+
+
+        // 4: fetch productsID List / Save Device (if New)
+        $isDuplicated = UserDevice::where('userId', $user->id)
+        ->where('serial', $request->deviceID)->count();
+
+
+        // 4.1: fetch products
+        $products = Product::whereIn('id', $request->productsID)->get();
+        $contentArray = array();
+
+
+
+        // 4.1.2: ProductsID is returned (in both options)
+        foreach ($products as $product) {
+
+            $content = new stdClass();
+            $content->id = $product->id;
+            $content->categoryId = $product->mainCategoryId;
+            $content->subCategoryId = $product->subCategoryId;
+            $content->typeId = $product->typeId;
+            $content->companyId = $product->companyId;
+
+
+            $content->name = $product->name;
+            $content->nameAr = $product->nameAr;
+
+            $content->mainPic = $product->image;
+            $content->additionalPics = null;
+
+            
+            
+            
+            // ::determine productType (byName - fixedSize - dynamicSize)
+            if ($product->weightOption == 'byName')
+                $content->productType = 'NAMEFULL';
+
+            else if ($product->weightOption == 'fixedSize')
+                $content->productType = 'FIXED';
+
+            else
+                $content->productType = 'DYNAMIC';
+
+
+            $content->measuringUnitId = $product->unitId;
+            $content->minQuantityToOrder = $product->weight;
+
+            $content->quantityAvailable = $product->quantity;
+            $content->maxQuantityToOrder = $product->maxQuantityPerOrder;
+            $content->originalPrice = $product->sellPrice;
+            $content->offerPrice = $product->offerPrice;
+
+            $content->desc = $product->desc;
+            $content->descAr = $product->descAr;
+
+
+            array_push($contentArray, $content);
+
+        } // end loop
+
+
+
+
+        
+
+
+
+
+        // 4.2: determine deviceID / FavoriteList actions
+        if ($isDuplicated > 0) {
+
+
+
+            // 4.2.1: remove previous favorites / update with ProductsIDs
+            UserFavorite::where('userId', $user->id)->delete();
+
+            foreach ($products as $product) {
+
+                $userFavorite = new UserFavorite();
+                $userFavorite->userId = $user->id;
+                $userFavorite->productId = $product->id;
+
+                $userFavorite->save();
+                
+            } // end loop
+
+            
+
+
+        } else {
+
+
+            // ::root -> Save deviceID
+            $userDevice = new UserDevice();
+            $userDevice->userId = $user->id;
+            $userDevice->serial = $request->deviceID;
+
+            $userDevice->save();
+
+
+
+
+
+            // 4.2.2: Favorites is returned / appended later on to returned
+            $favoritesID = UserFavorite::where('userId', $user->id)->get(['productId'])->toArray();
+            $favoriteProducts = Product::whereIn('id', $favoritesID)->get();
+
+
+            
+
+
+            // 4.2.3: ProductsIDs appended in favorites
+            foreach ($products->whereNotIn('id', $favoritesID) as $product) {
+
+                $userFavorite = new UserFavorite();
+                $userFavorite->userId = $user->id;
+                $userFavorite->productId = $product->id;
+
+                $userFavorite->save();
+                
+            } // end loop
+
+
+
+
+
+
+
+            // 4.2.4: favorites appended in returned
+            foreach ($favoriteProducts as $product) {
+
+                $content = new stdClass();
+                $content->id = $product->id;
+                $content->categoryId = $product->mainCategoryId;
+                $content->subCategoryId = $product->subCategoryId;
+                $content->typeId = $product->typeId;
+                $content->companyId = $product->companyId;
+    
+    
+                $content->name = $product->name;
+                $content->nameAr = $product->nameAr;
+    
+                $content->mainPic = $product->image;
+                $content->additionalPics = null;
+    
+                
+                
+                
+                // ::determine productType (byName - fixedSize - dynamicSize)
+                if ($product->weightOption == 'byName')
+                    $content->productType = 'NAMEFULL';
+    
+                else if ($product->weightOption == 'fixedSize')
+                    $content->productType = 'FIXED';
+    
+                else
+                    $content->productType = 'DYNAMIC';
+    
+    
+                $content->measuringUnitId = $product->unitId;
+                $content->minQuantityToOrder = $product->weight;
+    
+                $content->quantityAvailable = $product->quantity;
+                $content->maxQuantityToOrder = $product->maxQuantityPerOrder;
+                $content->originalPrice = $product->sellPrice;
+                $content->offerPrice = $product->offerPrice;
+    
+                $content->desc = $product->desc;
+                $content->descAr = $product->descAr;
+    
+    
+                array_push($contentArray, $content);
+    
+            } // end loop
+
+
+
+        } // end else
+
+
+
+
+
+
+
+        // ::prepare response
+        $response->favProducts = $contentArray;
+
+        
         return response()->json($response);
-
 
 
     } // end function
@@ -147,12 +366,12 @@ class UserController extends Controller {
         $response = new stdClass();
         $expireTime = 1;
         $expireDelete = false;
-        $request->isArSMS == "true" ? $lang = "arabic" : $lang = "english";
 
 
         // ::root - convert array to objects
         $request = (object) $request->all();
         $request->newUserData = (object) $request->newUserData;
+        $request->isArSMS == "true" ? $lang = "arabic" : $lang = "english";
 
 
 
@@ -161,7 +380,7 @@ class UserController extends Controller {
 
 
         // 1.1: Phone / checkValid
-        $userPhone = strval($request->newUserData->phone);
+        $userPhone = strval($request->newUserData->phoneNumber);
         $isPhoneValid = $this->checkPhone($userPhone);
 
 
@@ -289,6 +508,134 @@ class UserController extends Controller {
 
 
 
+
+
+    public function registerResend(Request $request) {
+
+        
+
+        // :: root
+        $response = new stdClass();
+        $response->errors = array();
+        $expireTime = 1;
+
+ 
+        // ::root - convert array to objects
+        $request = (object) $request->all();
+        $request->isArSMS == "true" ? $lang = "arabic" : $lang = "english";
+
+
+
+
+
+
+        // 1.1: Phone / checkValid
+        $userPhone = strval($request->phoneNumber);
+
+
+
+
+
+        // =============================
+        // =============================
+
+
+
+
+        // 2: check otp-expired
+        $userLead = UserLead::where('phone', $userPhone)->first();
+
+
+        if ($userLead->count() >= 1) {
+
+
+            $todayDate = new DateTime();
+            $previousDate = $userLead->created_at;
+            $timeDiff = $todayDate->diff($previousDate);
+
+            // ::get minutes
+            $minutes = $timeDiff->days * 24 * 60;
+            $minutes += $timeDiff->h * 60;
+            $minutes += $timeDiff->i;
+
+
+            // 2.1: if expired / remove from DB
+            if ($minutes > $expireTime) {
+
+                UserLead::where('phone', $userPhone)->delete();
+                
+                $response->errors[0] = 12;
+                return response()->json($response);
+
+            } // end if
+
+
+
+
+        } else {
+
+            $response->errors[0] = 12;
+            return response()->json($response);
+
+        } // end if
+
+
+
+
+
+
+
+
+
+        // =============================
+        // =============================
+
+
+
+        // 3: resend Otp
+        $otpResponse = $this->resendOTP($userPhone, $lang);
+
+
+        
+        // 4: handle Otp Response
+        if (!empty($otpResponse->errors)) {
+
+            $response->errors = $otpResponse->errors;
+                
+        } else {
+
+            $response = new stdClass();
+            $response->verificationCode = intval($otpResponse->otp);
+
+        } // end if
+
+
+
+
+
+
+        // ::prepare response
+        return response()->json($response);
+        
+
+    } //end of register function
+
+
+
+
+
+
+
+    // -----------------------------------------------------------------
+
+
+
+
+
+
+
+
+
     public function confirmRegister(Request $request) {
 
 
@@ -303,6 +650,8 @@ class UserController extends Controller {
         // ::root - convert array to objects
         $request = (object) $request->all();
         $request->newUserData = (object) $request->newUserData;
+        $request->newUserData->userAddress = (object) $request->newUserData->userAddress;
+
 
 
 
@@ -310,7 +659,7 @@ class UserController extends Controller {
 
 
         // 1.1: Phone / checkValid
-        $userPhone = strval($request->newUserData->phone);
+        $userPhone = strval($request->newUserData->phoneNumber);
 
 
         // 1.2: otp
@@ -396,15 +745,15 @@ class UserController extends Controller {
             $user->firstName = $request->newUserData->firstName;
             $user->lastName = $request->newUserData->lastName;
 
-            $user->email = $request->newUserData->email;
-            $user->phone = $request->newUserData->phone;
-            $user->address = $request->newUserData->address;
+            $user->email = $request->newUserData->emailAddress;
+            $user->phone = $request->newUserData->phoneNumber;
+            $user->address = $request->newUserData->userAddress->addressDescription;
 
             $user->password = Hash::make($request->newUserData->password);
 
             $user->countryId = 1;
-            $user->stateId = $request->newUserData->stateId;
-            $user->deliveryAreaId = $request->newUserData->regionId;
+            $user->stateId = $request->newUserData->userAddress->userStateId;
+            $user->deliveryAreaId = $request->newUserData->userAddress->userRegionId;
 
             $user->save();
 
@@ -421,18 +770,22 @@ class UserController extends Controller {
 
             $content->firstName = $user->firstName;
             $content->lastName = $user->lastName;
-            $content->email = $user->email;
+            $content->emailAddress = $user->email;
+            $content->phoneNumber = intval($user->phone);
+            
 
-            $content->phone = intval($user->phone);
-            $content->stateId = $user->stateId;
-            $content->regionId = $user->deliveryAreaId;
-            $content->address = $user->address;
 
-            $content->deliveryPrice = doubleval($user->deliveryArea->price);
-            $content->deliveryBlocked = !boolval($user->deliveryArea->isActive);
+            $content->userAddress = new stdClass();
 
-            $content->deliveryTime = $user->deliveryArea->deliveryTime->content;
-            $content->deliveryTimeAr = $user->deliveryArea->deliveryTime->contentAr;
+            $content->userAddress->userStateId = $user->stateId;
+            $content->userAddress->userRegionId = $user->deliveryAreaId;
+            
+            $content->userAddress->addressDescription = $user->address;
+            $content->userAddress->deliveryEstimatedTime = $user->deliveryArea->deliveryTime->content;
+            $content->userAddress->deliveryEstimatedTimeAr = $user->deliveryArea->deliveryTime->contentAr;
+
+            $content->userAddress->regionDeliveryPrice = intval($user->deliveryArea->price);
+            $content->userAddress->isDeliveryBlocked = !boolval($user->deliveryArea->isActive);
 
 
 
@@ -446,6 +799,54 @@ class UserController extends Controller {
 
             // 3.4: Delete UserLeads
             UserLead::where('phone', $userPhone)->delete();
+
+
+
+
+
+
+
+
+
+
+
+
+
+            // ==================================
+            // ==================================
+
+
+
+            // ::root -> Save deviceID
+            $userDevice = new UserDevice();
+            $userDevice->userId = $user->id;
+            $userDevice->serial = $request->deviceID;
+
+            $userDevice->save();
+
+
+
+
+
+
+
+
+
+            // 4.1: ProductsIDs appended in favorites
+            $products = Product::whereIn('id', $request->productsID)->get();
+
+            foreach ($products as $product) {
+
+                $userFavorite = new UserFavorite();
+                $userFavorite->userId = $user->id;
+                $userFavorite->productId = $product->id;
+
+                $userFavorite->save();
+                
+            } // end loop
+
+
+
 
 
 
@@ -470,7 +871,12 @@ class UserController extends Controller {
 
 
 
+
     // -----------------------------------------------------------------
+
+
+
+
 
 
 
@@ -539,7 +945,7 @@ class UserController extends Controller {
 
 
         // 3: Phone / Phone match
-        if (empty($request->newUserData->phone)) {
+        if (empty($request->newUserData->phoneNumber)) {
 
             $errorKeys->errors[$counter] = 3; $counter++;
 
@@ -562,7 +968,7 @@ class UserController extends Controller {
 
 
         // 4: Email
-        if (empty($request->newUserData->email)) {
+        if (empty($request->newUserData->emailAddress)) {
 
             $errorKeys->errors[$counter] = 5; $counter++;
 
@@ -570,7 +976,7 @@ class UserController extends Controller {
 
 
         // 5: Password + regionId + stateId
-        if (empty($request->newUserData->password) || empty($request->newUserData->regionId) || empty($request->newUserData->stateId)) {
+        if (empty($request->newUserData->password) || empty($request->newUserData->userAddress->regionId) || empty($request->newUserData->userAddress->stateId)) {
 
             $errorKeys->errors[$counter] = 17; $counter++;
 
@@ -578,7 +984,7 @@ class UserController extends Controller {
 
 
         // 6: address description invalid
-        if (empty($request->newUserData->address)) {
+        if (empty($request->newUserData->userAddress->address)) {
 
             $errorKeys->errors[$counter] = 9; $counter++;
 
@@ -725,6 +1131,76 @@ class UserController extends Controller {
 
 
     } // end function
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // -----------------------------------------------------------------
+
+
+
+
+
+
+    public function resendOTP($userPhone, $lang) {
+
+        // ::root 
+        $otpResponse = new stdClass();
+
+
+        // 1: get Otp-code
+        $userLead = UserLead::where('phone', $userPhone)->first();
+        $otpCode = $userLead->otp;
+    
+
+
+
+        // 2: Otp Provider EN / AR
+        // if ($lang == "english") {
+
+        //     $response = Http::get('https://www.airtel.sd/bulksms/webacc.aspx', [
+        //         'user' => 'nasra',
+        //         'pwd' => '540125',
+        //         'Sender' => 'Nasra', // 11 char max
+        //         'Nums' => $userPhone, // 249 99 959 0002 (like this) separated by (;) no space
+        //         'smstext' => 'Your Verification Code : ' . $otpCode, // 70 char per message - 160 (latin)
+        //     ]);
+
+        // } else {
+
+        //     $response = Http::get('https://www.airtel.sd/bulksms/webacc.aspx', [
+        //         'user' => 'nasra',
+        //         'pwd' => '540125',
+        //         'Sender' => 'Nasra', // 11 char max
+        //         'Nums' => $userPhone, // 249 99 959 0002 (like this) separated by (;) no space
+        //         'smstext' => 'رقم التأكيد الخاص بك : ' . $otpCode, //70 char per message - 160 (latin)
+        //     ]);
+
+        // } // end if
+        
+
+
+
+
+
+        // ::prepare response
+        $otpResponse->otp = $otpCode;
+
+        return $otpResponse;
+
+
+    } // end function
+
 
 
 

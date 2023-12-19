@@ -14,6 +14,10 @@ class User extends Authenticatable
 
     
 
+    public function devices() {
+        return $this->hasMany(UserDevice::class, 'userId');
+    }
+
 
     public function deliveryArea() {
         return $this->belongsTo(DeliveryArea::class, 'deliveryAreaId');
