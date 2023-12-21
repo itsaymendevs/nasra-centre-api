@@ -47,7 +47,7 @@ class PickupController extends Controller {
         // 1: toggle Receiving pickups
         $generalBlock = GeneralBlock::all()->first();
         
-        $generalBlock->stopPickup = boolval($request->stopPickup);
+        $generalBlock->stopPickup = !boolval($generalBlock->stopPickup);
         $generalBlock->save();
 
 
@@ -80,11 +80,12 @@ class PickupController extends Controller {
         $pickup->receivingTimes = $request->receivingTimes;
         $pickup->receivingTimesAr = $request->receivingTimesAr;
 
+
         $pickup->latitude = $request->latitude;
         $pickup->longitude = $request->longitude;
 
-        $pickup->isMainStore = $request->isMainStore;
-        $pickup->isActive = !boolval($request->isActive);
+        $pickup->isMainStore = $request->isMainStore == 'true' ? true : false;
+        $pickup->isActive = $request->isActive == 'true' ? false : true;
 
         // 1.2: upload image if exits
         if ($request->hasFile('image')) {
@@ -93,6 +94,7 @@ class PickupController extends Controller {
             $pickup->image = $fileName;
 
         } // end if
+
 
         $pickup->save();
 
@@ -143,7 +145,6 @@ class PickupController extends Controller {
         // ------------------------------------
         // ------------------------------------
 
-
         // 1: update item
         $pickup = PickupStore::find($id);
 
@@ -158,8 +159,8 @@ class PickupController extends Controller {
         $pickup->latitude = $request->latitude;
         $pickup->longitude = $request->longitude;
 
-        $pickup->isMainStore = $request->isMainStore;
-        $pickup->isActive = !boolval($request->isActive);
+        $pickup->isMainStore = $request->isMainStore == 'true' ? true : false;
+        $pickup->isActive = $request->isActive == 'true' ? false : true;
 
 
 

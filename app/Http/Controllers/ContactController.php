@@ -77,7 +77,7 @@ class ContactController extends Controller {
         // 1: update country
         $contact = Country::find($countryId);
 
-        $contact->isServiceActive = $request->isServiceActive;
+        $contact->isServiceActive = $request->isServiceActive == 'true' ? true : false;
         $contact->toSDG = $request->toSDG > 0 ? $request->toSDG : 0;
 
         $contact->save();

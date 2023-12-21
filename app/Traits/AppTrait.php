@@ -36,9 +36,9 @@ trait AppTrait {
     protected function uploadFile(Request $request, $name, $path) {
 
         $file = $request->file($name); // Retrieve the uploaded file from the request
-        $fileName = $file->getClientOriginalName(); // Retrieve the original filename
+        $fileName = date("h.iA") . $file->getClientOriginalName(); // Retrieve the original filename
 
-        Storage::disk('local')->put($path . '' . $fileName, file_get_contents($file));
+        Storage::disk('public')->put($path . '' . $fileName, file_get_contents($file));
 
         return $fileName;
 
@@ -53,7 +53,7 @@ trait AppTrait {
 
     protected function deleteFile($name, $path) {
 
-        Storage::disk('local')->delete($path . '' . $name);
+        Storage::disk('public')->delete($path . '' . $name);
         return true;
     } // end function
 

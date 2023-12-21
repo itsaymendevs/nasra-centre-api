@@ -88,13 +88,13 @@ class HelpController extends Controller {
         $address->address = $request->address;
         $address->longitude = $request->longitude;
         $address->latitude = $request->latitude;
-        $address->isHidden = $request->isHidden;
+        $address->isHidden = $request->isHidden == 'true' ? true : false;
 
 
         if ($request->hasFile('image')) {
             
-            $this->deleteFile($address->image, 'address/');
-            $fileName = $this->uploadFile($request, 'image', '$address/');
+            $this->deleteFile($address->image, 'interAddress/');
+            $fileName = $this->uploadFile($request, 'image', 'interAddress/');
             $address->image = $fileName;
 
         } // end if

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\UserReceiver;
 use App\Models\UserResetPassword;
 use App\Models\UserResetPhone;
 use DateTime;
@@ -12,7 +13,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use stdClass;
 
-class UserEditController extends Controller {
+class InterUserEditController extends Controller {
 
     
 
@@ -553,22 +554,81 @@ class UserEditController extends Controller {
 
             $content->userAddress = new stdClass();
 
-            $content->userAddress->userStateId = $user->stateId;
-            $content->userAddress->userRegionId = $user->deliveryAreaId;
-            
-            $content->userAddress->addressDescription = $user->address;
-            $content->userAddress->deliveryEstimatedTime = $user->deliveryArea->deliveryTime->content;
-            $content->userAddress->deliveryEstimatedTimeAr = $user->deliveryArea->deliveryTime->contentAr;
 
-            $content->userAddress->regionDeliveryPrice = intval($user->deliveryArea->price);
-            $content->userAddress->isDeliveryBlocked = !boolval($user->deliveryArea->isActive);
+            // 3.1.1: countryLettersCode
+            $content->countryLettersCode = $user->country->code;
+
+            // 3.1.2: uk address
+            if ($user->country->code == 'UK') {
+
+                $content->userAddress->addressFirstLine = $user->addressFirstLine;
+                $content->userAddress->addressSecondLine = $user->addressSecondLine; // optional
+                
+                $content->userAddress->addressThirdLine = $user->addressThirdLine; // optional
+                $content->userAddress->townCity = $user->townCity;
+                $content->userAddress->postcode = $user->postcode;
+                
+            } // end if
+
+
+            // 3.1.3: irl address
+            if ($user->country->code == 'IRL') {
+
+                $content->userAddress->addressFirstLine = $user->addressFirstLine;
+                $content->userAddress->addressSecondLine = $user->addressSecondLine; // optional
+                
+                $content->userAddress->postTown = $user->postTown;
+                $content->userAddress->county = $user->county; // optional
+                $content->userAddress->eircode = $user->eircode; // optional
+                
+            } // end if
+
+
+
+
+
+            
+            // 3.2: receivers
+            $content->receivers = array();
+
+            foreach ($user->receivers as $receiver) {
+
+                $item = new stdClass();
+
+                $item->receiverId = $receiver->id;
+                $item->receiverName = $receiver->name;
+                $item->phoneNumber = $receiver->phone;
+                $item->secondPhoneNumber = $receiver->phoneAlt;
+
+
+                $item->receiverAddress = new stdClass();
+
+                $item->receiverAddress->receiverStateId = $receiver->stateId;
+                $item->receiverAddress->receiverRegionId = $receiver->deliveryAreaId;
+                
+                $item->receiverAddress->addressDescription = $receiver->address;
+
+                $item->receiverAddress->deliveryEstimatedTime = $receiver->deliveryArea->deliveryTime->content;
+
+                $item->receiverAddress->deliveryEstimatedTimeAr = $receiver->deliveryArea->deliveryTime->contentAr;
+
+                $item->receiverAddress->regionDeliveryPrice = intval($receiver->deliveryArea->price);
+                $item->receiverAddress->isDeliveryBlocked = !boolval($receiver->deliveryArea->isActive);
+
+
+                array_push($content->receivers, $item);
+                
+            } // end loop
+
+
+
 
 
 
 
             // ::prepare response
             $response = new stdClass();
-            $response->user = $content;
+            $response->interUser = $content;
         
 
 
@@ -630,29 +690,7 @@ class UserEditController extends Controller {
 
 
         // 2.1 - english message
-        // if ($lang == "english") {
-
-        //     $response = Http::get('https://www.airtel.sd/bulksms/webacc.aspx', [
-        //         'user' => 'nasra',
-        //         'pwd' => '540125',
-        //         'Sender' => 'Nasra', // 11 char max
-        //         'Nums' => $userPhone, // 249 99 959 0002 - separate by (;) no space
-        //         'smstext' => 'Your Verification Code : ' . $otpCode, //70 char per message - 160 (latin)
-        //     ]);
-
-        // } else {
-
-        //     $response = Http::get('https://www.airtel.sd/bulksms/webacc.aspx', [
-        //         'user' => 'nasra',
-        //         'pwd' => '540125',
-        //         'Sender' => 'Nasra', // 11 char max
-        //         'Nums' => $userPhone, // 249 99 959 0002 - separate by (;) no space
-        //         'smstext' => 'رقم التأكيد الخاص بك : ' . $otpCode, // 70 char per message - 160 (latin)
-        //     ]);
-
-        // } // end if
-
-
+    
 
 
 
@@ -713,27 +751,7 @@ class UserEditController extends Controller {
 
 
         // 2.1 - english message
-        // if ($lang == "english") {
-
-        //     $response = Http::get('https://www.airtel.sd/bulksms/webacc.aspx', [
-        //         'user' => 'nasra',
-        //         'pwd' => '540125',
-        //         'Sender' => 'Nasra', // 11 char max
-        //         'Nums' => $userPhone, // 249 99 959 0002 - separate by (;) no space
-        //         'smstext' => 'Your Verification Code : ' . $otpCode, //70 char per message - 160 (latin)
-        //     ]);
-
-        // } else {
-
-        //     $response = Http::get('https://www.airtel.sd/bulksms/webacc.aspx', [
-        //         'user' => 'nasra',
-        //         'pwd' => '540125',
-        //         'Sender' => 'Nasra', // 11 char max
-        //         'Nums' => $userPhone, // 249 99 959 0002 - separate by (;) no space
-        //         'smstext' => 'رقم التأكيد الخاص بك : ' . $otpCode, // 70 char per message - 160 (latin)
-        //     ]);
-
-        // } // end if
+        
 
 
 
@@ -1252,27 +1270,7 @@ class UserEditController extends Controller {
 
         
         // 2.1 - english message
-        // if ($lang == "english") {
-
-        //     $response = Http::get('https://www.airtel.sd/bulksms/webacc.aspx', [
-        //         'user' => 'nasra',
-        //         'pwd' => '540125',
-        //         'Sender' => 'Nasra', // 11 char max
-        //         'Nums' => $userPhone, // 249 99 959 0002 - separate by (;) no space
-        //         'smstext' => 'Your Verification Code : ' . $otpCode, //70 char per message - 160 (latin)
-        //     ]);
-
-        // } else {
-
-        //     $response = Http::get('https://www.airtel.sd/bulksms/webacc.aspx', [
-        //         'user' => 'nasra',
-        //         'pwd' => '540125',
-        //         'Sender' => 'Nasra', // 11 char max
-        //         'Nums' => $userPhone, // 249 99 959 0002 - separate by (;) no space
-        //         'smstext' => 'رقم التأكيد الخاص بك : ' . $otpCode, // 70 char per message - 160 (latin)
-        //     ]);
-
-        // } // end if
+        
 
 
 
@@ -1342,27 +1340,7 @@ class UserEditController extends Controller {
 
         
         // 2.1 - english message
-        // if ($lang == "english") {
-
-        //     $response = Http::get('https://www.airtel.sd/bulksms/webacc.aspx', [
-        //         'user' => 'nasra',
-        //         'pwd' => '540125',
-        //         'Sender' => 'Nasra', // 11 char max
-        //         'Nums' => $userPhone, // 249 99 959 0002 - separate by (;) no space
-        //         'smstext' => 'Your Verification Code : ' . $otpCode, //70 char per message - 160 (latin)
-        //     ]);
-
-        // } else {
-
-        //     $response = Http::get('https://www.airtel.sd/bulksms/webacc.aspx', [
-        //         'user' => 'nasra',
-        //         'pwd' => '540125',
-        //         'Sender' => 'Nasra', // 11 char max
-        //         'Nums' => $userPhone, // 249 99 959 0002 - separate by (;) no space
-        //         'smstext' => 'رقم التأكيد الخاص بك : ' . $otpCode, // 70 char per message - 160 (latin)
-        //     ]);
-
-        // } // end if
+        
 
 
 
@@ -1571,17 +1549,120 @@ class UserEditController extends Controller {
         $request = (object) $request->all();
 
 
-        // 1: get user / regionId + stateId + address
+
+        // 1: get user
         $user = User::find(auth()->user()->id);
 
-        $stateId = $request->userStateId;
-        $regionId = $request->userRegionId;
-        $address = $request->addressDescription;
+
+
+        // 1.2: uk address
+        if ($user->country->code == 'UK') {
+
+            $user->addressFirstLine = $request->addressFirstLine;
+            $user->addressSecondLine = $request->addressSecondLine ? $request->addressSecondLine : null; // optional
+            
+            $user->addressThirdLine = $request->addressThirdLine ? $request->addressThirdLine : null; // optional
+            $user->townCity = $request->townCity;
+            $user->postcode = $request->postcode;
+            
+        } // end if
+
+
+        // 1.3: irl address
+        if ($user->country->code == 'IRL') {
+
+            $user->addressFirstLine = $request->addressFirstLine;
+            $user->addressSecondLine = $request->addressSecondLine ? $request->addressSecondLine : null; // optional
+            
+            $user->postTown = $request->postTown;
+            $user->county = $request->county ? $request->county : null; // optional
+            $user->eircode = $request->eircode ? $request->eircode : null; // optional
+            
+        } // end if
 
 
 
-        // 1.2: is address available
-        if (empty($address)) {
+        // 1.4: save changes
+        $user->save();
+
+
+
+
+
+
+
+        // ::prepare response
+        $response = new stdClass();
+        $response->validAddressInfo = true;
+
+
+
+        return response()->json($response);
+
+
+
+    } // end function
+
+
+
+
+
+
+
+
+
+
+    // -----------------------------------------------------------------
+    // -----------------------------------------------------------------
+    // -----------------------------------------------------------------
+    // -----------------------------------------------------------------
+    // -----------------------------------------------------------------
+    // -----------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+    public function storeReceiver(Request $request) {
+
+
+        // ::root
+        $response = new stdClass();
+        $response->errors = array();
+        
+
+
+        // ::root - convert array to objects
+        $request = (object) $request->all();
+        $request->receiverAddress = (object) $request->receiverAddress;
+
+
+
+        // 1: get user
+        $user = User::find(auth()->user()->id);
+
+
+
+
+
+
+
+        // 1.2: check receiver address / phone
+        $isPhoneValid = $this->checkLocalPhone($request->phoneNumber);
+
+        if (!$isPhoneValid) {
+
+            $response->errors[0] = 3;
+            return response()->json($response);
+
+        } // end if
+
+
+        if (empty($request->receiverAddress)) {
 
             $response->errors[0] = 9;
             return response()->json($response);
@@ -1591,13 +1672,23 @@ class UserEditController extends Controller {
 
 
 
+        
 
-        // 1.3: update DB
-        $user->stateId = $stateId;
-        $user->deliveryAreaId = $regionId;
-        $user->address = $address;
+        // 2: create receiver
+        $receiver = new UserReceiver();
 
-        $user->save();
+        
+        $receiver->name = $request->receiverName;
+        $receiver->phone = $request->phoneNumber;
+        $receiver->phoneAlt = $request->secondPhoneNumber ? $request->secondPhoneNumber : null;
+
+        $receiver->stateId = $request->receiverAddress->receiverStateId;
+        $receiver->deliveryAreaId = $request->receiverAddress->receiverRegionId;
+        $receiver->address = $request->receiverAddress->addressDescription;
+
+        $receiver->userId = $user->id;
+
+        $receiver->save();
 
 
 
@@ -1606,36 +1697,214 @@ class UserEditController extends Controller {
 
 
 
-
-
-        // ::prepare userModal
+        // 3: make receiver Modal
         $content = new stdClass();
-        $content->userAddress = new stdClass();
 
-        $content->userAddress->userStateId = $user->stateId;
-        $content->userAddress->userRegionId = $user->deliveryAreaId;
-        $content->userAddress->addressDescription = $user->address;
-
-
-        // ::deliveryTime Object
-        $content->userAddress->deliveryEstimatedTime = new stdClass();
-        $content->userAddress->deliveryEstimatedTime->title = $user->deliveryArea->deliveryTime->title;
-        $content->userAddress->deliveryEstimatedTime->titleAr = $user->deliveryArea->deliveryTime->titleAr;
-        $content->userAddress->deliveryEstimatedTime->content = $user->deliveryArea->deliveryTime->content;
-        $content->userAddress->deliveryEstimatedTime->contentAr = $user->deliveryArea->deliveryTime->contentAr;
+        $content->receiverId = $receiver->id;
+        $content->receiverName = $receiver->name;
+        $content->phoneNumber = $receiver->phone;
+        $content->secondPhoneNumber = $receiver->phoneAlt;
 
 
+        $content->receiverAddress = new stdClass();
 
-        $content->userAddress->regionDeliveryPrice = intval($user->deliveryArea->price);
-        $content->userAddress->isDeliveryBlocked = !boolval($user->deliveryArea->isActive);
+        $content->receiverAddress->receiverStateId = $receiver->stateId;
+        $content->receiverAddress->receiverRegionId = $receiver->deliveryAreaId;
+        
+        $content->receiverAddress->addressDescription = $receiver->address;
 
+        $content->receiverAddress->deliveryEstimatedTime = $receiver->deliveryArea->deliveryTime->content;
 
+        $content->receiverAddress->deliveryEstimatedTimeAr = $receiver->deliveryArea->deliveryTime->contentAr;
 
-        return response()->json($content);
+        $content->receiverAddress->regionDeliveryPrice = intval($receiver->deliveryArea->price);
+        $content->receiverAddress->isDeliveryBlocked = !boolval($receiver->deliveryArea->isActive);
 
 
 
-    } // end function
+
+
+
+
+        // ::prepare response
+        $response = new stdClass();
+        $response->receiver = $content;
+
+
+
+        return response()->json($response);
+
+    } // end of function
+
+
+
+
+
+
+
+    // -----------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+    public function updateReceiver(Request $request) {
+
+
+        // ::root
+        $response = new stdClass();
+        $response->errors = array();
+        
+
+
+        // ::root - convert array to objects
+        $request = (object) $request->all();
+        $request->receiverAddress = (object) $request->receiverAddress;
+
+
+
+
+
+        // 1: get receiver
+        $receiver = UserReceiver::find($request->receiverId);
+
+        
+
+
+
+
+        // 1.2: check receiver address / phone / receiver not found
+        $isPhoneValid = $this->checkLocalPhone($request->phoneNumber);
+
+        if (!$isPhoneValid) {
+
+            $response->errors[0] = 3;
+            return response()->json($response);
+
+        } // end if
+
+
+        if (empty($request->receiverAddress)) {
+
+            $response->errors[0] = 9;
+            return response()->json($response);
+
+        } // end if
+
+
+        if (!$receiver) {
+
+            $response->errors[0] = 22;
+            return response()->json($response);
+
+        } // end if
+
+
+
+
+        
+
+
+
+
+        // 2: update receiver
+        $receiver->name = $request->receiverName;
+        $receiver->phone = $request->phoneNumber;
+        $receiver->phoneAlt = $request->secondPhoneNumber ? $request->secondPhoneNumber : null;
+
+        $receiver->stateId = $request->receiverAddress->receiverStateId;
+        $receiver->deliveryAreaId = $request->receiverAddress->receiverRegionId;
+        $receiver->address = $request->receiverAddress->addressDescription;
+
+
+        $receiver->save();
+
+
+
+
+
+
+
+
+        // ::prepare response
+        $response = new stdClass();
+        $response->validReceiverInfo = true;
+
+
+
+        return response()->json($response);
+
+    } // end of function
+
+
+
+
+
+
+
+
+    // -----------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+    public function removeReceiver(Request $request) {
+
+
+        // ::root
+        $response = new stdClass();
+        $response->errors = array();
+        
+
+
+        // ::root - convert array to objects
+        $request = (object) $request->all();
+
+
+        
+        // 1: get receiver
+        $receiver = UserReceiver::find($request->receiverId);
+
+
+
+        // 1.2: if not found
+        if (!$receiver) {
+
+            $response->errors[0] = 22;
+            return response()->json($response);
+
+        } // end if
+
+
+
+
+        // 2: remove receiver
+        $receiver->delete();
+
+
+
+
+
+
+
+        // ::prepare response
+        $response = new stdClass();
+        $response->validReceiverInfo = true;
+
+
+
+        return response()->json($response);
+
+    } // end of function
 
 
 
@@ -1659,18 +1928,30 @@ class UserEditController extends Controller {
         $userPhone = strval($userPhone);
 
 
+        // 1: check length => NO CLEAR CHECK
+        return true;
+
+
+    } // end function
+
+
+
+
+
+
+
+    protected function checkLocalPhone($userPhone) {
+
+        // ::root
+        $userPhone = strval($userPhone);
+
+
         
         // 1: check length => (must be 12 - eg : 249 99 959 0002)
         if (strlen($userPhone) != 12) return false; else return true;
 
 
     } //end of check phone
-
-
-
-
-
-
 
 
 

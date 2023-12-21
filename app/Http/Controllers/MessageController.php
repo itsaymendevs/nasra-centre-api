@@ -65,7 +65,7 @@ class MessageController extends Controller {
         // 1: toggle Active
         $message = Message::find($request->id);
         
-        $message->isActive = $request->isActive;
+        $message->isActive = boolval($request->isActive);
         $message->save();
 
 
@@ -160,7 +160,7 @@ class MessageController extends Controller {
         // 1: toggle Active
         $message = GlobalMessage::find($request->id);
         
-        $message->isActive = $request->isActive;
+        $message->isActive = boolval($request->isActive);
         $message->save();
 
 

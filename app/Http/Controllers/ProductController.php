@@ -115,8 +115,8 @@ class ProductController extends Controller {
         $product->quantity = $request->units * $request->quantityPerUnit;
         $product->maxQuantityPerOrder = $request->maxQuantityPerOrder;
         
-        $product->isHidden = $request->isHidden;
-        $product->isMainPage = $request->isMainPage;
+        $product->isHidden = $request->isHidden == 'true' ? true : false;
+        $product->isMainPage = $request->isMainPage == 'true' ? true: false;
 
         $product->companyId = $request->companyId;
         $product->mainCategoryId = $request->mainCategoryId;
@@ -129,13 +129,43 @@ class ProductController extends Controller {
 
 
 
-        // 1.2: upload image if exits
+
+        // 1.4: upload image if exits
         if ($request->hasFile('image')) {
-            
-            $fileName = $this->uploadFile($request, 'image', 'pickups/');
+
+            $fileName = $this->uploadFile($request, 'image', 'products/');
             $product->image = $fileName;
 
         } // end if
+
+
+
+
+
+        // 1.5: upload extra-image if exits
+        if ($request->hasFile('firstExtraImage')) {
+
+            $fileName = $this->uploadFile($request, 'firstExtraImage', 'products/');
+            $product->firstExtraImage = $fileName;
+
+        } // end if
+
+
+        if ($request->hasFile('secExtraImage')) {
+
+            $fileName = $this->uploadFile($request, 'secExtraImage', 'products/');
+            $product->secExtraImage = $fileName;
+
+        } // end if
+
+
+        if ($request->hasFile('thirdExtraImage')) {
+
+            $fileName = $this->uploadFile($request, 'thirdExtraImage', 'products/');
+            $product->thirdExtraImage = $fileName;
+
+        } // end if
+
 
         $product->save();
 
@@ -252,8 +282,8 @@ class ProductController extends Controller {
         $product->quantity = $request->units * $request->quantityPerUnit;
         $product->maxQuantityPerOrder = $request->maxQuantityPerOrder;
         
-        $product->isHidden = $request->isHidden;
-        $product->isMainPage = $request->isMainPage;
+        $product->isHidden = $request->isHidden == 'true' ? true : false;
+        $product->isMainPage = $request->isMainPage == 'true' ? true: false;
 
         $product->companyId = $request->companyId;
         $product->mainCategoryId = $request->mainCategoryId;
@@ -270,10 +300,49 @@ class ProductController extends Controller {
         // 1.2: upload image if exits
         if ($request->hasFile('image')) {
             
-            $fileName = $this->uploadFile($request, 'image', 'pickups/');
+            $this->deleteFile($product->image, 'products/');
+
+            $fileName = $this->uploadFile($request, 'image', 'products/');
             $product->image = $fileName;
 
         } // end if
+
+
+
+
+        // 1.5: upload extra-image if exits
+        if ($request->hasFile('firstExtraImage')) {
+
+            $this->deleteFile($product->firstExtraImage, 'products/');
+
+            $fileName = $this->uploadFile($request, 'firstExtraImage', 'products/');
+            $product->firstExtraImage = $fileName;
+
+        } // end if
+
+
+        if ($request->hasFile('secExtraImage')) {
+
+            $this->deleteFile($product->secExtraImage, 'products/');
+
+            $fileName = $this->uploadFile($request, 'secExtraImage', 'products/');
+            $product->secExtraImage = $fileName;
+
+        } // end if
+
+
+        if ($request->hasFile('thirdExtraImage')) {
+
+            $this->deleteFile($product->thirdExtraImage, 'products/');
+
+            $fileName = $this->uploadFile($request, 'thirdExtraImage', 'products/');
+            $product->thirdExtraImage = $fileName;
+
+        } // end if
+
+
+
+
 
         $product->save();
 
@@ -306,7 +375,7 @@ class ProductController extends Controller {
 
 
         // reindex items / reset to null
-        if ($product->isMainPage == true) {
+        if ($product->isMainPage === true) {
 
 
             // 1.3: loop thru to sort all again

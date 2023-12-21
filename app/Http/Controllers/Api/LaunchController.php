@@ -971,7 +971,17 @@ class LaunchController extends Controller {
             ],
 
 
-     
+            
+            // Invalid Receiver Id (mismatched) - 22
+            [
+                "id" => 22,
+                "titleAr" => "هذا المستلم غير موجود",
+                "titleEn" => "The receiver does not exists",
+                "msgAr" => "",
+                "msgEn" => ""
+            ],
+
+
         ];
 
 

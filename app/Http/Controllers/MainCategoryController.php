@@ -40,6 +40,8 @@ class MainCategoryController extends Controller {
         // ------------------------------------
         // ------------------------------------
 
+        
+
 
         // 1: create item
         $mainCategory = new MainCategory();
@@ -77,19 +79,6 @@ class MainCategoryController extends Controller {
 
 
     public function update(Request $request) {
-
-        // :: validator
-        $validator = $this->validationTrait($request, 
-        ['name' => 'required', 'nameAr' => 'required']);
-
-        // ! if validation not passed
-        if ($validator != false) {
-            return response()->json($validator->original);
-        } // end if
-
-
-        // ------------------------------------
-        // ------------------------------------
 
         // 1: update item
         $mainCategory = MainCategory::find($request->id);

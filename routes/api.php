@@ -1,10 +1,12 @@
 <?php
 
 use App\Http\Controllers\Api\InfoController;
+use App\Http\Controllers\Api\InterUserController;
 use App\Http\Controllers\Api\LaunchController;
 use App\Http\Controllers\Api\ProductController as ProductControllerApp;
 use App\Http\Controllers\Api\UserController as UserControllerApp;
 use App\Http\Controllers\Api\UserEditController;
+use App\Http\Controllers\Api\InterUserEditController;
 
 
 use App\Http\Controllers\CompanyController;
@@ -229,6 +231,24 @@ Route::group(['middleware' => 'cors'], function () {
 
 
 
+    // 13: users
+    Route::get("/users", [UserController::class, 'index']);
+
+
+
+
+
+
+
+
+
+
+
+    // ----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
+
+
+
 
 
     // 1: employee middleware
@@ -237,7 +257,7 @@ Route::group(['middleware' => 'cors'], function () {
 
         // store - update - remove
         Route::post("/main-categories/store", [MainCategoryController::class, 'store'])->name('mainCategory.store');
-        Route::patch("/main-categories/update", [MainCategoryController::class, 'update'])->name('mainCategory.update');
+        Route::post("/main-categories/update", [MainCategoryController::class, 'update'])->name('mainCategory.update');
         Route::delete("/main-categories/{id}/delete", [MainCategoryController::class, 'delete'])->name('mainCategory.delete');
 
         // sort - updateSort
@@ -340,7 +360,7 @@ Route::group(['middleware' => 'cors'], function () {
 
         // 7.1: update media - address
         Route::patch("/help/media/update", [HelpController::class, 'updateMedia'])->name('help.updateMedia');
-        Route::patch("/help/address/update", [HelpController::class, 'updateAddress'])->name('help.updateAddress');
+        Route::post("/help/address/update", [HelpController::class, 'updateAddress'])->name('help.updateAddress');
 
 
         // 7.1: store - update about paragraphs
@@ -395,7 +415,7 @@ Route::group(['middleware' => 'cors'], function () {
         // store - update
         Route::post("/pickup/store", [PickupController::class, 'store'])->name('pickup.store');
 
-        Route::patch("/pickup/{id}/update", [PickupController::class, 'update'])->name('pickup.update');
+        Route::post("/pickup/{id}/update", [PickupController::class, 'update'])->name('pickup.update');
         Route::delete("/pickup/{id}/delete", [PickupController::class, 'delete'])->name('pickup.delete');
 
         // toggle active
@@ -496,7 +516,7 @@ Route::group(['middleware' => 'cors'], function () {
         Route::post("/products/store", [ProductController::class, 'store']);
 
         // edit - update
-        Route::patch("/products/{id}/update", [ProductController::class, 'update']);
+        Route::post("/products/{id}/update", [ProductController::class, 'update']);
 
 
         // toggle show / home
@@ -642,9 +662,77 @@ Route::group(['middleware' => 'cors'], function () {
 
 
 
-
+    
     // 4.3: logout (auth)
     Route::post("/app/user/logout", [UserControllerApp::class, 'logout']);
+
+
+
+    // ========================================================
+    // ========================================================
+
+
+
+
+
+    // 5: login
+    Route::post("/app/user/loginInter", [InterUserController::class, 'login']);
+
+
+
+    // 5.1: register
+    Route::post("/app/user/registerInter", [InterUserController::class, 'register']);
+    Route::post("/app/user/registerInter/confirm", [InterUserController::class, 'confirmRegister']);
+    Route::post("/app/user/registerInter/resend", [InterUserController::class, 'registerResend']);
+
+
+
+
+    // 5.2: reset-password
+    Route::post("/app/user/resetInterPassword/getOTP", [InterUserEditController::class, 'resetPasswordOTP']);
+    Route::post("/app/user/resetInterPassword/resendOTP", [InterUserEditController::class, 'resendResetPasswordOTP']);
+    Route::post("/app/user/resetInterPassword/confirmOTP",  [InterUserEditController::class, 'confirmResetPasswordOTP']);
+    Route::post("/app/user/resetInterPassword", [InterUserEditController::class, 'resetPassword']);
+
+
+
+
+
+
+    // 5.1: reset-phone (auth)
+    Route::post("/app/user/changeInterNumber/getOTP", [InterUserEditController::class, 'changeNumberOTP']);
+    Route::post("/app/user/changeInterNumber/resendOTP", [InterUserEditController::class, 'resendChangeNumberOTP']);
+    Route::post("/app/user/changeInterNumber/confirmOTP", [InterUserEditController::class, 'confirmChangeNumberOTP']);
+
+
+
+    // 5.2: Change Email / Password / Address (auth)
+    Route::post("/app/user/changeInterEmail", [InterUserEditController::class, 'changeEmail']);
+    Route::post("/app/user/changeInterPassword", [InterUserEditController::class, 'changePassword']);
+    Route::post("/app/user/changeInterAddress", [InterUserEditController::class, 'changeAddress']);
+
+
+
+
+
+
+
+    // ========================================================
+    // ========================================================
+
+
+
+
+
+
+
+    // 6: Add / update / remove receiver (auth)
+    Route::post("/app/user/addReceiver", [InterUserEditController::class, 'storeReceiver']);
+    Route::post("/app/user/updateReceiver", [InterUserEditController::class, 'updateReceiver']);
+    Route::post("/app/user/removeReceiver", [InterUserEditController::class, 'removeReceiver']);
+
+
+
 
 
 

@@ -19,6 +19,16 @@ class User extends Authenticatable
     }
 
 
+    public function receivers() {
+        return $this->hasMany(UserReceiver::class, 'userId');
+    }
+
+
+
+    public function country() {
+        return $this->belongsTo(Country::class, 'countryId');
+    }
+
     public function deliveryArea() {
         return $this->belongsTo(DeliveryArea::class, 'deliveryAreaId');
     }

@@ -57,7 +57,7 @@ class DeliveryController extends Controller {
         // 1: toggle Receiving pickups
         $generalBlock = GeneralBlock::all()->first();
         
-        $generalBlock->stopDelivery = boolval($request->stopDelivery);
+        $generalBlock->stopDelivery = !boolval($generalBlock->stopDelivery);
         $generalBlock->save();
 
 
@@ -90,7 +90,7 @@ class DeliveryController extends Controller {
         $area->districtId = $request->districtId;
         $area->deliveryTimeId = $request->deliveryTimeId;
 
-        $area->isActive = !boolval($request->isActive);
+        $area->isActive = $request->isActive == 'true' ? false : true;
 
         $area->save();
 
@@ -149,7 +149,7 @@ class DeliveryController extends Controller {
         $area->districtId = $request->districtId;
         $area->deliveryTimeId = $request->deliveryTimeId;
 
-        $area->isActive = !boolval($request->isActive);
+        $area->isActive = $request->isActive == 'true' ? false : true;
 
         $area->save();
 
