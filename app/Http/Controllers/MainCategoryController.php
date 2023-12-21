@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\MainCategory; 
 use Illuminate\Http\Request;
 use App\Traits\AppTrait;
+use stdClass;
 
 class MainCategoryController extends Controller {
 
@@ -16,8 +18,15 @@ class MainCategoryController extends Controller {
 
         // ::get items
         $mainCategories = MainCategory::all();
+        $category = Category::all()->first();
 
-        return response()->json($mainCategories, 200);
+        $combine = new stdClass();
+        $combine->mainCategories = $mainCategories;
+        $combine->category = $category;
+
+
+
+        return response()->json($combine, 200);
 
     } // end function
 
@@ -169,6 +178,52 @@ class MainCategoryController extends Controller {
         return response()->json(['message' => 'Items has been sorted!'], 200);
 
     } // end function
+
+
+
+
+
+
+
+
+    // ----------------------------------------------------------
+
+
+
+    public function updateCovers(Request $request) {
+
+        // 1: update item
+        $category = Category::all()->first();
+
+
+        // 1.2: upload image if exits / remove
+        if ($request->hasFile('image')) {
+            
+            $this->deleteFile($category->image, 'categories/');
+            $fileName = $this->uploadFile($request, 'image', 'categories/');
+            $category->image = $fileName;
+
+        } // end if
+
+
+
+        if ($request->hasFile('imageAr')) {
+            
+            $this->deleteFile($category->imageAr, 'categories/');
+            $fileName = $this->uploadFile($request, 'imageAr', 'categories/');
+            $category->imageAr = $fileName;
+
+        } // end if
+
+
+
+        $category->save();
+
+        return response()->json(['status' => true, 'message' => 'Category Covers has been updated!'], 200);
+
+    } // end function
+
+
 
 
 } // end function

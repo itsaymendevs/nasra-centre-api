@@ -41,16 +41,19 @@ return new class extends Migration
             $table->foreign('deliveryAreaId')->references('id')->on('delivery_areas')->onDelete('set null');
 
             // 2: In UK
+            $table->string('townCity', 255)->nullable();
+            $table->string('postcode', 255)->nullable(); 
             $table->text('firstAddressLine')->nullable(); //both
             $table->text('secAddressLine')->nullable(); //both
-            $table->text('thirdAddressLine')->nullable(); //both
-            $table->string('county', 255)->nullable(); //both
-            $table->string('mailCode', 255)->nullable(); //both
+            $table->text('thirdAddressLine')->nullable();
+            
 
 
             // 3: In IRL
-            $table->string('eircode', 255)->nullable();
             $table->string('postTown', 255)->nullable();
+            $table->string('county', 255)->nullable();
+            $table->string('eircode', 255)->nullable();
+
 
             $table->timestamps();
         });

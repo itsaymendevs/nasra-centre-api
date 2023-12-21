@@ -23,10 +23,20 @@ class User extends Authenticatable
         return $this->hasMany(UserReceiver::class, 'userId');
     }
 
+    public function favorites() {
+        return $this->hasMany(UserFavorite::class, 'userId');
+    }
 
+
+
+    
 
     public function country() {
         return $this->belongsTo(Country::class, 'countryId');
+    }
+
+    public function state() {
+        return $this->belongsTo(State::class, 'stateId');
     }
 
     public function deliveryArea() {

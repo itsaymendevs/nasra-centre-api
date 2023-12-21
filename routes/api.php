@@ -236,7 +236,14 @@ Route::group(['middleware' => 'cors'], function () {
 
 
 
+    // 13.1: single User
+    Route::get("/users/{id}", [UserController::class, 'singleUser']);
 
+
+
+
+    // 13.2: single Receiver
+    Route::get("/users/{id}/receivers/{receiverId}", [UserController::class, 'singleReceiver']);
 
 
 
@@ -254,14 +261,21 @@ Route::group(['middleware' => 'cors'], function () {
     // 1: employee middleware
     Route::middleware(['auth:sanctum', 'auth.employee'])->group(function() {
 
+        // categories - covers
+        Route::post("/categories/update", [MainCategoryController::class, 'updateCovers']);
+
+
+
+
+
 
         // store - update - remove
-        Route::post("/main-categories/store", [MainCategoryController::class, 'store'])->name('mainCategory.store');
-        Route::post("/main-categories/update", [MainCategoryController::class, 'update'])->name('mainCategory.update');
-        Route::delete("/main-categories/{id}/delete", [MainCategoryController::class, 'delete'])->name('mainCategory.delete');
+        Route::post("/main-categories/store", [MainCategoryController::class, 'store']);
+        Route::post("/main-categories/update", [MainCategoryController::class, 'update']);
+        Route::delete("/main-categories/{id}/delete", [MainCategoryController::class, 'delete']);
 
         // sort - updateSort
-        Route::patch("/main-categories/sort/update", [MainCategoryController::class, 'updateSort'])->name('mainCategory.updateSort');
+        Route::patch("/main-categories/sort/update", [MainCategoryController::class, 'updateSort']);
 
 
 
@@ -273,12 +287,12 @@ Route::group(['middleware' => 'cors'], function () {
         // 2: sub-category
      
         // store - update
-        Route::post("/sub-categories/store", [SubCategoryController::class, 'store'])->name('subCategory.store');
-        Route::patch("/sub-categories/update", [SubCategoryController::class, 'update'])->name('subCategory.update');
-        Route::delete("/sub-categories/{id}/delete", [SubCategoryController::class, 'delete'])->name('subCategory.delete');
+        Route::post("/sub-categories/store", [SubCategoryController::class, 'store']);
+        Route::patch("/sub-categories/update", [SubCategoryController::class, 'update']);
+        Route::delete("/sub-categories/{id}/delete", [SubCategoryController::class, 'delete']);
 
         // sort - updateSort
-        Route::patch("/sub-categories/{mainCategoryId}/sort/update", [SubCategoryController::class, 'updateSort'])->name('subCategory.updateSort');
+        Route::patch("/sub-categories/{mainCategoryId}/sort/update", [SubCategoryController::class, 'updateSort']);
 
 
 
@@ -290,12 +304,11 @@ Route::group(['middleware' => 'cors'], function () {
         // 3: inner-types
 
         // store - update
-        Route::post("/inner-types/store", [TypeController::class, 'store'])->name('innerType.store');
-        Route::patch("/inner-types/update", [TypeController::class, 'update'])->name('innerType.update');
-        Route::delete("/inner-types/{id}/delete", [TypeController::class, 'delete'])->name('innerType.delete');
-
+        Route::post("/inner-types/store", [TypeController::class, 'store']);
+        Route::patch("/inner-types/update", [TypeController::class, 'update']);
+        Route::delete("/inner-types/{id}/delete", [TypeController::class, 'delete']);
         // sort - updateSort
-        Route::patch("/inner-types/{mainCategoryId}/{subCategoryId}/sort/update", [TypeController::class, 'updateSort'])->name('innerType.updateSort');
+        Route::patch("/inner-types/{mainCategoryId}/{subCategoryId}/sort/update", [TypeController::class, 'updateSort']);
 
 
 
@@ -534,6 +547,19 @@ Route::group(['middleware' => 'cors'], function () {
 
 
         
+
+
+
+        // ========================================================
+        // ========================================================
+
+
+
+        // 13: users
+
+
+        // 13.1: toggle active / inactive
+        Route::patch("/users/{id}/toggle-active", [UserController::class, 'toggleActive']);
 
 
 

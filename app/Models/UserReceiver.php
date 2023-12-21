@@ -9,18 +9,23 @@ class UserReceiver extends Model {
     
 
     public function user() {
-        return $this->belongsTo(Country::class, 'userId');
+        return $this->belongsTo(User::class, 'userId');
     }
 
 
-    public function country() {
-        return $this->belongsTo(Country::class, 'countryId');
+
+    public function state() {
+        return $this->belongsTo(State::class, 'stateId');
     }
+
 
     public function deliveryArea() {
         return $this->belongsTo(DeliveryArea::class, 'deliveryAreaId');
     }
 
+
+
+    
 
 
 
