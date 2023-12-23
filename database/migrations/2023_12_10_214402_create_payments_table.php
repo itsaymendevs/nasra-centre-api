@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
 
+            $table->string('serial', 255)->nullable();
+            
             // DIRECTPAYMENT - ONLINEBANKINGPAYMENT - ATRECEIVINGPAYMENT
             $table->string('paymentType', 255)->nullable();
 
@@ -26,6 +28,8 @@ return new class extends Migration
             $table->boolean('isForDelivery')->nullable()->default(0);
             $table->boolean('isForPickup')->nullable()->default(0);
             $table->boolean('isForRefund')->nullable()->default(0);
+
+            $table->boolean('isActive')->nullable()->default(1);
 
 
 

@@ -25,7 +25,6 @@ class DatabaseSeeder extends Seeder
         $this->call(GlobalMessageSeeder::class);
         $this->call(MainCategorySeeder::class);
 
-
         
     }
 }

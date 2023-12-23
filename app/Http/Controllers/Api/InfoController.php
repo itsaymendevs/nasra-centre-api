@@ -12,6 +12,8 @@ use App\Models\Country;
 use App\Models\DeliveryCondition;
 use App\Models\GeneralBlock;
 use App\Models\MediaInfo;
+use App\Models\Payment;
+use App\Models\PaymentCondition;
 use App\Models\PickupCondition;
 use App\Models\PickupStore;
 use App\Models\Term;
@@ -201,12 +203,23 @@ class InfoController extends Controller {
 
 
         // 1.1: Payment Types + Payment Conditions
+        $directPayments = Payment::where('paymentType', 'DIRECTPAYMENT')->get(['name', 'nameAr', 'accountName', 'accountNumber', 'isForDelivery', 'isForPickup', 'isForRefund']);
+
+        $onlineBankingPayments = Payment::where('paymentType', 'ONLINEBANKINGPAYMENT')->get(['name', 'nameAr', 'accountName', 'accountNumber', 'isForDelivery', 'isForPickup', 'isForRefund']);
+
+        $atReceivingPayments = Payment::where('paymentType', 'ATRECEIVINGPAYMENT
+        ')->get(['name', 'nameAr', 'accountName', 'accountNumber', 'isForDelivery', 'isForPickup', 'isForRefund']);
+
+        $paymentConditions = PaymentCondition::all(['title', 'titleAr', 'content', 'contentAr']);
+
+
+
         $response->PickupAndDeliveryAndPaymentInfo->paymentInfo = new stdClass();
 
-        $response->PickupAndDeliveryAndPaymentInfo->paymentInfo->directPayment = [];
-        $response->PickupAndDeliveryAndPaymentInfo->paymentInfo->onlineBankingPayments = [];
-        $response->PickupAndDeliveryAndPaymentInfo->paymentInfo->atReceivingPayments = [];
-        $response->PickupAndDeliveryAndPaymentInfo->paymentInfo->termsAndConditions = [];
+        $response->PickupAndDeliveryAndPaymentInfo->paymentInfo->directPayment = $directPayments;
+        $response->PickupAndDeliveryAndPaymentInfo->paymentInfo->onlineBankingPayments = $onlineBankingPayments;
+        $response->PickupAndDeliveryAndPaymentInfo->paymentInfo->atReceivingPayments = $atReceivingPayments;
+        $response->PickupAndDeliveryAndPaymentInfo->paymentInfo->termsAndConditions = $paymentConditions;
 
 
 

@@ -18,6 +18,7 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\HelpController;
 use App\Http\Controllers\MainCategoryController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PickupController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SubCategoryController;
@@ -46,11 +47,11 @@ Route::group(['middleware' => 'cors'], function () {
 
 
     // 1: main-category
-    Route::get("/main-categories", [MainCategoryController::class, 'index'])->name('mainCategory.index');
+    Route::get("/main-categories", [MainCategoryController::class, 'index']);
 
   
     // sort - updateSort
-    Route::get("/main-categories/sort", [MainCategoryController::class, 'sort'])->name('mainCategory.sort');
+    Route::get("/main-categories/sort", [MainCategoryController::class, 'sort']);
 
 
 
@@ -60,10 +61,10 @@ Route::group(['middleware' => 'cors'], function () {
 
 
     // 2: sub-category
-    Route::get("/sub-categories", [SubCategoryController::class, 'index'])->name('subCategory.index');
+    Route::get("/sub-categories", [SubCategoryController::class, 'index']);
 
     // sort - updateSort
-    Route::get("/sub-categories/{mainCategoryId}/sort", [SubCategoryController::class, 'sort'])->name('subCategory.sort');
+    Route::get("/sub-categories/{mainCategoryId}/sort", [SubCategoryController::class, 'sort']);
  
 
 
@@ -73,11 +74,11 @@ Route::group(['middleware' => 'cors'], function () {
 
 
     // 3: inner-types
-    Route::get("/inner-types", [TypeController::class, 'index'])->name('innerType.index');
+    Route::get("/inner-types", [TypeController::class, 'index']);
 
    
     // sort - updateSort
-    Route::get("/inner-types/{mainCategoryId}/{subCategoryId}/sort", [TypeController::class, 'sort'])->name('innerType.sort');
+    Route::get("/inner-types/{mainCategoryId}/{subCategoryId}/sort", [TypeController::class, 'sort']);
   
 
 
@@ -87,7 +88,7 @@ Route::group(['middleware' => 'cors'], function () {
 
 
     // 4: companies
-    Route::get("/companies", [CompanyController::class, 'index'])->name('company.index');
+    Route::get("/companies", [CompanyController::class, 'index']);
 
 
 
@@ -98,7 +99,7 @@ Route::group(['middleware' => 'cors'], function () {
 
 
     // 5: units
-    Route::get("/units", [UnitController::class, 'index'])->name('unit.index');
+    Route::get("/units", [UnitController::class, 'index']);
 
 
 
@@ -109,7 +110,7 @@ Route::group(['middleware' => 'cors'], function () {
 
 
     // 6: employees
-    Route::get("/employees", [EmployeeController::class, 'index'])->name('employee.index');
+    Route::get("/employees", [EmployeeController::class, 'index']);
 
 
 
@@ -119,7 +120,7 @@ Route::group(['middleware' => 'cors'], function () {
 
 
     // 7: Help
-    Route::get("/help", [HelpController::class, 'index'])->name('help.index');
+    Route::get("/help", [HelpController::class, 'index']);
 
 
 
@@ -128,7 +129,7 @@ Route::group(['middleware' => 'cors'], function () {
 
 
     // 8: contact
-    Route::get("/contact/{countryId}", [ContactController::class, 'index'])->name('contact.index');
+    Route::get("/contact/{countryId}", [ContactController::class, 'index']);
 
 
 
@@ -138,18 +139,18 @@ Route::group(['middleware' => 'cors'], function () {
 
 
     // 9: pickup
-    Route::get("/pickup", [PickupController::class, 'index'])->name('pickup.index');
+    Route::get("/pickup", [PickupController::class, 'index']);
 
     // store - update
-    Route::get("/pickup/create", [PickupController::class, 'create'])->name('pickup.create');
+    Route::get("/pickup/create", [PickupController::class, 'create']);
 
-    Route::get("/pickup/{id}/edit", [PickupController::class, 'edit'])->name('pickup.edit');
+    Route::get("/pickup/{id}/edit", [PickupController::class, 'edit']);
  
 
 
 
     // 9.1: pickup conditions
-    Route::get("/pickup/conditions", [PickupController::class, 'conditions'])->name('pickup.conditions');
+    Route::get("/pickup/conditions", [PickupController::class, 'conditions']);
 
 
 
@@ -162,18 +163,18 @@ Route::group(['middleware' => 'cors'], function () {
 
 
     // 10: delivery
-    Route::get("/delivery", [DeliveryController::class, 'index'])->name('delivery.index');
+    Route::get("/delivery", [DeliveryController::class, 'index']);
 
     // store - update
-    Route::get("/delivery/create", [DeliveryController::class, 'create'])->name('delivery.create');
+    Route::get("/delivery/create", [DeliveryController::class, 'create']);
 
-    Route::get("/delivery/{id}/edit", [DeliveryController::class, 'edit'])->name('delivery.edit');
+    Route::get("/delivery/{id}/edit", [DeliveryController::class, 'edit']);
    
 
 
 
     // 10.1: delivery conditions
-    Route::get("/delivery/conditions", [DeliveryController::class, 'conditions'])->name('delivery.conditions');
+    Route::get("/delivery/conditions", [DeliveryController::class, 'conditions']);
 
 
 
@@ -185,11 +186,11 @@ Route::group(['middleware' => 'cors'], function () {
 
 
     // 11.1: messages - local
-    Route::get("/messages", [MessageController::class, 'index'])->name('message.index');
+    Route::get("/messages", [MessageController::class, 'index']);
 
 
     // 11.2: messages - global
-    Route::get("/messages-global", [MessageController::class, 'indexGlobal'])->name('messageGlobal.index');
+    Route::get("/messages-global", [MessageController::class, 'indexGlobal']);
 
 
 
@@ -247,6 +248,17 @@ Route::group(['middleware' => 'cors'], function () {
     // 13.2: single Receiver
     Route::get("/users/{id}/receivers/{receiverId}", [UserController::class, 'singleReceiver']);
 
+
+
+
+
+
+    // ========================================================
+    // ========================================================
+
+
+    // 14: payments
+    Route::get("/payments", [PaymentController::class, 'index']);
 
 
 
@@ -323,9 +335,9 @@ Route::group(['middleware' => 'cors'], function () {
         // 4: companies
 
         // store - update
-        Route::post("/companies/store", [CompanyController::class, 'store'])->name('company.store');
-        Route::patch("/companies/update", [CompanyController::class, 'update'])->name('company.update');
-        Route::delete("/companies/{id}/delete", [CompanyController::class, 'delete'])->name('company.delete');
+        Route::post("/companies/store", [CompanyController::class, 'store']);
+        Route::patch("/companies/update", [CompanyController::class, 'update']);
+        Route::delete("/companies/{id}/delete", [CompanyController::class, 'delete']);
 
 
 
@@ -338,9 +350,9 @@ Route::group(['middleware' => 'cors'], function () {
         // 5: units
 
         // store - update
-        Route::post("/units/store", [UnitController::class, 'store'])->name('unit.store');
-        Route::patch("/units/update", [UnitController::class, 'update'])->name('unit.update');
-        Route::delete("/units/{id}/delete", [UnitController::class, 'delete'])->name('unit.delete');
+        Route::post("/units/store", [UnitController::class, 'store']);
+        Route::patch("/units/update", [UnitController::class, 'update']);
+        Route::delete("/units/{id}/delete", [UnitController::class, 'delete']);
 
 
 
@@ -353,14 +365,15 @@ Route::group(['middleware' => 'cors'], function () {
         // 6: employees
 
         // store - update
-        Route::post("/employees/store", [EmployeeController::class, 'store'])->name('employee.store');
-        Route::patch("/employees/update", [EmployeeController::class, 'update'])->name('employee.update');
-        Route::patch("/employees/reset-password", [EmployeeController::class, 'resetPassword'])->name('employee.resetPassword');
+        Route::post("/employees/store", [EmployeeController::class, 'store']);
+        Route::patch("/employees/update", [EmployeeController::class, 'update']);
+        Route::patch("/employees/reset-password", [EmployeeController::class, 'resetPassword']);
 
-        Route::delete("/employees/{id}/delete", [EmployeeController::class, 'delete'])->name('employee.delete');
+
+        Route::delete("/employees/{id}/delete", [EmployeeController::class, 'delete']);
 
         // toggle active
-        Route::patch("/employees/{id}/toggle-active", [EmployeeController::class, 'toggleActive'])->name('employee.toggleActive');
+        Route::patch("/employees/{id}/toggle-active", [EmployeeController::class, 'toggleActive']);
 
 
 
@@ -374,14 +387,15 @@ Route::group(['middleware' => 'cors'], function () {
         // 7: Help
 
         // 7.1: update media - address
-        Route::patch("/help/media/update", [HelpController::class, 'updateMedia'])->name('help.updateMedia');
-        Route::post("/help/address/update", [HelpController::class, 'updateAddress'])->name('help.updateAddress');
+        Route::patch("/help/media/update", [HelpController::class, 'updateMedia']);
+        Route::post("/help/address/update", [HelpController::class, 'updateAddress']);
 
 
         // 7.1: store - update about paragraphs
-        Route::post("/help/about/store", [HelpController::class, 'storeAbout'])->name('help.storeAbout');
-        Route::patch("/help/about/update", [HelpController::class, 'updateAbout'])->name('help.updateAbout');
-        Route::delete("/help/about/{id}/delete", [HelpController::class, 'deleteAbout'])->name('help.deleteAbout');
+        Route::post("/help/about/store", [HelpController::class, 'storeAbout']);
+        Route::patch("/help/about/update", [HelpController::class, 'updateAbout']);
+        
+        Route::delete("/help/about/{id}/delete", [HelpController::class, 'deleteAbout']);
 
 
 
@@ -395,22 +409,27 @@ Route::group(['middleware' => 'cors'], function () {
         // 8: contact
 
         // 8.1: update
-        Route::patch("/contact/{countryId}/update", [ContactController::class, 'update'])->name('contact.update');
+        Route::patch("/contact/{countryId}/update", [ContactController::class, 'update']);
 
-        Route::patch("/contact/{countryId}/update-service", [ContactController::class, 'updateService'])->name('contact.updateService');
+        Route::patch("/contact/{countryId}/update-service", [ContactController::class, 'updateService']);
+
 
 
         // 8.2: contact phone => store - update - delete
-        Route::post("/contact/{countryId}/phones/store", [ContactController::class, 'storePhone'])->name('contact.storePhone');
-        Route::patch("/contact/{countryId}/phones/update", [ContactController::class, 'updatePhone'])->name('contact.updatePhone');
-        Route::delete("/contact/{countryId}/phones/{id}/delete", [ContactController::class, 'deletePhone'])->name('contact.deletePhone');
+        Route::post("/contact/{countryId}/phones/store", [ContactController::class, 'storePhone']);
+
+        Route::patch("/contact/{countryId}/phones/update", [ContactController::class, 'updatePhone']);
+
+        Route::delete("/contact/{countryId}/phones/{id}/delete", [ContactController::class, 'deletePhone']);
 
         
 
         // 8.3: contact terms & conditions => store - update
-        Route::post("/contact/{countryId}/terms/store", [ContactController::class, 'storeTerm'])->name('contact.storeTerm');
-        Route::patch("/contact/{countryId}/terms/update", [ContactController::class, 'updateTerm'])->name('contact.updateTerm');
-        Route::delete("/contact/{countryId}/terms/{id}/delete", [ContactController::class, 'deleteTerm'])->name('contact.deleteTerm');
+        Route::post("/contact/{countryId}/terms/store", [ContactController::class, 'storeTerm']);
+
+        Route::patch("/contact/{countryId}/terms/update", [ContactController::class, 'updateTerm']);
+
+        Route::delete("/contact/{countryId}/terms/{id}/delete", [ContactController::class, 'deleteTerm']);
 
 
 
@@ -425,25 +444,28 @@ Route::group(['middleware' => 'cors'], function () {
         // 9: pickup
 
         // ::special - stop receiving in all stores
-        Route::patch("/pickup/toggle-receiving", [PickupController::class, 'toggleReceiving'])->name('pickup.toggleReceiving');
+        Route::patch("/pickup/toggle-receiving", [PickupController::class, 'toggleReceiving']);
+
 
         // store - update
-        Route::post("/pickup/store", [PickupController::class, 'store'])->name('pickup.store');
+        Route::post("/pickup/store", [PickupController::class, 'store']);
 
-        Route::post("/pickup/{id}/update", [PickupController::class, 'update'])->name('pickup.update');
-        Route::delete("/pickup/{id}/delete", [PickupController::class, 'delete'])->name('pickup.delete');
+        Route::post("/pickup/{id}/update", [PickupController::class, 'update']);
+        Route::delete("/pickup/{id}/delete", [PickupController::class, 'delete']);
 
         // toggle active
-        Route::patch("/pickup/{id}/toggle-active", [PickupController::class, 'toggleActive'])->name('pickup.toggleActive');
+        Route::patch("/pickup/{id}/toggle-active", [PickupController::class, 'toggleActive']);
 
 
 
 
         // 9.1: pickup conditions
 
-        Route::post("/pickup/conditions/store", [PickupController::class, 'storeCondition'])->name('pickup.storeCondition');
-        Route::post("/pickup/conditions/update", [PickupController::class, 'updateCondition'])->name('pickup.updateCondition');
-        Route::delete("/pickup/conditions/{id}/delete", [PickupController::class, 'deleteCondition'])->name('pickup.deleteCondition');
+        Route::post("/pickup/conditions/store", [PickupController::class, 'storeCondition']);
+
+        Route::post("/pickup/conditions/update", [PickupController::class, 'updateCondition']);
+
+        Route::delete("/pickup/conditions/{id}/delete", [PickupController::class, 'deleteCondition']);
 
 
 
@@ -462,16 +484,17 @@ Route::group(['middleware' => 'cors'], function () {
         // 10: delivery
 
         // ::special - stop delivery in all areas
-        Route::patch("/delivery/toggle-delivery", [DeliveryController::class, 'toggleDelivery'])->name('delivery.toggleDelivery');
+        Route::patch("/delivery/toggle-delivery", [DeliveryController::class, 'toggleDelivery']);
+
 
         // store - update
-        Route::post("/delivery/store", [DeliveryController::class, 'store'])->name('delivery.store');
+        Route::post("/delivery/store", [DeliveryController::class, 'store']);
 
-        Route::patch("/delivery/{id}/update", [DeliveryController::class, 'update'])->name('delivery.update');
-        Route::delete("/delivery/{id}/delete", [DeliveryController::class, 'delete'])->name('delivery.delete');
+        Route::patch("/delivery/{id}/update", [DeliveryController::class, 'update']);
+        Route::delete("/delivery/{id}/delete", [DeliveryController::class, 'delete']);
 
         // toggle active
-        Route::patch("/delivery/{id}/toggle-active", [DeliveryController::class, 'toggleActive'])->name('delivery.toggleActive');
+        Route::patch("/delivery/{id}/toggle-active", [DeliveryController::class, 'toggleActive']);
 
 
 
@@ -499,8 +522,8 @@ Route::group(['middleware' => 'cors'], function () {
 
 
         // update - toggle
-        Route::patch("/messages/update", [MessageController::class, 'update'])->name('message.update');
-        Route::patch("/messages/toggle-active", [MessageController::class, 'toggleActive'])->name('message.toggleActive');
+        Route::patch("/messages/update", [MessageController::class, 'update']);
+        Route::patch("/messages/toggle-active", [MessageController::class, 'toggleActive']);
 
 
 
@@ -508,8 +531,9 @@ Route::group(['middleware' => 'cors'], function () {
 
 
         // update - toggle
-        Route::patch("/messages-global/update", [MessageController::class, 'updateGlobal'])->name('messageGlobal.update');
-        Route::patch("/messages-global/toggle-active", [MessageController::class, 'toggleActiveGlobal'])->name('messageGlobal.toggleActive');
+        Route::patch("/messages-global/update", [MessageController::class, 'updateGlobal']);
+        
+        Route::patch("/messages-global/toggle-active", [MessageController::class, 'toggleActiveGlobal']);
 
 
 
@@ -562,6 +586,29 @@ Route::group(['middleware' => 'cors'], function () {
 
         // 13.1: toggle active / inactive
         Route::patch("/users/{id}/toggle-active", [UserController::class, 'toggleActive']);
+
+
+
+
+
+
+        // ========================================================
+        // ========================================================
+
+
+        // 14: payments
+
+        // store - update
+        Route::post("/payments/store", [PaymentController::class, 'store']);
+        Route::patch("/payments/update", [PaymentController::class, 'update']);
+
+        Route::delete("/payments/{id}/delete", [PaymentController::class, 'delete']);
+
+
+        // toggle active
+        Route::patch("/payments/{id}/toggle-active", [PaymentController::class, 'toggleActive']);
+
+
 
 
 
