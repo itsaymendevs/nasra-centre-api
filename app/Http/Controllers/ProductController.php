@@ -103,7 +103,7 @@ class ProductController extends Controller {
         // 1.2: weight options
         $product->weightOption = $request->weightOption;
 
-        if ($request->weightOption == 'fixedSize' || $request->weightOption == 'dynamicSize') {
+        if ($request->weightOption == 'FIXED' || $request->weightOption == 'DYNAMIC') {
             
             $product->weight = $request->weight;
             $product->unitId = $request->unitId;
@@ -265,7 +265,7 @@ class ProductController extends Controller {
         // 1.2: weight options
         $product->weightOption = $request->weightOption;
 
-        if ($request->weightOption == 'fixedSize' || $request->weightOption == 'dynamicSize') {
+        if ($request->weightOption == 'FIXED' || $request->weightOption == 'DYNAMIC') {
             
             $product->weight = $request->weight;
             $product->unitId = $request->unitId;

@@ -20,7 +20,7 @@ use stdClass;
 class OrderController extends Controller {
     
 
-    public function store (Request $request) {
+    public function makeOrder(Request $request) {
 
         // ::root - initials / response / objecting request
         $countryLettersCode = 'SD';
@@ -379,13 +379,7 @@ class OrderController extends Controller {
 
 
                 // ::ProductType
-                $currentProductType = 'NAMEFULL';
-
-                if ($product->weightOption == 'fixedSize')
-                    $currentProductType = "FIXED";
-                else
-                    $currentProductType = "DYNAMIC";
-
+                $currentProductType = $product->weightOption;
 
 
 
@@ -414,15 +408,8 @@ class OrderController extends Controller {
                     
                     
                     
-                    // ::determine productType (byName - fixedSize - dynamicSize)
-                    if ($product->weightOption == 'byName')
-                        $content->productType = 'NAMEFULL';
-
-                    else if ($product->weightOption == 'fixedSize')
-                        $content->productType = 'FIXED';
-
-                    else
-                        $content->productType = 'DYNAMIC';
+                    // ::determine productType
+                    $content->productType = $product->weightOption;
 
 
                     $content->measuringUnitId = $product->unitId;
@@ -851,6 +838,12 @@ class OrderController extends Controller {
             $newOrderProduct->nameAr = $product->nameAr;
             $newOrderProduct->sellPrice = $product->sellPrice;
 
+            $newOrderProduct->weight = $product->weight;
+            $newOrderProduct->weightOption = $product->weightOption;
+            $newOrderProduct->unitId = $product->unitId;
+
+
+
             if (!empty($product->offerPrice)) {
 
                 $newOrderProduct->sellPrice = $product->offerPrice;
@@ -865,7 +858,7 @@ class OrderController extends Controller {
 
 
             // 1.2: TotalPrice based on weightOption
-            if ($product->weightOption == 'dynamicSize') {
+            if ($product->weightOption == 'DYNAMIC') {
 
                 $newOrderProduct->orderProductPrice = ($newOrderProduct->sellPrice * $newOrderProduct->orderProductQuantity) / $product->weight;
 
@@ -874,7 +867,7 @@ class OrderController extends Controller {
 
 
             // => Fixed / byName
-            }else {
+            } else {
 
                 $newOrderProduct->orderProductPrice = ($newOrderProduct->sellPrice * $newOrderProduct->orderProductQuantity);
 
@@ -993,109 +986,116 @@ class OrderController extends Controller {
 
 
 
-        // 4: Return PreviousOrder
+        // 4: PreviousOrder
+        $previousOrder = new stdClass();
+        $previousOrder->generalInfo = new stdClass();
+        $previousOrder->previousOrderProducts = array();
 
         
-        // array contain previousOrder Data (send to app)
-        $apipreviousorder = array();
 
-        // part 1
-        $apipreviousorder['generalInfo']['orderNumber'] = intval($localorderserial);
-        $apipreviousorder['generalInfo']['orderDate'] = strval($apiorderdate); //not the same
-        $apipreviousorder['generalInfo']['orderTime'] = strval($apiordertime); //not the same
-        $apipreviousorder['generalInfo']['orderStatus'] = strval($apiorderstatus); //not the same
 
-        $apipreviousorder['generalInfo']['paymentType'] = strval($paymenttype);
-        $apipreviousorder['generalInfo']['paymentId'] = intval($paymentid);
-        $apipreviousorder['generalInfo']['isPaymentDone'] = strval($localorderpaymentstatus);
+        // 4.1: General Info
+        $previousOrder->generalInfo->orderNumber = $newOrder->orderNumber;
+        $previousOrder->generalInfo->orderDate = date('d-m-Y', strtotime($newOrder->orderDateTime));
+        $previousOrder->generalInfo->orderTime = date('h:m i A', strtotime($newOrder->orderDateTime));
+        $previousOrder->generalInfo->orderStatus = 'WAITING';
+        $previousOrder->generalInfo->paymentType = $newOrder->paymentType;
+        $previousOrder->generalInfo->paymentId = $newOrder->paymentId;
+        $previousOrder->generalInfo->isPaymentDone = $newOrder->isPaymentDone;
 
 
 
 
-        // get products for this order
-        $tmppreviousorderproducts = Orderproduct::where('orderinfo_id', $neworder->id)->get(['product_id', 'name_arabic', 'name_english', 'measuringunit_id', 'quantity', 'packsize', 'minquantity', 'totalprice']);
+
+        // 4.2: Products
+        $previousOrderProducts = OrderProduct::where('orderId', $newOrder->id)->get();
 
 
-        // copy into new one with customkeys
-        // updateProducts send with previousOrder.
-        $localpreviousorderproducts = array();
+        foreach ($previousOrderProducts as $previousOrderProduct) {
 
-        for ($i = 0; $i < count($tmppreviousorderproducts); $i++) {
 
-            $localpreviousorderproducts[$i]['id'] = intval($tmppreviousorderproducts[$i]['product_id']);
-
-            $localpreviousorderproducts[$i]['nameAr'] = strval($tmppreviousorderproducts[$i]['name_arabic']);
-
-            $localpreviousorderproducts[$i]['nameEn'] = strval($tmppreviousorderproducts[$i]['name_english']);
-
-            $localpreviousorderproducts[$i]['measuringUnitId'] = intval($tmppreviousorderproducts[$i]['measuringunit_id']);
-
-            $localpreviousorderproducts[$i]['packSize'] = strval($tmppreviousorderproducts[$i]['packsize']);
-
-            $localpreviousorderproducts[$i]['quantity'] = doubleval(number_format((double)$tmppreviousorderproducts[$i]['quantity'], 2, '.', ''));
-
+            $content = new stdClass();
             
-            $localpreviousorderproducts[$i]['totalPrice'] = intval($tmppreviousorderproducts[$i]['totalprice']);
+            $content->id = $previousOrderProduct->id;
+            $content->name = $previousOrderProduct->name;
+            $content->nameAr = $previousOrderProduct->nameAr;
 
-
-
-        } //end for loop
-        
-
-        // clone to api
-        $apipreviousorder['previousOrderProducts'] = $localpreviousorderproducts;
-
-
-
-
-
-
-
-
-
-
-        // part 2
-        $apipreviousorder['generalInfo']['productsPrice'] = intval($productstotalprice);
-        $apipreviousorder['generalInfo']['orderTotalPrice'] = intval($localordertotalprice);
-        
-        $apipreviousorder['receivingOption'] = strval($apiorderreceivingoption);
-        
-
-        // A- DELIVERY CASE
-        if ($apiorderreceivingoption == "DELIVERY") {
-
-            $apipreviousorder['deliveryPreviousOrder']['stateDeliveryId'] = intval($neworder->deliveryarea->city_id);
-            $apipreviousorder['deliveryPreviousOrder']['regionDeliveryId'] = intval($neworder->deliveryarea_id);
-
-            $apipreviousorder['deliveryPreviousOrder']['deliveryEstimatedTimeArabic'] = strval($neworder->deliveryarea->deliverytime->description_arabic);
-            $apipreviousorder['deliveryPreviousOrder']['deliveryEstimatedTimeEnglish'] =
-            strval($neworder->deliveryarea->deliverytime->description_english);
-
-            $apipreviousorder['deliveryPreviousOrder']['deliveryPrice'] = intval($localorderdeliveryprice);
+            $content->productType = $previousOrderProduct->weightOption;
+            $content->packSize = $previousOrderProduct->weight;
+            $content->measuringUnitId = $previousOrderProduct->unitId;
             
-
-        } 
-
-        // B- PICKUP CASE
-        else {
-
-            $apipreviousorder['pickupPreviousOrder']['storeId'] = intval($localordercollectstore_id);
-            $apipreviousorder['pickupPreviousOrder']['pickupCode'] = strval($localorderpickupcode);
-
-
-        } //end else
+            $content->orderProductQuantity = $previousOrderProduct->orderProductQuantity;
+            $content->orderProductPrice = $previousOrderProduct->orderProductPrice;
 
 
 
-        // return json to application
-        $content['previousOrder'] = $apipreviousorder;
-        $content['updateProducts'] = $apiupdateproducts;
+            array_push($previousOrder->previousOrderProducts, $content);
+
+
+        } // end loop
+
+
+
+
+
+
+
+
+
+
+
+        // 4.3: General Info Part.2
+        $previousOrder->generalInfo->productsPrice = doubleval($newOrder->productsPrice);
+        $previousOrder->generalInfo->orderTotalPrice = doubleval($newOrder->orderTotalPrice);
         
+
+
+        
+
+        // 4.4: Receiving Option
+        $previousOrder->receivingOption = $receivingOption;
+
+
+        // 4.4.1: deliveryOrder
+        if ($receivingOption == "DELIVERY") {
+
+
+            $previousOrder->deliveryPreviousOrder = new stdClass();
+
+            $previousOrder->deliveryPreviousOrder->stateDeliveryId = $newOrder->stateId;
+            $previousOrder->deliveryPreviousOrder->regionDeliveryId = $newOrder->deliveryAreaId;
+
+            $previousOrder->deliveryPreviousOrder->deliveryEstimatedTime = $newOrder->deliveryEstimatedTime;
+            $previousOrder->deliveryPreviousOrder->deliveryEstimatedTimeAr = $newOrder->deliveryEstimatedTimeAr;
+            $previousOrder->deliveryPreviousOrder->deliveryPrice = doubleval($newOrder->deliveryPrice);
+
+
+
+
+        // 4.4.2: pickupOrder
+        } else {
+
+            $previousOrder->pickupPreviousOrder = new stdClass();
+
+            $previousOrder->pickupPreviousOrder->storeId = $newOrder->storeId;
+            $previousOrder->pickupPreviousOrder->pickupCode = $newOrder->pickupCode;
+
+
+        } // end if
+
+
+
+
+
+
+
+        // ::prepare response
+        $response = new stdClass();
+
+        $response->previousOrder = $previousOrder;
+        $response->updateProducts = $updateProducts;
 
         return response()->json($content); 
-
-
-
 
 
     } // end function

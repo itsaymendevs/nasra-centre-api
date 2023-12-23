@@ -23,15 +23,21 @@ return new class extends Migration
 
             // ::Product
             $table->bigInteger('productId')->unsigned()->nullable();
-            $table->foreign('productId')->references('id')->on('products')->onDelete('set null');
+            $table->foreign('productId')->references('id')->on('products')->onDelete('cascade');
 
             $table->string('serial', 255)->nullable();
             $table->string('name', 255)->nullable();
             $table->string('nameAr', 255)->nullable();
             $table->double('sellPrice', 10,2)->nullable();
 
+            $table->string('weightOption', 100)->nullable();
+            $table->double('weight', 10,2)->nullable();
+            $table->bigInteger('unitId')->unsigned()->nullable();
+            $table->foreign('unitId')->references('id')->on('units')->onDelete('set null');
 
 
+
+            
             // ::Foreign Keys
             $table->bigInteger('orderId')->unsigned()->nullable();
             $table->foreign('orderId')->references('id')->on('orders')->onDelete('cascade');

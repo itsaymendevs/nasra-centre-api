@@ -245,14 +245,7 @@ class InterUserController extends Controller {
             
             
             // ::determine productType (byName - fixedSize - dynamicSize)
-            if ($product->weightOption == 'byName')
-                $content->productType = 'NAMEFULL';
-
-            else if ($product->weightOption == 'fixedSize')
-                $content->productType = 'FIXED';
-
-            else
-                $content->productType = 'DYNAMIC';
+            $content->productType = $product->weightOption;
 
 
             $content->measuringUnitId = $product->unitId;
@@ -360,14 +353,8 @@ class InterUserController extends Controller {
                 
                 
                 // ::determine productType (byName - fixedSize - dynamicSize)
-                if ($product->weightOption == 'byName')
-                    $content->productType = 'NAMEFULL';
+                $content->productType = $product->weightOption;
     
-                else if ($product->weightOption == 'fixedSize')
-                    $content->productType = 'FIXED';
-    
-                else
-                    $content->productType = 'DYNAMIC';
     
     
                 $content->measuringUnitId = $product->unitId;

@@ -184,14 +184,7 @@ class UserController extends Controller {
             
             
             // ::determine productType (byName - fixedSize - dynamicSize)
-            if ($product->weightOption == 'byName')
-                $content->productType = 'NAMEFULL';
-
-            else if ($product->weightOption == 'fixedSize')
-                $content->productType = 'FIXED';
-
-            else
-                $content->productType = 'DYNAMIC';
+            $content->productType = $product->weightOption;
 
 
             $content->measuringUnitId = $product->unitId;
@@ -299,14 +292,7 @@ class UserController extends Controller {
                 
                 
                 // ::determine productType (byName - fixedSize - dynamicSize)
-                if ($product->weightOption == 'byName')
-                    $content->productType = 'NAMEFULL';
-    
-                else if ($product->weightOption == 'fixedSize')
-                    $content->productType = 'FIXED';
-    
-                else
-                    $content->productType = 'DYNAMIC';
+                $content->productType = $product->weightOption;
     
     
                 $content->measuringUnitId = $product->unitId;

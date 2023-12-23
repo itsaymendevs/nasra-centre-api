@@ -3,6 +3,8 @@
 use App\Http\Controllers\Api\InfoController;
 use App\Http\Controllers\Api\InterUserController;
 use App\Http\Controllers\Api\LaunchController;
+use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\PreviousOrderController;
 use App\Http\Controllers\Api\ProductController as ProductControllerApp;
 use App\Http\Controllers\Api\UserController as UserControllerApp;
 use App\Http\Controllers\Api\UserEditController;
@@ -761,6 +763,23 @@ Route::group(['middleware' => 'cors'], function () {
 
 
 
+
+
+
+
+
+
+
+
+    // ========================================================
+    // ========================================================
+
+
+    // 7: makeOrder / Previous Orders (auth)
+    Route::post("/app/user/makeOrder", [OrderController::class, 'makeOrder']);
+    Route::post("/app/user/previousOrders", [PreviousOrderController::class, 'previousOrders']);
+
+    
 
 
 }); // end cors middleware
