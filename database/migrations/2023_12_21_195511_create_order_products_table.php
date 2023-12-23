@@ -15,17 +15,27 @@ return new class extends Migration
             $table->id();
 
 
+            
+            // General
             $table->double('orderProductQuantity', 10, 2)->nullable();
             $table->double('orderProductPrice', 10, 2)->nullable();
 
 
-            // ::foreign keys
+            // ::Product
             $table->bigInteger('productId')->unsigned()->nullable();
             $table->foreign('productId')->references('id')->on('products')->onDelete('set null');
 
+            $table->string('serial', 255)->nullable();
+            $table->string('name', 255)->nullable();
+            $table->string('nameAr', 255)->nullable();
+            $table->double('sellPrice', 10,2)->nullable();
 
+
+
+            // ::Foreign Keys
             $table->bigInteger('orderId')->unsigned()->nullable();
             $table->foreign('orderId')->references('id')->on('orders')->onDelete('cascade');
+
 
 
             $table->bigInteger('userId')->unsigned()->nullable();

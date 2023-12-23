@@ -21,7 +21,9 @@ return new class extends Migration
             // WAITING - COMPLETED - CANCELED
             $table->string('orderStatus', 100)->nullable();
             $table->string('orderSecondPhone', 100)->nullable();
-            
+
+            $table->bigInteger('orderEmployeeId')->unsigned()->nullable();
+            $table->foreign('orderEmployeeId')->references('id')->on('employees')->onDelete('cascade');
 
             
 
@@ -40,6 +42,8 @@ return new class extends Migration
 
 
             // :: 1: DELIVERY
+            $table->text('address')->nullable();
+
             $table->bigInteger('stateId')->unsigned()->nullable();
             $table->foreign('stateId')->references('id')->on('states')->onDelete('cascade');
             $table->bigInteger('deliveryAreaId')->unsigned()->nullable();
@@ -68,11 +72,15 @@ return new class extends Migration
 
             // DIRECTPAYMENT - ONLINEBANKINGPAYMENT - ATRECEIVINGPAYMENT
             $table->string('paymentType', 100)->nullable();
+            $table->string('paymentDateTime', 100)->nullable();
             $table->bigInteger('paymentId')->unsigned()->nullable();
             $table->foreign('paymentId')->references('id')->on('payments')->onDelete('cascade');
             $table->boolean('isPaymentDone')->nullable()->default(0);
 
+            $table->bigInteger('paymentEmployeeId')->unsigned()->nullable();
+            $table->foreign('paymentEmployeeId')->references('id')->on('employees')->onDelete('cascade');
 
+            
 
 
             // ::GLOBAL ORDER - Receiver
@@ -86,14 +94,23 @@ return new class extends Migration
 
 
 
-            // ::GLOBAL ORDER - Invoice
+            // ::GLOBAL ORDER - Invoice / Refund
             $table->text('invoiceNumber')->nullable();
+
+
             $table->text('refundInvoiceNumber')->nullable();
+            $table->string('refundDateTime', 100)->nullable();
+            $table->bigInteger('refundEmployeeId')->unsigned()->nullable();
+            $table->foreign('refundEmployeeId')->references('id')->on('employees')->onDelete('cascade');
+
+
 
 
             // ::foreign keys
             $table->bigInteger('userId')->unsigned()->nullable();
             $table->foreign('userId')->references('id')->on('users')->onDelete('cascade');
+
+            
 
 
             $table->timestamps();
