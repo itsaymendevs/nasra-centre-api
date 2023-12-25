@@ -44,12 +44,13 @@ class PaymentController extends Controller {
         $payment->accountName = $request->accountName;
         $payment->accountNumber = $request->accountNumber;
 
-        $payment->isForDelivery = $request->isForDelivery;
-        $payment->isForPickup = $request->isForPickup;
-        $payment->isForRefund = $request->isForRefund;
+        $payment->isForDelivery = boolval($request->isForDelivery);
+        $payment->isForPickup = boolval($request->isForPickup);
+        $payment->isForRefund = boolval($request->isForRefund);
 
         $payment->isActive = true;
 
+        
         $payment->save();
 
         return response()->json(['status' => true, 'message' => 'Payment has been added!'], 200);
@@ -81,7 +82,7 @@ class PaymentController extends Controller {
         $payment->isForPickup = $request->isForPickup;
         $payment->isForRefund = $request->isForRefund;
 
-        $payment->isActive = true;
+        $payment->isActive = $request->isActive;
 
         $payment->save();
 

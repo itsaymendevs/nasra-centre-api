@@ -21,6 +21,8 @@ return new class extends Migration
             // WAITING - COMPLETED - CANCELED
             $table->string('orderStatus', 100)->nullable();
             $table->string('orderSecondPhone', 100)->nullable();
+            $table->text('orderNote')->nullable();
+
 
             $table->bigInteger('orderEmployeeId')->unsigned()->nullable();
             $table->foreign('orderEmployeeId')->references('id')->on('employees')->onDelete('cascade');

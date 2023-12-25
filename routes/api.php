@@ -21,6 +21,7 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PickupController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\OrderController as LocalOrderController;
 use App\Http\Controllers\SubCategoryController;
 use App\Http\Controllers\TypeController;
 use App\Http\Controllers\UnitController;
@@ -259,6 +260,22 @@ Route::group(['middleware' => 'cors'], function () {
 
     // 14: payments
     Route::get("/payments", [PaymentController::class, 'index']);
+
+
+
+
+
+
+    // ========================================================
+    // ========================================================
+
+
+    // 15: orders
+    Route::get("/orders", [LocalOrderController::class, 'index']);
+
+    Route::get("/previousOrders", [LocalOrderController::class, 'previousOrders']);
+
+    
 
 
 
@@ -602,14 +619,23 @@ Route::group(['middleware' => 'cors'], function () {
         Route::post("/payments/store", [PaymentController::class, 'store']);
         Route::patch("/payments/update", [PaymentController::class, 'update']);
 
-        Route::delete("/payments/{id}/delete", [PaymentController::class, 'delete']);
-
 
         // toggle active
         Route::patch("/payments/{id}/toggle-active", [PaymentController::class, 'toggleActive']);
 
 
 
+
+
+        // ========================================================
+        // ========================================================
+
+
+
+
+
+        Route::patch("/previousOrders/toggle-ordering", [LocalOrderController::class, 'toggleOrdering']);
+        Route::patch("/previousOrders/toggle-global-ordering", [LocalOrderController::class, 'toggleGlobalOrdering']);
 
 
     }); // end sanctum middleware - Employee

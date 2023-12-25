@@ -997,15 +997,13 @@ class OrderController extends Controller {
         // 4.1: General Info
         $previousOrder->generalInfo->orderNumber = $newOrder->orderNumber;
         $previousOrder->generalInfo->orderDate = date('d-m-Y', strtotime($newOrder->orderDateTime));
-        $previousOrder->generalInfo->orderTime = date('h:m i A', strtotime($newOrder->orderDateTime));
+        $previousOrder->generalInfo->orderTime = date('h:m A', strtotime($newOrder->orderDateTime));
         $previousOrder->generalInfo->orderStatus = 'WAITING';
         $previousOrder->generalInfo->paymentType = $newOrder->paymentType;
         $previousOrder->generalInfo->paymentId = $newOrder->paymentId;
         $previousOrder->generalInfo->isPaymentDone = $newOrder->isPaymentDone;
 
-
-
-
+        
 
         // 4.2: Products
         $previousOrderProducts = OrderProduct::where('orderId', $newOrder->id)->get();
