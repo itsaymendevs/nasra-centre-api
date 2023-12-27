@@ -81,7 +81,7 @@ class DeliveryController extends Controller {
         // 1: create item
         $area = new DeliveryArea();
 
-        $area->serial = $this->createSerial('DA', DeliveryArea::count());
+        $area->serial = $this->createSerial('DA', DeliveryArea::latest()->first() ? DeliveryArea::latest()->first()->id : 0);
         $area->name = $request->name;
         $area->nameAr = $request->nameAr;
         $area->price = $request->price;
@@ -255,7 +255,7 @@ class DeliveryController extends Controller {
         // 1: create item
         $condition = new DeliveryCondition();
 
-        $condition->serial = $this->createSerial('DC', DeliveryCondition::count());
+        $condition->serial = $this->createSerial('DC', DeliveryCondition::latest()->first() ? DeliveryCondition::latest()->first()->id : 0);
         $condition->title = $request->title;
         $condition->titleAr = $request->titleAr;
 

@@ -71,7 +71,7 @@ class PickupController extends Controller {
         // 1: create item
         $pickup = new PickupStore();
 
-        $pickup->serial = $this->createSerial('PS', PickupStore::count());
+        $pickup->serial = $this->createSerial('PS', PickupStore::latest()->first() ? PickupStore::latest()->first()->id : 0);
         $pickup->title = $request->title;
         $pickup->titleAr = $request->titleAr;
         
@@ -282,7 +282,7 @@ class PickupController extends Controller {
         // 1: create item
         $condition = new PickupCondition();
 
-        $condition->serial = $this->createSerial('PC', PickupCondition::count());
+        $condition->serial = $this->createSerial('PC', PickupCondition::latest()->first() ? PickupCondition::latest()->first()->id : 0);
         $condition->title = $request->title;
         $condition->titleAr = $request->titleAr;
 
@@ -307,18 +307,6 @@ class PickupController extends Controller {
 
 
     public function updateCondition(Request $request) {
-
-        // :: validator
-        $validator = $this->validationTrait($request, 
-        ['title' => 'required', 'titleAr' => 'required', 'content' => 'required', 'contentAr' => 'required']);
-
-        // ! if validation not passed
-        if ($validator != false) {
-            return response()->json($validator->original);
-        } // end if
-
-        // ------------------------------------
-        // ------------------------------------
 
 
         // 1: create item

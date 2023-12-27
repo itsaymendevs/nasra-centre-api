@@ -35,7 +35,7 @@ class PaymentController extends Controller {
         // 1: create item
         $payment = new Payment();
 
-        $payment->serial = $this->createSerial('PM', Payment::count());
+        $payment->serial = $this->createSerial('PM', Payment::latest()->first() ? Payment::latest()->first()->id : 0);
 
         $payment->paymentType = $request->paymentType;
 
@@ -113,6 +113,27 @@ class PaymentController extends Controller {
         return response()->json(['status' => true, 'message' => 'Status has been updated!'], 200);
 
         
+    } // end function
+
+
+
+
+
+
+
+
+    // ----------------------------------------------------------
+
+
+
+    public function delete(Request $request, $id) {
+
+        // 1: delete item
+        $payment = Payment::find($id);
+        $payment->delete();
+
+        return response()->json(['status' => true, 'message' => 'Payment has been removed!'], 200);
+
     } // end function
 
 

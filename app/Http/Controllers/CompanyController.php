@@ -47,7 +47,7 @@ class CompanyController extends Controller {
 
         $company->name = $request->name;
         $company->nameAr = $request->nameAr;
-        $company->serial = $this->createSerial('C', Company::count());
+        $company->serial = $this->createSerial('C', Company::latest()->first() ? Company::latest()->first()->id : 0);
         
         $company->save();
 

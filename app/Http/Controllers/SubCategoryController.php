@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MainCategory;
 use App\Models\SubCategory;
 use Illuminate\Http\Request;
 use App\Traits\AppTrait;
+use stdClass;
 
 
 class SubCategoryController extends Controller {
@@ -18,8 +20,13 @@ class SubCategoryController extends Controller {
 
         // ::get items
         $subCategories = SubCategory::all();
+        $mainCategories = MainCategory::all();
 
-        return response()->json($subCategories, 200);
+        $combine = new stdClass();
+        $combine->mainCategories = $mainCategories;
+        $combine->subCategories = $subCategories;
+
+        return response()->json($combine, 200);
 
     } // end function
 
@@ -46,7 +53,7 @@ class SubCategoryController extends Controller {
         // 1: create item
         $subCategory = new SubCategory();
 
-        $subCategory->serial = $this->createSerial('SC', SubCategory::count());
+        $subCategory->serial = $this->createSerial('SC', SubCategory::latest()->first() ? SubCategory::latest()->first()->id : 0);
         $subCategory->name = $request->name;
         $subCategory->nameAr = $request->nameAr;
         $subCategory->index = SubCategory::where('mainCategoryId', $request->mainCategoryId)->count() + 1;

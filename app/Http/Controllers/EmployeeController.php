@@ -49,7 +49,7 @@ class EmployeeController extends Controller {
         // 1: create item
         $employee = new Employee();
 
-        $employee->serial = $this->createSerial('EM', Employee::count());
+        $employee->serial = $this->createSerial('EM', Employee::latest()->first() ? Employee::latest()->first()->id : 0);
         $employee->name = $request->name;
         $employee->nameAr = $request->nameAr;
         $employee->permission = $request->permission;

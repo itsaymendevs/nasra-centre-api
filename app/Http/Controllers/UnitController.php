@@ -44,7 +44,7 @@ class UnitController extends Controller {
         // 1: create item
         $unit = new Unit();
 
-        $unit->serial = $this->createSerial('MU', Unit::count());
+        $unit->serial = $this->createSerial('MU', Unit::latest()->first() ? Unit::latest()->first()->id : 0);
         $unit->name = $request->name;
         $unit->nameAr = $request->nameAr;
 

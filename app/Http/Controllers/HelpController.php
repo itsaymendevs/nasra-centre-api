@@ -140,7 +140,7 @@ class HelpController extends Controller {
         // 1: create item
         $paragraph = new AboutInfo();
 
-        $paragraph->serial = $this->createSerial('AP', AboutInfo::count());
+        $paragraph->serial = $this->createSerial('AP', AboutInfo::latest()->first() ? AboutInfo::latest()->first()->id : 0);
         $paragraph->title = $request->title;
         $paragraph->titleAr = $request->titleAr;
 

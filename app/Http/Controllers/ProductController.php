@@ -59,7 +59,7 @@ class ProductController extends Controller {
         $types = Type::all();
         $companies = Company::all();
         $units = Unit::all();
-        $serial = $this->createSerial('P', Product::count());
+        $serial = $this->createSerial('P', Product::latest()->first() ? Product::latest()->first()->id : 0);
 
         $combine = new stdClass();
         $combine->mainCategories = $mainCategories;
@@ -88,7 +88,7 @@ class ProductController extends Controller {
         // 1: create item
         $product = new Product();
 
-        $product->serial = $this->createSerial('P', Product::count());
+        $product->serial = $this->createSerial('P', Product::latest()->first() ? Product::latest()->first()->id : 0);
         $product->name = $request->name;
         $product->nameAr = $request->nameAr;
         
@@ -508,6 +508,60 @@ class ProductController extends Controller {
         return response()->json($product, 200);
 
     } // end function
+
+
+
+
+    // ----------------------------------------------------------
+
+
+
+    public function delete(Request $request, $id) {
+
+        // 1: delete item / image
+        $product = Product::find($id);
+
+        // 1.2: remove image if exits
+        if ($product->image) {
+            
+            $this->deleteFile($product->image, 'products/');
+
+        } // end if
+
+
+        // 1.3: remove firstExtraImage if exits
+        if ($product->firstExtraImage) {
+            
+            $this->deleteFile($product->firstExtraImage, 'products/');
+
+        } // end if
+
+
+        // 1.2: remove secExtraImage if exits
+        if ($product->secExtraImage) {
+            
+            $this->deleteFile($product->secExtraImage, 'products/');
+
+        } // end if
+
+
+        // 1.2: remove thirdExtraImage if exits
+        if ($product->thirdExtraImage) {
+            
+            $this->deleteFile($product->thirdExtraImage, 'products/');
+
+        } // end if
+
+
+
+        $product->delete();
+
+
+
+        return response()->json(['status' => true, 'message' => 'Product has been removed!'], 200);
+
+    } // end function
+
 
 
 

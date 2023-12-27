@@ -116,7 +116,7 @@ class ContactController extends Controller {
         // 1: create item
         $phone = new ContactPhone();
 
-        $phone->serial = $this->createSerial('PH', ContactPhone::where('countryId', $countryId)->count());
+        $phone->serial = $this->createSerial('PH', ContactPhone::where('countryId', $countryId)->latest()->first() ? ContactPhone::where('countryId', $countryId)->latest()->first()->id : 0);
 
         $phone->phone = $request->phone;
         $phone->countryId = $countryId;
@@ -218,7 +218,7 @@ class ContactController extends Controller {
         // 1: create item
         $term = new Term();
 
-        $term->serial = $this->createSerial('TR', Term::where('countryId', $countryId)->count());
+        $term->serial = $this->createSerial('TR', Term::where('countryId', $countryId)->latest()->first() ? Term::where('countryId', $countryId)->latest()->first()->id : 0);
         $term->title = $request->title;
         $term->titleAr = $request->titleAr;
 

@@ -55,7 +55,7 @@ class MainCategoryController extends Controller {
         // 1: create item
         $mainCategory = new MainCategory();
 
-        $mainCategory->serial = $this->createSerial('MC', MainCategory::count());
+        $mainCategory->serial = $this->createSerial('MC', MainCategory::latest()->first() ? MainCategory::latest()->first()->id : 0);
         $mainCategory->name = $request->name;
         $mainCategory->nameAr = $request->nameAr;
         $mainCategory->index = MainCategory::count() + 1;

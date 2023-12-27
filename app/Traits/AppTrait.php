@@ -64,6 +64,9 @@ trait AppTrait {
 
     protected function createSerial($characters, $number) {
 
+        $number = intval($number);
+
+        
         if ($number < 10) {
 
             return $characters .'-00'. ($number + 1);

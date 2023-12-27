@@ -170,6 +170,7 @@ Route::group(['middleware' => 'cors'], function () {
     Route::get("/delivery/create", [DeliveryController::class, 'create']);
 
     Route::get("/delivery/{id}/edit", [DeliveryController::class, 'edit']);
+
    
 
 
@@ -490,7 +491,7 @@ Route::group(['middleware' => 'cors'], function () {
 
         Route::post("/pickup/conditions/store", [PickupController::class, 'storeCondition']);
 
-        Route::post("/pickup/conditions/update", [PickupController::class, 'updateCondition']);
+        Route::patch("/pickup/conditions/update", [PickupController::class, 'updateCondition']);
 
         Route::delete("/pickup/conditions/{id}/delete", [PickupController::class, 'deleteCondition']);
 
@@ -530,7 +531,7 @@ Route::group(['middleware' => 'cors'], function () {
 
         Route::post("/delivery/conditions/store", [DeliveryController::class, 'storeCondition']);
         
-        Route::post("/delivery/conditions/update", [DeliveryController::class, 'updateCondition']);
+        Route::patch("/delivery/conditions/update", [DeliveryController::class, 'updateCondition']);
         Route::delete("/delivery/conditions/{id}/delete", [DeliveryController::class, 'deleteCondition']);
 
 
@@ -581,8 +582,10 @@ Route::group(['middleware' => 'cors'], function () {
         // create - store
         Route::post("/products/store", [ProductController::class, 'store']);
 
-        // edit - update
+        // update - delete
         Route::post("/products/{id}/update", [ProductController::class, 'update']);
+        Route::delete("/products/{id}/delete", [ProductController::class, 'delete']);
+
 
 
         // toggle show / home
@@ -629,11 +632,10 @@ Route::group(['middleware' => 'cors'], function () {
         Route::post("/payments/store", [PaymentController::class, 'store']);
         Route::patch("/payments/update", [PaymentController::class, 'update']);
 
-
         // toggle active
         Route::patch("/payments/{id}/toggle-active", [PaymentController::class, 'toggleActive']);
 
-
+        Route::delete("/payments/{id}/delete", [PaymentController::class, 'delete']);
 
 
 

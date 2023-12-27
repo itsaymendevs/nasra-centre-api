@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MainCategory;
+use App\Models\SubCategory;
 use App\Models\Type;
 use Illuminate\Http\Request;
 use App\Traits\AppTrait;
+use stdClass;
 
 class TypeController extends Controller {
 
@@ -16,9 +19,19 @@ class TypeController extends Controller {
     public function index() {
 
         // ::get items
+        $subCategories = SubCategory::all();
+        $mainCategories = MainCategory::all();
         $types = Type::all();
+
+
+        $combine = new stdClass();
+        $combine->mainCategories = $mainCategories;
+        $combine->subCategories = $subCategories;
+        $combine->types = $types;
+
+
         
-        return response()->json($types, 200);
+        return response()->json($combine, 200);
 
     } // end function
 
@@ -44,7 +57,7 @@ class TypeController extends Controller {
         // 1: create item
         $type = new Type();
 
-        $type->serial = $this->createSerial('IT', Type::count());
+        $type->serial = $this->createSerial('IT', Type::latest()->first() ? Type::latest()->first()->id : 0);
         $type->name = $request->name;
         $type->nameAr = $request->nameAr;
         $type->index = Type::where('subCategoryId', $request->subCategoryId)->count() + 1;
