@@ -13,9 +13,9 @@ class MessageController extends Controller {
     public function index() {
 
         // ::get items
-        $phoneMessage = Message::where('isFor', 'phone')->first();
-        $deliveryMessages = Message::where('isFor', 'delivery')->get();
-        $pickupMessages = Message::where('isFor', 'pickup')->get();
+        $phoneMessage = Message::where('isFor', 'PHONE')->first();
+        $deliveryMessages = Message::where('isFor', 'DELIVERY')->get();
+        $pickupMessages = Message::where('isFor', 'PICKUP')->get();
 
         // 1: combine into one object
         $combine = new stdClass();
@@ -100,13 +100,13 @@ class MessageController extends Controller {
     public function indexGlobal() {
 
         // ::get items
-        $phoneMessageCustomer = GlobalMessage::where('isFor', 'phone')->where('target', 'customer')->first();
-        $deliveryMessagesCustomer = GlobalMessage::where('isFor', 'delivery')->where('target', 'customer')->get();
-        $pickupMessagesCustomer = GlobalMessage::where('isFor', 'pickup')->where('target', 'customer')->get();
+        $phoneMessageCustomer = GlobalMessage::where('isFor', 'PHONE')->where('target', 'customer')->first();
+        $deliveryMessagesCustomer = GlobalMessage::where('isFor', 'DELIVERY')->where('target', 'customer')->get();
+        $pickupMessagesCustomer = GlobalMessage::where('isFor', 'PICKUP')->where('target', 'customer')->get();
 
        
-        $deliveryMessagesReceiver = GlobalMessage::where('isFor', 'delivery')->where('target', 'receiver')->get();
-        $pickupMessagesReceiver = GlobalMessage::where('isFor', 'pickup')->where('target', 'receiver')->get();
+        $deliveryMessagesReceiver = GlobalMessage::where('isFor', 'DELIVERY')->where('target', 'receiver')->get();
+        $pickupMessagesReceiver = GlobalMessage::where('isFor', 'PICKUP')->where('target', 'receiver')->get();
 
 
         // 1: combine into one object

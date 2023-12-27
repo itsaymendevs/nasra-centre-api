@@ -17,12 +17,16 @@ return new class extends Migration
             $table->text('userToken')->nullable();
             $table->integer('orderNumber')->nullable();
             $table->string('orderDateTime', 100)->nullable();
+            $table->string('orderStatusDateTime', 100)->nullable();
+
             
             // WAITING - COMPLETED - CANCELED
             $table->string('orderStatus', 100)->nullable();
             $table->string('orderSecondPhone', 100)->nullable();
             $table->text('orderNote')->nullable();
+            $table->text('orderCancellationNote')->nullable();
 
+            
 
             $table->bigInteger('orderEmployeeId')->unsigned()->nullable();
             $table->foreign('orderEmployeeId')->references('id')->on('employees')->onDelete('cascade');
@@ -77,6 +81,7 @@ return new class extends Migration
             $table->string('paymentDateTime', 100)->nullable();
             $table->bigInteger('paymentId')->unsigned()->nullable();
             $table->foreign('paymentId')->references('id')->on('payments')->onDelete('cascade');
+            $table->text('paymentNote')->nullable();
             $table->boolean('isPaymentDone')->nullable()->default(0);
 
             $table->bigInteger('paymentEmployeeId')->unsigned()->nullable();

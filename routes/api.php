@@ -271,11 +271,21 @@ Route::group(['middleware' => 'cors'], function () {
 
 
     // 15: orders
+    Route::get("/previousOrders", [LocalOrderController::class, 'previousOrders']);
     Route::get("/orders", [LocalOrderController::class, 'index']);
 
-    Route::get("/previousOrders", [LocalOrderController::class, 'previousOrders']);
 
-    
+
+
+    // ========================================================
+    // ========================================================
+
+
+    // 16: SingleOrder
+    Route::get("/orders/{id}", [LocalOrderController::class, 'singleOrder']);
+
+
+
 
 
 
@@ -633,9 +643,42 @@ Route::group(['middleware' => 'cors'], function () {
 
 
 
-
+        // 15: Orders / PreviousOrders
         Route::patch("/previousOrders/toggle-ordering", [LocalOrderController::class, 'toggleOrdering']);
         Route::patch("/previousOrders/toggle-global-ordering", [LocalOrderController::class, 'toggleGlobalOrdering']);
+
+
+
+
+
+
+
+        // ========================================================
+        // ========================================================
+
+
+
+        // 16.1: Payment
+        Route::patch("/orders/{id}/confirm-payment", [LocalOrderController::class, 'confirmPayment']);
+        Route::patch("/orders/{id}/cancel-payment", [LocalOrderController::class, 'cancelPayment']);
+
+
+
+
+        // 16.2: OTP
+        Route::patch("/orders/{id}/send-otp", [LocalOrderController::class, 'sendOTP']);
+
+
+        // 16.3: OrderNote
+        Route::patch("/orders/{id}/update-note", [LocalOrderController::class, 'updateOrderNote']);
+
+
+
+        // 16.4: processOrder / cancelOrder
+        Route::patch("/orders/{id}/process-order", [LocalOrderController::class, 'processOrder']);
+        Route::patch("/orders/{id}/cancel-order", [LocalOrderController::class, 'cancelOrder']);
+
+
 
 
     }); // end sanctum middleware - Employee

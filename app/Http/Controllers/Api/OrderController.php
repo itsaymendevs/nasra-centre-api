@@ -694,7 +694,8 @@ class OrderController extends Controller {
 
 
         $newOrder->orderNumber = $orderNumber;
-        $newOrder->orderDateTime = Carbon::now();
+        $newOrder->orderDateTime = Carbon::now()->addHours(2);
+        $newOrder->orderStatusDateTime = Carbon::now()->addHours(2);
         $newOrder->orderStatus = 'PENDING'; // => WAITING
         $newOrder->orderSecondPhone = $request->generalInfo->secondNumber ? $request->generalInfo->secondNumber : null;
         $newOrder->receivingOption = $receivingOption;

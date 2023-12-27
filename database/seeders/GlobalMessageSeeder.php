@@ -13,8 +13,8 @@ class GlobalMessageSeeder extends Seeder {
     public function run(): void {
 
         $messages = [
-            ["isFor" => "phone",
-            "type" => "otp",
+            ["isFor" => "PHONE",
+            "type" => "OTP",
             "content" => "",
             "contentAr" => "",
             'target' => 'customer'],
@@ -24,23 +24,23 @@ class GlobalMessageSeeder extends Seeder {
             // ------------------
 
 
-            ["isFor" => "delivery",
-            "type" => "processing",
+            ["isFor" => "DELIVERY",
+            "type" => "PROCESSING",
             "content" => "",
             "contentAr" => "",
             'target' => 'customer'],
 
 
 
-            ["isFor" => "delivery",
-            "type" => "canceled",
+            ["isFor" => "DELIVERY",
+            "type" => "CANCELED",
             "content" => "",
             "contentAr" => "",
             'target' => 'customer'],
 
 
-            ["isFor" => "delivery",
-            "type" => "canceled",
+            ["isFor" => "DELIVERY",
+            "type" => "CANCELED",
             "content" => "",
             "contentAr" => "",
             'target' => 'receiver'],
@@ -48,15 +48,15 @@ class GlobalMessageSeeder extends Seeder {
 
 
 
-            ["isFor" => "delivery",
-            "type" => "completed",
+            ["isFor" => "DELIVERY",
+            "type" => "COMPLETED",
             "content" => "",
             "contentAr" => "",
             'target' => 'customer'],
 
 
-            ["isFor" => "delivery",
-            "type" => "completed",
+            ["isFor" => "DELIVERY",
+            "type" => "COMPLETED",
             "content" => "",
             "contentAr" => "",
             'target' => 'receiver'],
@@ -64,8 +64,8 @@ class GlobalMessageSeeder extends Seeder {
 
 
 
-            ["isFor" => "delivery",
-            "type" => "reception",
+            ["isFor" => "DELIVERY",
+            "type" => "RECEPTION",
             "content" => "",
             "contentAr" => "",
             'target' => 'receiver'],
@@ -76,22 +76,22 @@ class GlobalMessageSeeder extends Seeder {
             // ------------------
             
 
-            ["isFor" => "pickup",
-            "type" => "processing",
+            ["isFor" => "PICKUP",
+            "type" => "PROCESSING",
             "content" => "",
             "contentAr" => "",
             'target' => 'customer'],
 
 
 
-            ["isFor" => "pickup",
-            "type" => "canceled",
+            ["isFor" => "PICKUP",
+            "type" => "CANCELED",
             "content" => "",
             "contentAr" => "",
             'target' => 'customer'],
 
-            ["isFor" => "pickup",
-            "type" => "canceled",
+            ["isFor" => "PICKUP",
+            "type" => "CANCELED",
             "content" => "",
             "contentAr" => "",
             'target' => 'receiver'],
@@ -100,14 +100,14 @@ class GlobalMessageSeeder extends Seeder {
 
 
 
-            ["isFor" => "pickup",
-            "type" => "completed",
+            ["isFor" => "PICKUP",
+            "type" => "COMPLETED",
             "content" => "",
             "contentAr" => "",
             'target' => 'customer'],
 
-            ["isFor" => "pickup",
-            "type" => "completed",
+            ["isFor" => "PICKUP",
+            "type" => "COMPLETED",
             "content" => "",
             "contentAr" => "",
             'target' => 'receiver'],
@@ -115,8 +115,8 @@ class GlobalMessageSeeder extends Seeder {
 
 
 
-            ["isFor" => "pickup",
-            "type" => "reception",
+            ["isFor" => "PICKUP",
+            "type" => "RECEPTION",
             "content" => "",
             "contentAr" => "",
             'target' => 'receiver'],

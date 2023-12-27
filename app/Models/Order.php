@@ -44,15 +44,15 @@ class Order extends Model {
 
 
     public function orderEmployee() {
-        return $this->belongsTo(Employee::class, 'orderEmployeeId', 'id');
+        return $this->belongsTo(Employee::class, 'orderEmployeeId');
     }
 
     public function paymentEmployee () {
-        return $this->belongsTo(Employee::class, 'paymentEmployeeId', 'id');
+        return $this->belongsTo(Employee::class, 'paymentEmployeeId');
     }
 
     public function refundEmployee () {
-        return $this->belongsTo(Employee::class, 'refundEmployeeId', 'id');
+        return $this->belongsTo(Employee::class, 'refundEmployeeId');
     }
 
 
@@ -64,6 +64,11 @@ class Order extends Model {
     }
 
 
+
+
+    public function products() {
+        return $this->hasMany(OrderProduct::class, 'orderId', 'id');
+    }
 
 
 

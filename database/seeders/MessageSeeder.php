@@ -11,8 +11,8 @@ class MessageSeeder extends Seeder {
     public function run(): void {
         
         $messages = [
-            ["isFor" => "phone",
-            "type" => "otp",
+            ["isFor" => "PHONE",
+            "type" => "OTP",
             "content" => "",
             "contentAr" => ""],
 
@@ -21,19 +21,19 @@ class MessageSeeder extends Seeder {
             // ------------------
 
 
-            ["isFor" => "delivery",
-            "type" => "processing",
+            ["isFor" => "DELIVERY",
+            "type" => "PROCESSING",
             "content" => "",
             "contentAr" => ""],
 
-            ["isFor" => "delivery",
-            "type" => "canceled",
+            ["isFor" => "DELIVERY",
+            "type" => "CANCELED",
             "content" => "",
             "contentAr" => ""],
 
 
-            ["isFor" => "delivery",
-            "type" => "completed",
+            ["isFor" => "DELIVERY",
+            "type" => "COMPLETED",
             "content" => "",
             "contentAr" => ""],
 
@@ -42,18 +42,18 @@ class MessageSeeder extends Seeder {
             // ------------------
             
 
-            ["isFor" => "pickup",
-            "type" => "processing",
+            ["isFor" => "PICKUP",
+            "type" => "PROCESSING",
             "content" => "",
             "contentAr" => ""],
 
-            ["isFor" => "pickup",
-            "type" => "canceled",
+            ["isFor" => "PICKUP",
+            "type" => "CANCELED",
             "content" => "",
             "contentAr" => ""],
 
-            ["isFor" => "pickup",
-            "type" => "completed",
+            ["isFor" => "PICKUP",
+            "type" => "COMPLETED",
             "content" => "",
             "contentAr" => ""],
 

@@ -24,14 +24,22 @@ class CountrySeeder extends Seeder
             "nameAr" => "بريطانيا",
             "code" => "UK",
             "currency" => "GBP",
-            "toSDG" => "1"],
+            "toSDG" => "100"],
 
             ["serial" => "CN-003",
             "name" => "Ireland",
             "nameAr" => "إيرلندا",
             "code" => "IRL",
             "currency" => "EUR",
-            "toSDG" => "1"]
+            "toSDG" => "150"],
+
+            ["serial" => "CN-004",
+            "name" => "Egypt",
+            "nameAr" => "مصر",
+            "code" => "EG",
+            "currency" => "EGP",
+            "toSDG" => "20"]
+
         ];
 
         foreach ($countries as $country) {  
@@ -40,6 +48,7 @@ class CountrySeeder extends Seeder
                 'serial' => $country['serial'],
                 'name' => $country['name'],
                 'nameAr' => $country['nameAr'],
+                'code' => $country['code'],
                 'currency' => $country['currency'],
                 'toSDG' => $country['toSDG'],
                 'created_at' => Carbon::now(),
