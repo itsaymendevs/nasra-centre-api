@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Country;
 use App\Models\DeliveryArea;
+use App\Models\Order;
 use App\Models\State;
 use App\Models\User;
 use App\Models\UserReceiver;
@@ -40,7 +41,7 @@ class UserController extends Controller {
 
 
         // 1: get users / filters
-        $users = User::all();
+        $users = User::with(['favorites'])->get();
 
         $countries = Country::all();
         $states = State::all();
@@ -101,7 +102,7 @@ class UserController extends Controller {
 
 
         // 1: get users / dependencies
-        $user = User::with(['country', 'state', 'deliveryArea', 'favorites.product', 'receivers'])->where('id', $id)->first();
+        $user = User::with(['country', 'state', 'deliveryArea', 'favorites.product', 'receivers', 'orders.products', 'orders.deliveryArea', 'orders.store', 'orders.payment'])->where('id', $id)->first();
         $countries = Country::all();
         
 
@@ -119,6 +120,34 @@ class UserController extends Controller {
 
 
 
+
+
+
+
+    // ----------------------------------------------------------
+
+
+
+
+    public function singleUserOrder(Request $request, $id, $orderId) {
+
+
+        // 1: get users / dependencies
+        $order = Order::with(['user', 'user.country', 'state', 'deliveryArea', 'receiver', 'products', 'store', 'payment', 'orderEmployee', 'paymentEmployee', 'refundEmployee'])->where('id', $id)->first();
+        $countries = Country::all();
+        
+
+        // 1.2: combine
+        $combine = new stdClass();
+
+        $combine->order = $order;
+        $combine->countries = $countries;
+
+
+
+        return response()->json($combine, 200);
+
+    } // end function
 
 
 

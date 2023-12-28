@@ -245,9 +245,12 @@ Route::group(['middleware' => 'cors'], function () {
     Route::get("/users/{id}", [UserController::class, 'singleUser']);
 
 
+    // 13.2: single User - Order
+    Route::get("/users/{id}/orders/{orderId}", [UserController::class, 'singleUserOrder']);
 
 
-    // 13.2: single Receiver
+    
+    // 13.3: single Receiver
     Route::get("/users/{id}/receivers/{receiverId}", [UserController::class, 'singleReceiver']);
 
 
@@ -617,6 +620,9 @@ Route::group(['middleware' => 'cors'], function () {
         // 13.1: toggle active / inactive
         Route::patch("/users/{id}/toggle-active", [UserController::class, 'toggleActive']);
 
+
+
+        Route::patch("/users/{id}/toggle-active", [UserController::class, 'toggleActive']);
 
 
 
