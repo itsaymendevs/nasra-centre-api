@@ -25,6 +25,31 @@ class UserReceiver extends Model {
 
 
 
+    public function orders() {
+        return $this->hasMany(Order::class, 'receiverId', 'id');
+    }
+
+    public function completedOrders() {
+        return $this->orders()->where('orderStatus', 'COMPLETED');
+    }
+
+    public function canceledOrders() {
+        return $this->orders()->where('orderStatus', 'CANCELED');
+    }
+
+
+    public function pendingOrders() {
+        return $this->orders()->where('orderStatus', 'PENDING');
+    }
+    
+    public function processingOrders() {
+        return $this->orders()->where('orderStatus', 'PROCESSING');
+    }
+
+
+
+
+
     
 
 

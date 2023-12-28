@@ -124,11 +124,7 @@ class ProductController extends Controller {
         $product->typeId = $request->typeId;
         
 
-        // 1.3: category index based on type
-        $product->index = Product::where('typeId', $request->typeId)->count() + 1;
-
-
-
+       
 
         // 1.4: upload image if exits
         if ($request->hasFile('image')) {
@@ -165,6 +161,108 @@ class ProductController extends Controller {
             $product->thirdExtraImage = $fileName;
 
         } // end if
+
+
+
+
+
+
+
+        // -------------------------------
+        // -------------------------------
+
+
+
+        // 1.6: indexMainPage - reindex items / reset to null
+        if ($product->isMainPage === true) {
+
+
+            // 1.6.1: loop thru to sort all again
+            $indexCounter = 1;
+            $sortProducts = Product::where('isMainPage', true)
+            ->orderBy('indexMainPage','asc')->get();
+
+            foreach ($sortProducts as $item) {
+
+                $item->indexMainPage = $indexCounter;
+                $item->save();
+
+                $indexCounter++;
+
+            } // end loop
+
+
+            // 1.6.2: sort recent one
+            $product->indexMainPage = Product::where('isMainPage', true)->count() + 1;
+
+        } else {
+
+            $product->indexMainPage = null;
+            
+        } // end if
+
+
+
+
+
+
+
+        // 1.7: index - reindex items
+        if (true) {
+
+
+            // 1.7.1: loop thru to sort all again
+            $indexCounter = 1;
+            $sortProducts = Product::where('typeId', $request->typeId)
+            ->orderBy('index','asc')->get();
+
+            foreach ($sortProducts as $item) {
+
+                $item->index = $indexCounter;
+                $item->save();
+
+                $indexCounter++;
+
+            } // end loop
+
+
+            // 1.7.2: sort recent one
+            $product->index = Product::where('typeId', $request->typeId)->count() + 1;
+
+        } // end if
+
+
+
+
+
+
+
+        // 1.8: indexOffers - reindex items
+        if (!empty($request->offerPrice)) {
+
+
+            // 1.8.1: loop thru to sort all again
+            $indexCounter = 1;
+            $sortProducts = Product::whereNotNull('offerPrice')
+            ->orderBy('indexOffers','asc')->get();
+
+            foreach ($sortProducts as $item) {
+
+                $item->indexOffers = $indexCounter;
+                $item->save();
+
+                $indexCounter++;
+
+            } // end loop
+
+
+            // 1.8.2: sort recent one
+            $product->indexOffers = Product::whereNotNull('offerPrice')->count() + 1;
+
+        } // end if
+
+
+
 
 
         $product->save();
@@ -247,9 +345,16 @@ class ProductController extends Controller {
 
     public function update(Request $request, $id) {
 
+        
+
 
         // 1: create item
         $product = Product::find($id);
+
+
+        // ::deprived
+        $oldTypeId = $product->typeId;
+
 
         $product->name = $request->name;
         $product->nameAr = $request->nameAr;
@@ -291,9 +396,6 @@ class ProductController extends Controller {
         $product->typeId = $request->typeId;
         
 
-        // 1.3: category index based on type
-        $product->index = Product::where('id', '!=', $product->id)
-        ->where('typeId', $request->typeId)->count() + 1;
 
 
 
@@ -344,6 +446,113 @@ class ProductController extends Controller {
 
 
 
+
+
+
+        // -------------------------------
+        // -------------------------------
+
+
+
+        // 1.6: indexMainPage - reindex items / reset to null
+        if ($product->isMainPage === true && empty($product->indexMainPage)) {
+
+
+            // 1.6.1: loop thru to sort all again
+            $indexCounter = 1;
+            $sortProducts = Product::where('isMainPage', true)
+            ->orderBy('indexMainPage','asc')->get();
+
+            foreach ($sortProducts as $item) {
+
+                $item->indexMainPage = $indexCounter;
+                $item->save();
+
+                $indexCounter++;
+
+            } // end loop
+
+
+            // 1.6.2: sort recent one
+            $product->indexMainPage = Product::where('isMainPage', true)->count() + 1;
+
+
+
+        } elseif ($product->isMainPage === false) {
+
+            $product->indexMainPage = null;
+            
+        } // end if
+
+
+
+
+
+
+        
+        // 1.7: index - reindex items
+        if ($oldTypeId != $request->typeId) {
+
+
+            // 1.6.1: loop thru to sort all again
+            $indexCounter = 1;
+            $sortProducts = Product::where('typeId', $request->typeId)
+            ->orderBy('index','asc')->get();
+
+            foreach ($sortProducts as $item) {
+
+                $item->index = $indexCounter;
+                $item->save();
+
+                $indexCounter++;
+
+            } // end loop
+
+
+            // 1.6.2: sort recent one
+            $product->index = Product::where('typeId', $request->typeId)->count() + 1;
+
+        } // end if
+
+
+
+
+
+
+        // 1.8: indexOffers - reindex items
+        if (!empty($request->offerPrice) && empty($product->indexOffers)) {
+
+
+            // 1.8.1: loop thru to sort all again
+            $indexCounter = 1;
+            $sortProducts = Product::whereNotNull('offerPrice')
+            ->orderBy('indexOffers','asc')->get();
+
+            foreach ($sortProducts as $item) {
+
+                $item->indexOffers = $indexCounter;
+                $item->save();
+
+                $indexCounter++;
+
+            } // end loop
+
+
+            // 1.8.2: sort recent one
+            $product->indexOffers = Product::whereNotNull('offerPrice')->count() + 1;
+
+
+
+        } elseif (empty($request->offerPrice)) {
+
+            $product->indexOffers = null;
+            
+        } // end if
+
+        
+
+
+
         $product->save();
 
 
@@ -374,14 +583,14 @@ class ProductController extends Controller {
         $product->isMainPage = !boolval($product->isMainPage);
 
 
-        // reindex items / reset to null
-        if ($product->isMainPage === true) {
+        // 1.2: indexMainPage - reindex items / reset to null
+        if ($product->isMainPage === true && empty($product->indexMainPage)) {
 
 
-            // 1.3: loop thru to sort all again
+            // 1.2.1: loop thru to sort all again
             $indexCounter = 1;
             $sortProducts = Product::where('isMainPage', true)
-            ->orderBy('indexMainPage','desc')->get();
+            ->orderBy('indexMainPage','asc')->get();
 
             foreach ($sortProducts as $item) {
 
@@ -393,10 +602,12 @@ class ProductController extends Controller {
             } // end loop
 
 
-            // 1.2: sort recent one
+            // 1.2.2: sort recent one
             $product->indexMainPage = Product::where('isMainPage', true)->count() + 1;
 
-        } else {
+
+
+        } elseif ($product->isMainPage === false) {
 
             $product->indexMainPage = null;
             
@@ -449,7 +660,7 @@ class ProductController extends Controller {
     public function mainPageSort() {
 
         // 1: get sorted items
-        $product = Product::where('isMainPage', true)->orderBy('indexMainPage','desc')->get();
+        $product = Product::where('isMainPage', true)->orderBy('indexMainPage','asc')->get();
 
         return response()->json($product, 200);
 
@@ -503,7 +714,7 @@ class ProductController extends Controller {
 
         // 1: get sorted items
         $product = Product::where('typeId', $typeId)
-        ->orderBy('index','desc')->get();
+        ->orderBy('index','asc')->get();
 
         return response()->json($product, 200);
 

@@ -32,8 +32,25 @@ class User extends Authenticatable
         return $this->hasMany(Order::class, 'userId');
     }
 
+    public function completedOrders() {
+        return $this->orders()->where('orderStatus', 'COMPLETED');
+    }
 
+    public function canceledOrders() {
+        return $this->orders()->where('orderStatus', 'CANCELED');
+    }
+
+
+    public function pendingOrders() {
+        return $this->orders()->where('orderStatus', 'PENDING');
+    }
     
+    public function processingOrders() {
+        return $this->orders()->where('orderStatus', 'PROCESSING');
+    }
+
+
+
 
     public function country() {
         return $this->belongsTo(Country::class, 'countryId');

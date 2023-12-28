@@ -60,10 +60,37 @@ class TypeController extends Controller {
         $type->serial = $this->createSerial('IT', Type::latest()->first() ? Type::latest()->first()->id : 0);
         $type->name = $request->name;
         $type->nameAr = $request->nameAr;
-        $type->index = Type::where('subCategoryId', $request->subCategoryId)->count() + 1;
         $type->mainCategoryId = $request->mainCategoryId;
         $type->subCategoryId = $request->subCategoryId;
         
+
+
+        // 1.2: sort Type
+        if (true) {
+
+            // 1.2.1: loop thru to sort all again
+            $indexCounter = 1;
+            $sortTypes = Type::where('subCategoryId', $request->subCategoryId)
+            ->orderBy('index','asc')->get();
+
+            foreach ($sortTypes as $item) {
+
+                $item->index = $indexCounter;
+                $item->save();
+
+                $indexCounter++;
+
+            } // end loop
+
+
+            // 1.2.2: sort recent one
+            $type->index = Type::where('subCategoryId', $request->subCategoryId)->count() + 1;
+
+        } // end if
+
+
+
+
 
         $type->save();
 
@@ -84,28 +111,49 @@ class TypeController extends Controller {
 
     public function update(Request $request) {
 
-        // :: validator
-        $validator = $this->validationTrait($request, 
-        ['name' => 'required', 'nameAr' => 'required']);
-
-        // ! if validation not passed
-        if ($validator != false) {
-            return response()->json($validator->original);
-        } // end if
-
-
-        // ------------------------------------
-        // ------------------------------------
-
 
         // 1: update item
         $type = Type::find($request->id);
+
+        // ::root
+        $oldSubCategoryId = $type->subCategoryId;
+
 
         $type->name = $request->name;
         $type->nameAr = $request->nameAr;
         
         $type->mainCategoryId = $request->mainCategoryId;
         $type->subCategoryId = $request->subCategoryId;
+
+
+
+
+
+        // 1.2: sort Type
+        if ($oldSubCategoryId != $request->subCategoryId) {
+
+            // 1.2.1: loop thru to sort all again
+            $indexCounter = 1;
+            $sortTypes = Type::where('subCategoryId', $request->subCategoryId)
+            ->orderBy('index','asc')->get();
+
+            foreach ($sortTypes as $item) {
+
+                $item->index = $indexCounter;
+                $item->save();
+
+                $indexCounter++;
+
+            } // end loop
+
+
+            // 1.2.2: sort recent one
+            $type->index = Type::where('subCategoryId', $request->subCategoryId)->count() + 1;
+
+        } // end if
+
+
+
 
         $type->save();
 

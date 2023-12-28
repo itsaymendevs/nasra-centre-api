@@ -56,9 +56,34 @@ class SubCategoryController extends Controller {
         $subCategory->serial = $this->createSerial('SC', SubCategory::latest()->first() ? SubCategory::latest()->first()->id : 0);
         $subCategory->name = $request->name;
         $subCategory->nameAr = $request->nameAr;
-        $subCategory->index = SubCategory::where('mainCategoryId', $request->mainCategoryId)->count() + 1;
-
         $subCategory->mainCategoryId = $request->mainCategoryId;
+
+
+        // 1.2: sort SubCategory
+        if (true) {
+
+            // 1.2.1: loop thru to sort all again
+            $indexCounter = 1;
+            $sortSubCategories = SubCategory::where('mainCategoryId', $request->mainCategoryId)
+            ->orderBy('index','asc')->get();
+
+            foreach ($sortSubCategories as $item) {
+
+                $item->index = $indexCounter;
+                $item->save();
+
+                $indexCounter++;
+
+            } // end loop
+
+
+            // 1.2.2: sort recent one
+            $subCategory->index = SubCategory::where('mainCategoryId', $request->mainCategoryId)->count() + 1;
+
+        } // end if
+
+
+
 
         $subCategory->save();
 
@@ -83,10 +108,42 @@ class SubCategoryController extends Controller {
         // 1: update item
         $subCategory = SubCategory::find($request->id);
 
+        // ::root
+        $oldMainCategoryId = $subCategory->mainCategoryId;
+
+
         $subCategory->name = $request->name;
         $subCategory->nameAr = $request->nameAr;
         $subCategory->mainCategoryId = $request->mainCategoryId;
-        
+
+
+
+        // 1.2: sort SubCategory
+        if ($oldMainCategoryId != $request->mainCategoryId) {
+
+
+            // 1.2.1: loop thru to sort all again
+            $indexCounter = 1;
+            $sortSubCategories = SubCategory::where('mainCategoryId', $request->mainCategoryId)
+            ->orderBy('index','asc')->get();
+
+            foreach ($sortSubCategories as $item) {
+
+                $item->index = $indexCounter;
+                $item->save();
+
+                $indexCounter++;
+
+            } // end loop
+
+
+            // 1.2.2: sort recent one
+            $subCategory->index = SubCategory::where('mainCategoryId', $request->mainCategoryId)->count() + 1;
+
+        } // end if
+
+
+
         $subCategory->save();
 
         return response()->json(['status' => true, 'message' => 'SubCategory has been updated!'], 200);
@@ -125,7 +182,7 @@ class SubCategoryController extends Controller {
 
         // 1: get sorted items
         $subCategories = SubCategory::where('mainCategoryId', $mainCategoryId)
-        ->orderBy('index','desc')->get();
+        ->orderBy('index','asc')->get();
 
         return response()->json($subCategories, 200);
 

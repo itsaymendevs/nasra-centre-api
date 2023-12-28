@@ -41,7 +41,7 @@ class UserController extends Controller {
 
 
         // 1: get users / filters
-        $users = User::with(['favorites'])->get();
+        $users = User::with(['favorites', 'completedOrders', 'canceledOrders'])->get();
 
         $countries = Country::all();
         $states = State::all();
@@ -102,7 +102,7 @@ class UserController extends Controller {
 
 
         // 1: get users / dependencies
-        $user = User::with(['country', 'state', 'deliveryArea', 'favorites.product', 'receivers', 'orders.products', 'orders.deliveryArea', 'orders.store', 'orders.payment'])->where('id', $id)->first();
+        $user = User::with(['country', 'state', 'deliveryArea', 'favorites.product.favorites', 'receivers.canceledOrders', 'receivers.completedOrders', 'orders.products', 'orders.deliveryArea', 'orders.store', 'orders.payment', 'completedOrders', 'canceledOrders', 'pendingOrders', 'processingOrders'])->where('id', $id)->first();
         $countries = Country::all();
         
 
@@ -161,7 +161,7 @@ class UserController extends Controller {
 
 
         // 1: get receiver / dependencies
-        $receiver = UserReceiver::with(['state.country', 'deliveryArea', 'user.country'])->where('id', $receiverId)->first();
+        $receiver = UserReceiver::with(['state.country', 'deliveryArea', 'user.country', 'orders', 'completedOrders', 'canceledOrders', 'pendingOrders', 'processingOrders', 'orders.payment', 'orders.deliveryArea', 'orders.store', 'orders.products'])->where('id', $receiverId)->first();
       
         
 
