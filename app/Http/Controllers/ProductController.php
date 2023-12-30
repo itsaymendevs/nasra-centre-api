@@ -321,13 +321,48 @@ class ProductController extends Controller {
     public function updateShorthand(Request $request) {
 
 
-        // 1: create item
-
+        // 1: update item
         $product = Product::find($request[0]['id']);
 
         $product->sellPrice = !empty($request[0]['sellPrice']) ? $request[0]['sellPrice'] : 1;
         $product->offerPrice = !empty($request[0]['offerPrice']) ? $request[0]['offerPrice'] : null;
         $product->quantity =  !empty($request[0]['quantity']) ? $request[0]['quantity'] : 0;
+
+
+
+
+
+        // 1.2: indexOffers - reindex items
+        if (!empty($request[0]['offerPrice']) && empty($product->indexOffers)) {
+
+
+            // 1.8.1: loop thru to sort all again
+            $indexCounter = 1;
+            $sortProducts = Product::whereNotNull('offerPrice')
+            ->orderBy('indexOffers','asc')->get();
+
+            foreach ($sortProducts as $item) {
+
+                $item->indexOffers = $indexCounter;
+                $item->save();
+
+                $indexCounter++;
+
+            } // end loop
+
+
+            // 1.8.2: sort recent one
+            $product->indexOffers = Product::whereNotNull('offerPrice')->count() + 1;
+
+
+
+        } elseif (empty($request[0]['offerPrice'])) {
+
+            $product->indexOffers = null;
+            
+        } // end if
+
+
 
         $product->save();
 

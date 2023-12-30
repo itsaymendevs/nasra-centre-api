@@ -23,7 +23,7 @@ class OrderController extends Controller {
     public function index() {
 
         // 1: currentOrders
-        $orders = Order::with(['user', 'country', 'state', 'deliveryArea', 'store', 'receiver', 'payment', 'orderEmployee', 'paymentEmployee', 'refundEmployee'])
+        $orders = Order::with(['user', 'user.country', 'country', 'state', 'deliveryArea', 'store', 'receiver', 'payment', 'orderEmployee', 'paymentEmployee', 'refundEmployee'])
         ->where('orderStatus', '!=', 'COMPLETED')->where('orderStatus', '!=', 'CANCELED')->get();
         
         // ::dependencies
@@ -57,7 +57,7 @@ class OrderController extends Controller {
     public function previousOrders() {
 
         // 1: currentOrders
-        $orders = Order::with(['user', 'country', 'state', 'deliveryArea', 'store', 'receiver', 'payment', 'orderEmployee', 'paymentEmployee', 'refundEmployee'])
+        $orders = Order::with(['user', 'user.country', 'country', 'state', 'deliveryArea', 'store', 'receiver', 'payment', 'orderEmployee', 'paymentEmployee', 'refundEmployee'])
         ->where('orderStatus', 'COMPLETED')->orWhere('orderStatus', 'CANCELED')->get();
         
         // ::dependencies
@@ -115,7 +115,12 @@ class OrderController extends Controller {
         Country::where('code', 'IRL')->update([
             'isOrderingActive' => ($request->orderingIRL == 'true' || $request->orderingIRL == 1) ? false : true
         ]);
-    
+        
+        Country::where('code', 'EG')->update([
+            'isOrderingActive' => ($request->orderingEG == 'true' || $request->orderingEG == 1) ? false : true
+        ]);
+
+
 
         return response()->json(['status' => true, 'message' => 'Status has been updated!'], 200);
 
