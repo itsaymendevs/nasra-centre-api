@@ -1,0 +1,213 @@
+* {
+  color: #111;
+  font-family: 'Poppins', 'Noto Sans Arabic';
+  font-weight: 500 !important;
+  transition: 0.3s all ease-in-out;
+}
+
+.font--cour {
+  font-family: 'Courgette';
+}
+
+body, html {
+  overflow-x: hidden;
+}
+
+button, a, input, select, textarea, checkbox, radio {
+  box-shadow: none !important;
+}
+
+.form-control:focus {
+  color: inherit;
+  border-color: var(--color-theme);
+}
+
+.bg--main {
+  background-color: #f8f8f8;
+  background-image: url("../../assets/img/Covers/animated-bg-3.svg");
+}
+
+.regulate--link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.regulate--link:hover, .regulate--link:focus {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* btns */
+
+.btn--navbar {
+  background-color: var(--bg-theme);
+  color: var(--bs-white);
+  border-radius: 0px;
+  height: var(--navbar-btn-height);
+  display: flex;
+  align-items: center;
+  text-transform: uppercase;
+  justify-content: start;
+  border: 2px solid transparent;
+  margin-bottom: 5px;
+}
+
+.btn--navbar:hover, .btn--navbar:focus {
+  background-color: transparent;
+  color: var(--color-theme);
+  border: 2px solid var(--bg-theme);
+}
+
+.btn--navbar-arrow {
+  background-color: transparent;
+  color: var(--color-theme);
+  justify-content: center;
+  border-color: var(--color-theme);
+}
+
+.btn--navbar svg {
+  fill: var(--bs-white);
+  font-size: 22px;
+  margin-right: 15px;
+  width: 22px;
+}
+
+.btn--navbar:hover svg, .btn--navbar:focus svg {
+  fill: var(--color-theme);
+}
+
+/* btn / theme */
+
+.btn--theme {
+  background-color: var(--bg-theme);
+  color: var(--bs-white);
+  border-radius: 0px;
+  height: var(--btn-height);
+  display: inline-flex;
+  align-items: center;
+  text-transform: uppercase;
+  justify-content: start;
+  border: 2px solid transparent;
+}
+
+.btn--theme:hover, .btn--theme:focus {
+  background-color: transparent;
+  color: var(--bg-theme);
+  border: 2px solid var(--bg-theme);
+}
+
+.btn--theme svg, .btn--theme svg {
+  fill: var(--bs-white);
+}
+
+.btn--theme:hover svg, .btn--theme:focus svg {
+  fill: var(--color-theme);
+}
+
+.btn--outline-theme {
+  background-color: transparent;
+  color: var(--bg-theme);
+  border-radius: 0px;
+  height: var(--btn-height);
+  display: inline-flex;
+  align-items: center;
+  text-transform: uppercase;
+  justify-content: start;
+  border: 2px solid var(--bg-theme);
+}
+
+.btn--outline-theme:hover, .btn--outline-theme:focus {
+  background-color: var(--bg-theme);
+  color: var(--bs-white);
+}
+
+.btn--outline-theme svg, .btn--outline-theme svg {
+  fill: var(--color-theme);
+}
+
+.btn--outline-theme:hover svg, .btn--outline-theme:focus svg {
+  fill: var(--bs-white);
+}
+
+/* btn - extra */
+
+.btn--sm {
+  height: var(--btn-height-sm);
+}
+
+.btn--submit {
+  width: 220px;
+  justify-content: center;
+}
+
+.btn--outline-danger {
+  background-color: transparent;
+  color: var(--delete-color) !important;
+  border-color: var(--delete-color) !important;
+}
+
+.btn--outline-danger:hover, .btn--outline-danger:focus {
+  background-color: var(--delete-color) !important;
+  color: white !important;
+  border-color: var(--delete-color) !important;
+}
+
+/* btn icons */
+
+.btn--raw-icon {
+  width: 100%;
+  padding: 0px;
+  height: 100%;
+  font-size: 20px;
+  border: none !important;
+}
+
+.btn--raw-icon.edit svg {
+  fill: var(--edit-color);
+}
+
+/* inputs / label */
+
+input:read-only {
+  background-color: var(--result-bg-odd);
+  cursor: not-allowed;
+}
+
+.row--label {
+  overflow: hidden;
+  display: -webkit-box !important;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  white-space: pre-wrap;
+  padding: 0px;
+}
+
+.form--label {
+  font-size: 13px;
+  display: block;
+}
+
+.form--input {
+  width: 90%;
+  height: var(--input-height);
+  border: 1px solid var(--input-border-color);
+  border-radius: var(--input-radius);
+  padding: var(--input-padding);
+  font-size: var(--input-font);
+}
+
+/* textarea */
+
+.form--textarea {
+  height: 130px;
+  padding: 15px;
+}
+
+/* hr label */
+
+.hr--label {
+  font-size: 12px;
+  min-width: 110px;
+  max-width: 150px;
+}
+

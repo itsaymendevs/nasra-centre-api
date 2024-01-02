@@ -1,0 +1,11 @@
+.modal--header {
+  background-color: var(--bg-alternate);
+  border-bottom: 0px;
+  margin-bottom: 15px;
+}
+
+.modal-body, .modal-header, .modal-footer {
+  padding-left: 30px;
+  padding-right: 30px;
+}
+

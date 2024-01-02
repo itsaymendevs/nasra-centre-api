@@ -52,7 +52,7 @@ Route::group(['middleware' => 'cors'], function () {
     // 1: main-category
     Route::get("/main-categories", [MainCategoryController::class, 'index']);
 
-  
+
     // sort - updateSort
     Route::get("/main-categories/sort", [MainCategoryController::class, 'sort']);
 
@@ -68,7 +68,7 @@ Route::group(['middleware' => 'cors'], function () {
 
     // sort - updateSort
     Route::get("/sub-categories/{mainCategoryId}/sort", [SubCategoryController::class, 'sort']);
- 
+
 
 
 
@@ -79,10 +79,10 @@ Route::group(['middleware' => 'cors'], function () {
     // 3: inner-types
     Route::get("/inner-types", [TypeController::class, 'index']);
 
-   
+
     // sort - updateSort
     Route::get("/inner-types/{mainCategoryId}/{subCategoryId}/sort", [TypeController::class, 'sort']);
-  
+
 
 
 
@@ -148,7 +148,7 @@ Route::group(['middleware' => 'cors'], function () {
     Route::get("/pickup/create", [PickupController::class, 'create']);
 
     Route::get("/pickup/{id}/edit", [PickupController::class, 'edit']);
- 
+
 
 
 
@@ -173,7 +173,7 @@ Route::group(['middleware' => 'cors'], function () {
 
     Route::get("/delivery/{id}/edit", [DeliveryController::class, 'edit']);
 
-   
+
 
 
 
@@ -181,6 +181,10 @@ Route::group(['middleware' => 'cors'], function () {
     Route::get("/delivery/conditions", [DeliveryController::class, 'conditions']);
 
 
+
+
+    // 10.2: delivery times
+    Route::get("/delivery/times", [DeliveryController::class, 'times']);
 
 
 
@@ -224,8 +228,8 @@ Route::group(['middleware' => 'cors'], function () {
     Route::get("/products/main-page/sort", [ProductController::class, 'mainPageSort']);
 
     Route::get("/products/{type}/sort", [ProductController::class, 'typeSort']);
-    
-   
+
+
 
 
 
@@ -251,7 +255,7 @@ Route::group(['middleware' => 'cors'], function () {
     Route::get("/users/{id}/orders/{orderId}", [UserController::class, 'singleUserOrder']);
 
 
-    
+
     // 13.3: single Receiver
     Route::get("/users/{id}/receivers/{receiverId}", [UserController::class, 'singleReceiver']);
 
@@ -267,8 +271,7 @@ Route::group(['middleware' => 'cors'], function () {
     // 14: payments
     Route::get("/payments", [PaymentController::class, 'index']);
 
-
-
+    Route::get("/payments/conditions", [PaymentController::class, 'conditions']);
 
 
 
@@ -332,7 +335,7 @@ Route::group(['middleware' => 'cors'], function () {
 
 
         // 2: sub-category
-     
+
         // store - update
         Route::post("/sub-categories/store", [SubCategoryController::class, 'store']);
         Route::patch("/sub-categories/update", [SubCategoryController::class, 'update']);
@@ -427,7 +430,7 @@ Route::group(['middleware' => 'cors'], function () {
         // 7.1: store - update about paragraphs
         Route::post("/help/about/store", [HelpController::class, 'storeAbout']);
         Route::patch("/help/about/update", [HelpController::class, 'updateAbout']);
-        
+
         Route::delete("/help/about/{id}/delete", [HelpController::class, 'deleteAbout']);
 
 
@@ -455,7 +458,7 @@ Route::group(['middleware' => 'cors'], function () {
 
         Route::delete("/contact/{countryId}/phones/{id}/delete", [ContactController::class, 'deletePhone']);
 
-        
+
 
         // 8.3: contact terms & conditions => store - update
         Route::post("/contact/{countryId}/terms/store", [ContactController::class, 'storeTerm']);
@@ -535,12 +538,19 @@ Route::group(['middleware' => 'cors'], function () {
         // 10.1: delivery conditions
 
         Route::post("/delivery/conditions/store", [DeliveryController::class, 'storeCondition']);
-        
-        Route::patch("/delivery/conditions/update", [DeliveryController::class, 'updateCondition']);
+
+        Route::post("/delivery/conditions/update", [DeliveryController::class, 'updateCondition']);
         Route::delete("/delivery/conditions/{id}/delete", [DeliveryController::class, 'deleteCondition']);
 
 
 
+
+
+        // 10.2: delivery times
+        Route::post("/delivery/times/store", [DeliveryController::class, 'storeTime']);
+
+        Route::post("/delivery/times/update", [DeliveryController::class, 'updateTime']);
+        Route::delete("/delivery/times/{id}/delete", [DeliveryController::class, 'deleteTime']);
 
 
 
@@ -565,7 +575,7 @@ Route::group(['middleware' => 'cors'], function () {
 
         // update - toggle
         Route::patch("/messages-global/update", [MessageController::class, 'updateGlobal']);
-        
+
         Route::patch("/messages-global/toggle-active", [MessageController::class, 'toggleActiveGlobal']);
 
 
@@ -607,7 +617,7 @@ Route::group(['middleware' => 'cors'], function () {
         Route::patch("/products/{type}/sort/update", [ProductController::class, 'updateTypeSort']);
 
 
-        
+
 
 
 
@@ -644,6 +654,18 @@ Route::group(['middleware' => 'cors'], function () {
         Route::patch("/payments/{id}/toggle-active", [PaymentController::class, 'toggleActive']);
 
         Route::delete("/payments/{id}/delete", [PaymentController::class, 'delete']);
+
+
+
+
+
+        // 14.2: payment conditions
+
+        Route::post("/payments/conditions/store", [PaymentController::class, 'storeCondition']);
+
+        Route::post("/payments/conditions/update", [PaymentController::class, 'updateCondition']);
+        Route::delete("/payments/conditions/{id}/delete", [PaymentController::class, 'deleteCondition']);
+
 
 
 
@@ -776,7 +798,7 @@ Route::group(['middleware' => 'cors'], function () {
 
     // ========================================================
     // ========================================================
-    
+
 
     // 4: login
     Route::post("/app/user/login", [UserControllerApp::class, 'login']);
@@ -816,7 +838,7 @@ Route::group(['middleware' => 'cors'], function () {
 
 
 
-    
+
     // 4.3: logout (auth)
     Route::post("/app/user/logout", [UserControllerApp::class, 'logout']);
 
@@ -905,7 +927,7 @@ Route::group(['middleware' => 'cors'], function () {
     Route::post("/app/user/makeOrder", [OrderController::class, 'makeOrder']);
     Route::post("/app/user/previousOrders", [PreviousOrderController::class, 'previousOrders']);
 
-    
+
 
 
 }); // end cors middleware

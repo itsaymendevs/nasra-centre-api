@@ -1,0 +1,17 @@
+.login--hr {
+  width: 40px;
+  opacity: 1;
+  border-color: var(--bg-theme);
+  border-width: 2px;
+  display: inline-block;
+}
+
+.login--hr.black {
+  border-color: var(--bs-gray-900);
+}
+
+.error--icon {
+  fill: var(--bs-danger);
+  font-size: 16px;
+}
+

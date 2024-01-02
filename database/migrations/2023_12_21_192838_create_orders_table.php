@@ -15,25 +15,26 @@ return new class extends Migration
             $table->id();
 
             $table->text('userToken')->nullable();
+            $table->string('orderLang', 100)->nullable()->default('EN');
             $table->integer('orderNumber')->nullable();
             $table->string('orderDateTime', 100)->nullable();
             $table->string('orderStatusDateTime', 100)->nullable();
 
-            
+
             // WAITING - COMPLETED - CANCELED
             $table->string('orderStatus', 100)->nullable();
             $table->string('orderSecondPhone', 100)->nullable();
             $table->text('orderNote')->nullable();
             $table->text('orderCancellationNote')->nullable();
 
-            
+
 
             $table->bigInteger('orderEmployeeId')->unsigned()->nullable();
             $table->foreign('orderEmployeeId')->references('id')->on('employees')->onDelete('cascade');
 
-            
 
-        
+
+
             // ::receiving option (DELIVERY - PICKUP)
             $table->string('receivingOption', 100)->nullable();
 
@@ -87,7 +88,7 @@ return new class extends Migration
             $table->bigInteger('paymentEmployeeId')->unsigned()->nullable();
             $table->foreign('paymentEmployeeId')->references('id')->on('employees')->onDelete('cascade');
 
-            
+
 
 
             // ::GLOBAL ORDER - Receiver
@@ -117,7 +118,7 @@ return new class extends Migration
             $table->bigInteger('userId')->unsigned()->nullable();
             $table->foreign('userId')->references('id')->on('users')->onDelete('cascade');
 
-            
+
 
 
             $table->timestamps();

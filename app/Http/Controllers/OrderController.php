@@ -12,6 +12,7 @@ use App\Models\Order;
 use App\Models\Payment;
 use App\Models\PickupStore;
 use App\Models\State;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use stdClass;
@@ -25,7 +26,7 @@ class OrderController extends Controller {
         // 1: currentOrders
         $orders = Order::with(['user', 'user.country', 'country', 'state', 'deliveryArea', 'store', 'receiver', 'payment', 'orderEmployee', 'paymentEmployee', 'refundEmployee'])
         ->where('orderStatus', '!=', 'COMPLETED')->where('orderStatus', '!=', 'CANCELED')->get();
-        
+
         // ::dependencies
         $countries = Country::all();
         $states = State::all();
@@ -44,7 +45,7 @@ class OrderController extends Controller {
 
 
         return response()->json($combine, 200);
-        
+
     } // end function
 
 
@@ -59,7 +60,7 @@ class OrderController extends Controller {
         // 1: currentOrders
         $orders = Order::with(['user', 'user.country', 'country', 'state', 'deliveryArea', 'store', 'receiver', 'payment', 'orderEmployee', 'paymentEmployee', 'refundEmployee'])
         ->where('orderStatus', 'COMPLETED')->orWhere('orderStatus', 'CANCELED')->get();
-        
+
         // ::dependencies
         $countries = Country::all();
         $states = State::all();
@@ -79,7 +80,7 @@ class OrderController extends Controller {
         $combine->employees = $employees;
         $combine->generalBlock = $generalBlock;
 
-        
+
 
         // ::derived
         $combine->productsTotalPrice = $orders->sum('deliveryPrice');
@@ -88,7 +89,7 @@ class OrderController extends Controller {
 
 
         return response()->json($combine, 200);
-        
+
     } // end function
 
 
@@ -99,7 +100,7 @@ class OrderController extends Controller {
 
 
 
-    
+
     public function toggleOrdering(Request $request) {
 
 
@@ -115,7 +116,7 @@ class OrderController extends Controller {
         Country::where('code', 'IRL')->update([
             'isOrderingActive' => ($request->orderingIRL == 'true' || $request->orderingIRL == 1) ? false : true
         ]);
-        
+
         Country::where('code', 'EG')->update([
             'isOrderingActive' => ($request->orderingEG == 'true' || $request->orderingEG == 1) ? false : true
         ]);
@@ -128,7 +129,7 @@ class OrderController extends Controller {
 
 
 
-    
+
 
 
 
@@ -137,13 +138,13 @@ class OrderController extends Controller {
 
 
 
-    
+
     public function toggleGlobalOrdering(Request $request) {
 
 
         // 1: get generalBlocks
         $generalBlock = GeneralBlock::all()->first();
-        
+
         $generalBlock->stopOrders = boolval($request->stopOrders);
         $generalBlock->save();
 
@@ -172,7 +173,7 @@ class OrderController extends Controller {
         // 1: singleOrder
         $order = Order::with(['user.country', 'user.state', 'country', 'state', 'deliveryArea', 'store', 'receiver', 'payment', 'orderEmployee', 'paymentEmployee', 'refundEmployee', 'products', 'receiver.state', 'receiver.deliveryArea'])
         ->where('id', $id)->first();
-        
+
 
 
         // 2: messages / global
@@ -217,7 +218,7 @@ class OrderController extends Controller {
 
 
         return response()->json($combine, 200);
-        
+
     } // end function
 
 
@@ -269,7 +270,7 @@ class OrderController extends Controller {
             if ($order->orderStatus == 'PROCESSING') {
 
                 $order->orderStatus = 'PENDING';
-                
+
             } // end if
 
 
@@ -282,7 +283,7 @@ class OrderController extends Controller {
         // 1.4: update DateTime / orderEmployee
         $order->orderStatusDateTime = Carbon::now()->addHours(2);
         $order->orderEmployeeId = 1; // TODO: EMPLOYEE SESSION
-        
+
 
         $order->save();
 
@@ -321,8 +322,8 @@ class OrderController extends Controller {
 
         $order->orderStatus = 'CANCELED';
 
-        
-        
+
+
         $order->save();
 
 
@@ -362,7 +363,7 @@ class OrderController extends Controller {
         $order->paymentEmployeeId = 1; // TODO: EMPLOYEE SESSION
         $order->paymentDateTime = Carbon::now()->addHours(2);
         $order->paymentType = $payment->paymentType;
-        
+
         $order->save();
 
 
@@ -440,37 +441,57 @@ class OrderController extends Controller {
 
         // 1.2: check if local / global
         $otpType = !empty($order->receiverId) ? 'global' : 'local';
-        
-        
+
+
         // 1.2.1: local
         if ($otpType == 'local') {
 
 
             // 1: get userPhone / otpMessage
-            $userPhone = $order->user->phone; 
+            $userPhone = $order->user->phone;
             $otpMessage = $request->userOTP;
 
 
             // 2: replace userFN / userLN / orderNum / PickupCode (optional)
+            $otpMessage = str_replace('@userFN', $order->user->firstName, $otpMessage);
+            $otpMessage = str_replace('@userLN', $order->user->lastName, $otpMessage);
+            $otpMessage = str_replace('@orderNum', $order->orderNumber, $otpMessage);
+
+            $order->pickupCode ? $otpMessage = str_replace('@pickupCode', $order->pickupCode, $otpMessage) : null;
 
 
 
-            // 3: TODO: send otp
+
+            // 3: send otp
+            $token = env('SMS_TOKEN');
+
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Basic ' . $token
+            ])->post('https://api.bulksms.com/v1/messages?auto-unicode=true&longMessageMaxParts=30', [
+                'from' => 'Nasra', // 11 char max
+                'to' => '+' . $userPhone, // +249 99 959 0002
+                'body' => $otpMessage, // 70 char per message - 160 (latin)
+            ]);
+
+
+
+
 
 
 
 
         // 1.2.2: global
         } else {
-            
+
 
             // 1: get userPhone / otpMessage
-            $userPhone = $order->user->phone; 
+            $userPhone = $order->user->phone;
             $otpMessage = $request->userOTP;
 
             // 1.2: check if receiver
             if ($request->target == 'receiver') {
-                
+
                 $userPhone = $order->receiverPhone;
                 $otpMessage = $request->receiverOTP;
 
@@ -479,17 +500,38 @@ class OrderController extends Controller {
 
 
 
-            // 2: replace userFN / userLN / orderNum / PickupCode (optional)
+            // 2: replace userFN / userLN / orderNum / receiver /  PickupCode (optional)
+            $otpMessage = str_replace('@userFN', $order->user->firstName, $otpMessage);
+            $otpMessage = str_replace('@userLN', $order->user->lastName, $otpMessage);
+            $otpMessage = str_replace('@orderNum', $order->orderNumber, $otpMessage);
+            $otpMessage = str_replace('@receiver', $order->receiverName, $otpMessage);
 
 
-            
-            // 3: TODO: send otp
+            $order->pickupCode ? $otpMessage = str_replace('@pickupCode', $order->pickupCode, $otpMessage) : null;
+
+
+
+
+            // 3: send otp
+            $token = env('SMS_TOKEN');
+
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Basic ' . $token
+            ])->post('https://api.bulksms.com/v1/messages?auto-unicode=true&longMessageMaxParts=30', [
+                'from' => 'Nasra', // 11 char max
+                'to' => '+' . $userPhone, // +249 99 959 0002 or +44
+                'body' => $otpMessage, // 70 char per message - 160 (latin)
+            ]);
+
+
+
 
 
 
         } // end if
 
-        
+
 
 
 
@@ -536,7 +578,7 @@ class OrderController extends Controller {
 
 
 
-    
+
 
 
 } // end controller

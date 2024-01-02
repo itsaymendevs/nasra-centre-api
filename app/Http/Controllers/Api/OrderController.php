@@ -18,7 +18,7 @@ use Illuminate\Support\Carbon;
 use stdClass;
 
 class OrderController extends Controller {
-    
+
 
     public function makeOrder(Request $request) {
 
@@ -62,7 +62,7 @@ class OrderController extends Controller {
 
 
 
-        // 1: invalidOrder => [OrderingBlocked - deliveryBlocked or StoreBlocked - InvalidPaymentMethod] 
+        // 1: invalidOrder => [OrderingBlocked - deliveryBlocked or StoreBlocked - InvalidPaymentMethod]
 
 
 
@@ -74,7 +74,7 @@ class OrderController extends Controller {
             $response->errors[0] = "Unauthorized Access";
             return response()->json($response);
 
-        } // end if 
+        } // end if
 
 
 
@@ -85,7 +85,7 @@ class OrderController extends Controller {
             $response->errors[0] = "InvalidOrder";
             return response()->json($response);
 
-        } // end if 
+        } // end if
 
 
 
@@ -96,10 +96,10 @@ class OrderController extends Controller {
             $response = new stdClass();
             $response->unMatchedInformation = new stdClass();
             $response->unMatchedInformation->isOrderingBlocked = true;
-            
-            return response()->json($response); 
 
-        } // end if 
+            return response()->json($response);
+
+        } // end if
 
 
 
@@ -130,7 +130,7 @@ class OrderController extends Controller {
 
             // 2.1.1: PickupBlocked
             if ($generalBlock->stopPickup) {
-                
+
                 $response = new stdClass();
                 $response->unMatchedInformation = new stdClass();
                 $response->unMatchedInformation->pdp = $this->mainCall();
@@ -143,32 +143,9 @@ class OrderController extends Controller {
 
             // 2.1.2: get pickupStore / check isActive
             $pickupStore = PickupStore::find($request->pickupOrder->storeId);
-            
+
             if (!$pickupStore->isActive) {
 
-                $response = new stdClass();
-                $response->unMatchedInformation = new stdClass();
-                $response->unMatchedInformation->pdp = $this->mainCall();
-
-                return response()->json($response);
-
-            } // end if 
-            
-
-
-
-
-
-
-        // 2.2: Delivery Order
-        } else {
-
-            
-
-
-            // 2.2.1: DeliveryBlocked
-            if ($generalBlock->stopDelivery) {
-                
                 $response = new stdClass();
                 $response->unMatchedInformation = new stdClass();
                 $response->unMatchedInformation->pdp = $this->mainCall();
@@ -178,7 +155,30 @@ class OrderController extends Controller {
             } // end if
 
 
-         
+
+
+
+
+
+        // 2.2: Delivery Order
+        } else {
+
+
+
+
+            // 2.2.1: DeliveryBlocked
+            if ($generalBlock->stopDelivery) {
+
+                $response = new stdClass();
+                $response->unMatchedInformation = new stdClass();
+                $response->unMatchedInformation->pdp = $this->mainCall();
+
+                return response()->json($response);
+
+            } // end if
+
+
+
 
 
 
@@ -190,14 +190,14 @@ class OrderController extends Controller {
                 $response = new stdClass();
                 $response->unMatchedInformation = new stdClass();
                 $response->unMatchedInformation->userAddress = new stdClass();
-                
+
                 $response->unMatchedInformation->userAddress->userStateId = $user->stateId;
                 $response->unMatchedInformation->userAddress->userRegionId = $user->deliveryAreaId;
                 $response->unMatchedInformation->userAddress->addressDescription = $user->address;
 
                 $response->unMatchedInformation->userAddress->deliveryEstimatedTime = $user->deliveryArea->deliveryTime->content;
                 $response->unMatchedInformation->userAddress->deliveryEstimatedTimeAr = $user->deliveryArea->deliveryTime->contentAr;
-                
+
                 $response->unMatchedInformation->userAddress->regionDeliveryPrice = intval($user->deliveryArea->price);
                 $response->unMatchedInformation->userAddress->isDeliveryBlocked = !boolval($user->deliveryArea->isActive);
 
@@ -307,7 +307,7 @@ class OrderController extends Controller {
             // 4.1.1: Objectified
             $orderProducts[$i] = (Object) $orderProducts[$i];
 
-            
+
 
 
 
@@ -336,7 +336,7 @@ class OrderController extends Controller {
                 // ::FlagInErrors / inc. counter
                 $counter++;
                 $productsWithErrors[$i] = true;
-                
+
             } // end if
 
 
@@ -354,7 +354,7 @@ class OrderController extends Controller {
         // ------------------------------
         // ------------------------------
 
-        
+
 
 
 
@@ -372,7 +372,7 @@ class OrderController extends Controller {
             // 4.2.1: Product Not-Flagged
             if ($productsWithErrors[$i] === false) {
 
-            
+
                 // :: getProduct
                 $product = Product::find($orderProducts[$i]->id);
 
@@ -405,9 +405,9 @@ class OrderController extends Controller {
                     $content->mainPic = $product->image;
                     $content->additionalPics = null;
 
-                    
-                    
-                    
+
+
+
                     // ::determine productType
                     $content->productType = $product->weightOption;
 
@@ -460,7 +460,7 @@ class OrderController extends Controller {
             // 4.3.1: Product Not-Flagged
             if ($productsWithErrors[$i] === false) {
 
-            
+
                 // :: getProduct
                 $product = Product::find($orderProducts[$i]->id);
 
@@ -491,7 +491,7 @@ class OrderController extends Controller {
                     array_push($outOfStockProducts, $content);
 
 
-                } // end if 
+                } // end if
 
             } // end if
 
@@ -527,15 +527,15 @@ class OrderController extends Controller {
             // 4.3.1: Product Not-Flagged
             if ($productsWithErrors[$i] === false) {
 
-            
+
                 // :: getProduct
                 $product = Product::find($orderProducts[$i]->id);
 
-                
+
 
                 // :: get CurrentPrice
                 $currentProductPrice = $product->sellPrice;
-                
+
                 if (!empty($product->offerPrice)) {
 
                     $currentProductPrice = $product->offerPrice;
@@ -569,7 +569,7 @@ class OrderController extends Controller {
 
                     array_push($invalidPriceProducts, $content);
 
-                } // end if 
+                } // end if
 
             } // end if
 
@@ -597,12 +597,12 @@ class OrderController extends Controller {
         // 4.5: CHECKING PHASE
         $response = new stdClass();
         $response->reviewOrder = new stdClass();
-        
+
 
         // 4.5.1: HiddenProducts
         (count($hiddenProducts) > 0) ? $response->reviewOrder->hiddenProducts = $hiddenProducts : null;
 
-            
+
 
         // 4.5.2: mixedProducts
         (count($mixedProducts) > 0) ? $response->reviewOrder->mixedTypeProducts = $mixedProducts : null;
@@ -619,14 +619,14 @@ class OrderController extends Controller {
         (count($invalidPriceProducts) > 0) ? $response->reviewOrder->invalidPriceProducts = $invalidPriceProducts : null;
 
 
-        
+
 
 
         // 4.5.5: return JSON if found
         if (count($hiddenProducts) > 0 || count($mixedProducts) > 0 || count($outOfStockProducts) > 0 || count($invalidPriceProducts) > 0) {
 
             return response()->json($content);
-        
+
         } // end if
 
 
@@ -660,14 +660,14 @@ class OrderController extends Controller {
 
         // 5: Save Order To DB
 
-        // ::root 
+        // ::root
 
 
         // 1: Generate Serial
         $orderNumber = $this->generateSerial();
-        
+
         while(true) {
-  
+
             $isDuplicated = Order::where('orderNumber', $orderNumber)->count();
 
             if ($isDuplicated == 0)
@@ -677,7 +677,7 @@ class OrderController extends Controller {
 
         } // end while
 
-        
+
 
 
 
@@ -694,6 +694,7 @@ class OrderController extends Controller {
 
 
         $newOrder->orderNumber = $orderNumber;
+        $newOrder->orderLang = $request->generalInfo->orderLang;
         $newOrder->orderDateTime = Carbon::now()->addHours(2);
         $newOrder->orderStatusDateTime = Carbon::now()->addHours(2);
         $newOrder->orderStatus = 'PENDING'; // => WAITING
@@ -721,7 +722,7 @@ class OrderController extends Controller {
                 $newOrder->stateId = $user->stateId;
                 $newOrder->deliveryAreaId = $user->deliveryAreaId;
 
-                
+
                 $newOrder->deliveryPrice = $user->deliveryArea->price;
                 $newOrder->deliveryEstimatedTime = $user->deliveryArea->deliveryTime->content;
                 $newOrder->deliveryEstimatedTimeAr = $user->deliveryArea->deliveryTime->contentAr;
@@ -749,9 +750,9 @@ class OrderController extends Controller {
 
                 $isDuplicated = Order::where('pickupCode', $pickupSerial)->count();
 
-                if ($isDuplicated == 0) 
+                if ($isDuplicated == 0)
                     break;
-                else 
+                else
                     $pickupSerial = $this->generatePickupSerial();
 
 
@@ -777,8 +778,8 @@ class OrderController extends Controller {
         $newOrder->paymentId = $paymentMethod;
         $newOrder->paymentDateTime = null;
         $newOrder->isPaymentDone = false;
-        
-        
+
+
 
 
 
@@ -816,10 +817,10 @@ class OrderController extends Controller {
 
 
 
-        // 3.1: OrderProducts / 
+        // 3.1: OrderProducts /
         for ($i = 0; $i < count($orderProducts); $i++) {
 
-       
+
 
             // :: getProduct
             $product = Product::find($orderProducts[$i]->id);
@@ -893,7 +894,7 @@ class OrderController extends Controller {
 
 
 
-            // :: Add Product into updateProducts 
+            // :: Add Product into updateProducts
             $content = new stdClass();
 
             $content->id = $product->id;
@@ -924,9 +925,9 @@ class OrderController extends Controller {
 
         if ($receivingOption == "DELIVERY")
             $orderTotalPrice = $productsTotalPrice + doubleval($newOrder->deliveryPrice);
-            
 
-     
+
+
 
         // :: Save orderTotalPrice / productsPrice
         $newOrder->productsPrice = $productsTotalPrice;
@@ -936,7 +937,7 @@ class OrderController extends Controller {
 
 
 
-        
+
 
 
 
@@ -950,7 +951,7 @@ class OrderController extends Controller {
 
             // :: Remove Order
             Order::find($newOrder->id)->delete();
-            
+
 
             // :: prepare response
             $response = new stdClass();
@@ -992,10 +993,11 @@ class OrderController extends Controller {
         $previousOrder->generalInfo = new stdClass();
         $previousOrder->previousOrderProducts = array();
 
-        
+
 
 
         // 4.1: General Info
+        $previousOrder->generalInfo->orderLang = $newOrder->orderLang;
         $previousOrder->generalInfo->orderNumber = $newOrder->orderNumber;
         $previousOrder->generalInfo->orderDate = date('d-m-Y', strtotime($newOrder->orderDateTime));
         $previousOrder->generalInfo->orderTime = date('h:m A', strtotime($newOrder->orderDateTime));
@@ -1004,7 +1006,7 @@ class OrderController extends Controller {
         $previousOrder->generalInfo->paymentId = $newOrder->paymentId;
         $previousOrder->generalInfo->isPaymentDone = $newOrder->isPaymentDone;
 
-        
+
 
         // 4.2: Products
         $previousOrderProducts = OrderProduct::where('orderId', $newOrder->id)->get();
@@ -1014,7 +1016,7 @@ class OrderController extends Controller {
 
 
             $content = new stdClass();
-            
+
             $content->id = $previousOrderProduct->id;
             $content->name = $previousOrderProduct->name;
             $content->nameAr = $previousOrderProduct->nameAr;
@@ -1022,7 +1024,7 @@ class OrderController extends Controller {
             $content->productType = $previousOrderProduct->weightOption;
             $content->packSize = $previousOrderProduct->weight;
             $content->measuringUnitId = $previousOrderProduct->unitId;
-            
+
             $content->orderProductQuantity = $previousOrderProduct->orderProductQuantity;
             $content->orderProductPrice = $previousOrderProduct->orderProductPrice;
 
@@ -1046,10 +1048,10 @@ class OrderController extends Controller {
         // 4.3: General Info Part.2
         $previousOrder->generalInfo->productsPrice = doubleval($newOrder->productsPrice);
         $previousOrder->generalInfo->orderTotalPrice = doubleval($newOrder->orderTotalPrice);
-        
 
 
-        
+
+
 
         // 4.4: Receiving Option
         $previousOrder->receivingOption = $receivingOption;
@@ -1094,7 +1096,7 @@ class OrderController extends Controller {
         $response->previousOrder = $previousOrder;
         $response->updateProducts = $updateProducts;
 
-        return response()->json($content); 
+        return response()->json($content);
 
 
     } // end function
@@ -1128,7 +1130,7 @@ class OrderController extends Controller {
 
     } // end function
 
-    
+
 
 
 
@@ -1143,7 +1145,7 @@ class OrderController extends Controller {
 
 
         // 1: Formula
-        static $max = 60466175; 
+        static $max = 60466175;
 
         // 1.2: Generate
         return strtoupper(sprintf(
@@ -1152,7 +1154,7 @@ class OrderController extends Controller {
             base_convert(random_int(0, $max), 10, 36),
             base_convert(random_int(0, $max), 10, 36)
         ));
-        
+
     } // end function
 
 
@@ -1234,7 +1236,7 @@ class OrderController extends Controller {
             $content->isForPickup = boolval($onlineBankingPayment->isForPickup);
             $content->isForRefund = boolval($onlineBankingPayment->isForRefund);
 
-            
+
             array_push($contentArray, $content);
 
         } // end loop
@@ -1244,7 +1246,7 @@ class OrderController extends Controller {
         $response->PickupAndDeliveryAndPaymentInfo->paymentInfo->onlineBankingPayments = $contentArray;
 
 
-        
+
 
 
         // 2: atReceivingPayment
@@ -1267,7 +1269,7 @@ class OrderController extends Controller {
             $content->isForPickup = boolval($atReceivingPayment->isForPickup);
             $content->isForRefund = boolval($atReceivingPayment->isForRefund);
 
-            
+
             array_push($contentArray, $content);
 
         } // end loop
@@ -1303,7 +1305,7 @@ class OrderController extends Controller {
             $content->isForPickup = boolval($directPayment->isForPickup);
             $content->isForRefund = boolval($directPayment->isForRefund);
 
-            
+
             array_push($contentArray, $content);
 
         } // end loop
@@ -1318,7 +1320,7 @@ class OrderController extends Controller {
 
 
 
-        
+
         // 4: paymentConditions
         $paymentConditions = PaymentCondition::all();
 
@@ -1338,7 +1340,7 @@ class OrderController extends Controller {
 
         } // end loop
 
-        
+
 
         // ::push to response
         $response->PickupAndDeliveryAndPaymentInfo->paymentInfo->paymentConditions = $contentArray;
@@ -1391,10 +1393,10 @@ class OrderController extends Controller {
 
             $content->storeLocation = $store->desc;
             $content->storeLocationAr = $store->descAr;
-            
+
             $content->latitude = $store->latitude;
             $content->longitude = $store->longitude;
-            
+
             $content->collectingWorkingHours = $store->receivingTimes;
             $content->collectingWorkingHoursAr = $store->receivingTimesAr;
 
@@ -1463,7 +1465,7 @@ class OrderController extends Controller {
         // -----------------------------------------------------------------
 
 
-        
+
 
 
         // 1.3: delivery information
@@ -1508,7 +1510,7 @@ class OrderController extends Controller {
 
 
 
-        
+
 
 
 

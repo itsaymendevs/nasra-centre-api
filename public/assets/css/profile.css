@@ -1,0 +1,36 @@
+.profile--label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0px;
+}
+
+.profile--label svg {
+  margin-right: 5px;
+  font-size: 11px;
+  margin-bottom: 1px;
+}
+
+.profile--span-title {
+  border-bottom: 2px solid var(--color-theme);
+  margin-right: 5px;
+  line-height: 30px;
+}
+
+.profile--span-title.one-line {
+  display: block;
+  border-bottom: none;
+  margin-bottom: 3px;
+  margin-right: 0px;
+}
+
+.profile--span-title::after {
+  content: '-';
+  border-bottom: none;
+  margin-left: 3px;
+  margin-right: 0px;
+}
+
+.profile--span-title.one-line::after {
+  content: none;
+}
+

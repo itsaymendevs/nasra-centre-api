@@ -1,0 +1,43 @@
+.navbar--col {
+  padding-top: 20px;
+}
+
+.nav--menu {
+  position: sticky;
+  top: 0px;
+  left: 0px;
+}
+
+.navbar--split-btn .btn {
+  flex: inherit;
+  width: 15%;
+}
+
+.navbar--split-btn .btn--navbar:first-child {
+  width: 85%;
+}
+
+/* content */
+
+.navbar--content {
+  position: sticky;
+  top: 20px;
+  left: 0px;
+  min-height: 100vh;
+  z-index: 10;
+}
+
+/* header */
+
+.header--div {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: rgba(248,248,248,0.48);
+}
+
+.btn--header {
+  height: 50px !important;
+}
+

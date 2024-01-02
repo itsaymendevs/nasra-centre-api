@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\GlobalMessage;
 use App\Models\User;
 use App\Models\UserReceiver;
 use App\Models\UserResetPassword;
@@ -15,7 +16,7 @@ use stdClass;
 
 class InterUserEditController extends Controller {
 
-    
+
 
 
 
@@ -49,7 +50,7 @@ class InterUserEditController extends Controller {
         // :1.3: check existence / isActive
         if (!$user) {
 
-            $response->errors[0] = 18; 
+            $response->errors[0] = 18;
             return response()->json($response);
 
         } // end if
@@ -127,7 +128,7 @@ class InterUserEditController extends Controller {
         if (!empty($otpResponse->errors)) {
 
             $response->errors = $otpResponse->errors;
-                
+
         } else {
 
 
@@ -191,7 +192,7 @@ class InterUserEditController extends Controller {
         // :1.3: check existence / isActive
         if (!$user) {
 
-            $response->errors[0] = 18; 
+            $response->errors[0] = 18;
             return response()->json($response);
 
         } // end if
@@ -239,7 +240,7 @@ class InterUserEditController extends Controller {
             if ($minutes > $expireTime) {
 
                 UserResetPassword::where('phone', $userPhone)->delete();
-                
+
                 $response->errors[0] = 12;
                 return response()->json($response);
 
@@ -264,7 +265,7 @@ class InterUserEditController extends Controller {
         // ==================================
         // ==================================
 
-        
+
 
 
 
@@ -279,7 +280,7 @@ class InterUserEditController extends Controller {
         if (!empty($otpResponse->errors)) {
 
             $response->errors = $otpResponse->errors;
-                
+
         } else {
 
 
@@ -343,7 +344,7 @@ class InterUserEditController extends Controller {
         $otpCode = $request->enteredVerificationCode;
 
 
-        
+
 
 
 
@@ -369,10 +370,10 @@ class InterUserEditController extends Controller {
 
             // :: if expired
             if ($minutes > $expireTime) {
-                
+
                 // :: remove from-db
                 UserResetPassword::where('phone', $userPhone)->delete();
-                
+
                 $response->errors[0] = 12;
                 return response()->json($response);
 
@@ -380,7 +381,7 @@ class InterUserEditController extends Controller {
 
 
 
-        
+
 
         // 2.2: Not Found
         } else {
@@ -390,7 +391,7 @@ class InterUserEditController extends Controller {
             return response()->json($response);
 
         } // end if
-        
+
 
 
 
@@ -406,13 +407,13 @@ class InterUserEditController extends Controller {
 
 
 
-        
+
         // 3: check if confirmed-already
         if (boolval($userPasswordLead->isConfirmed) === true) {
 
 
             $response = new stdClass();
-            $response->validOTP = true; 
+            $response->validOTP = true;
 
             return response()->json($response);
 
@@ -421,12 +422,12 @@ class InterUserEditController extends Controller {
 
 
 
-        
+
         // 3.2: => check otp-match - update DB
         if ($otpCode == $userPasswordLead->otp) {
 
             $response = new stdClass();
-            $response->validOTP = true; 
+            $response->validOTP = true;
 
             UserResetPassword::where('phone', $userPhone)->update([
                 'confirmed'=> true
@@ -439,7 +440,7 @@ class InterUserEditController extends Controller {
         // 3.3: not-valid
         } else {
 
-            $response->errors[0] = 13; 
+            $response->errors[0] = 13;
 
             return response()->json($response);
 
@@ -488,10 +489,10 @@ class InterUserEditController extends Controller {
         $userPhone = $request->phoneNumber;
         $newPassword = $request->newPassword;
 
-        
 
 
-        // 2: check expiry - 30 minutes 
+
+        // 2: check expiry - 30 minutes
         $userPasswordLead = UserResetPassword::where('phone', $userPhone)->first();
 
 
@@ -514,7 +515,7 @@ class InterUserEditController extends Controller {
             if ($minutes > $expireTime) {
 
                 UserResetPassword::where('phone', $userPhone)->delete();
-                
+
                 $response->errors[0] = 20;
                 return response()->json($response);
 
@@ -528,7 +529,7 @@ class InterUserEditController extends Controller {
 
             // 3: Update Password
             $user = User::where('phone', $userPhone)->first();
-    
+
             $user->password = Hash::make($newPassword);
             $user->save();
 
@@ -536,7 +537,7 @@ class InterUserEditController extends Controller {
             // 4: remove Old-data
             UserResetPassword::where('phone', $userPhone)->delete();
 
-            
+
 
 
             // 5: return User Modal
@@ -544,12 +545,12 @@ class InterUserEditController extends Controller {
             $content->id = $user->id;
 
 
-            
+
             $content->firstName = $user->firstName;
             $content->lastName = $user->lastName;
             $content->emailAddress = $user->email;
             $content->phoneNumber = intval($user->phone);
-            
+
 
 
             $content->userAddress = new stdClass();
@@ -563,11 +564,11 @@ class InterUserEditController extends Controller {
 
                 $content->userAddress->addressFirstLine = $user->addressFirstLine;
                 $content->userAddress->addressSecondLine = $user->addressSecondLine; // optional
-                
+
                 $content->userAddress->addressThirdLine = $user->addressThirdLine; // optional
                 $content->userAddress->townCity = $user->townCity;
                 $content->userAddress->postcode = $user->postcode;
-                
+
             } // end if
 
 
@@ -576,18 +577,18 @@ class InterUserEditController extends Controller {
 
                 $content->userAddress->addressFirstLine = $user->addressFirstLine;
                 $content->userAddress->addressSecondLine = $user->addressSecondLine; // optional
-                
+
                 $content->userAddress->postTown = $user->postTown;
                 $content->userAddress->county = $user->county; // optional
                 $content->userAddress->eircode = $user->eircode; // optional
-                
+
             } // end if
 
 
 
 
 
-            
+
             // 3.2: receivers
             $content->receivers = array();
 
@@ -605,7 +606,7 @@ class InterUserEditController extends Controller {
 
                 $item->receiverAddress->receiverStateId = $receiver->stateId;
                 $item->receiverAddress->receiverRegionId = $receiver->deliveryAreaId;
-                
+
                 $item->receiverAddress->addressDescription = $receiver->address;
 
                 $item->receiverAddress->deliveryEstimatedTime = $receiver->deliveryArea->deliveryTime->content;
@@ -617,7 +618,7 @@ class InterUserEditController extends Controller {
 
 
                 array_push($content->receivers, $item);
-                
+
             } // end loop
 
 
@@ -629,7 +630,7 @@ class InterUserEditController extends Controller {
             // ::prepare response
             $response = new stdClass();
             $response->interUser = $content;
-        
+
 
 
             // return response in json
@@ -639,7 +640,7 @@ class InterUserEditController extends Controller {
 
 
 
-        
+
 
     } // end of function
 
@@ -671,6 +672,8 @@ class InterUserEditController extends Controller {
 
         // :: root
         $otpResponse = new stdClass();
+        $token = env('SMS_TOKEN');
+        $otpMessage = GlobalMessage::where('isFor', 'PHONE')->first();
 
         $otpCode = mt_rand(1000, 9999);
 
@@ -689,8 +692,30 @@ class InterUserEditController extends Controller {
 
 
 
-        // 2.1 - english message
-    
+        // 2: Otp Provider EN / AR
+        if ($lang == "english") {
+
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Basic ' . $token
+            ])->post('https://api.bulksms.com/v1/messages?auto-unicode=true&longMessageMaxParts=30', [
+                'from' => 'Nasra', // 11 char max
+                'to' => '+' . $userPhone, // +44 99 959 0002
+                'body' => $otpMessage->content . ' ' . $otpCode, // 70 char per message - 160 (latin)
+            ]);
+
+        } else {
+
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Basic ' . $token
+            ])->post('https://api.bulksms.com/v1/messages?auto-unicode=true&longMessageMaxParts=30', [
+                'from' => 'Nasra', // 11 char max
+                'to' => '+' . $userPhone, // +44 99 959 0002
+                'body' => $otpMessage->contentAr . ' ' . $otpCode, // 70 char per message - 160 (latin)
+            ]);
+
+        } // end if
 
 
 
@@ -742,6 +767,9 @@ class InterUserEditController extends Controller {
 
         // :: root
         $otpResponse = new stdClass();
+        $token = env('SMS_TOKEN');
+        $otpMessage = GlobalMessage::where('isFor', 'PHONE')->first();
+
 
         $userPasswordLead = UserResetPassword::where('phone', $userPhone)->first();
         $otpCode = $userPasswordLead->otp;
@@ -750,8 +778,33 @@ class InterUserEditController extends Controller {
 
 
 
-        // 2.1 - english message
-        
+
+
+
+        // 2: Otp Provider EN / AR
+        if ($lang == "english") {
+
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Basic ' . $token
+            ])->post('https://api.bulksms.com/v1/messages?auto-unicode=true&longMessageMaxParts=30', [
+                'from' => 'Nasra', // 11 char max
+                'to' => '+' . $userPhone, // +44 99 959 0002
+                'body' => $otpMessage->content . ' ' . $otpCode, // 70 char per message - 160 (latin)
+            ]);
+
+        } else {
+
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Basic ' . $token
+            ])->post('https://api.bulksms.com/v1/messages?auto-unicode=true&longMessageMaxParts=30', [
+                'from' => 'Nasra', // 11 char max
+                'to' => '+' . $userPhone, // +44 99 959 0002
+                'body' => $otpMessage->contentAr . ' ' . $otpCode, // 70 char per message - 160 (latin)
+            ]);
+
+        } // end if
 
 
 
@@ -875,7 +928,7 @@ class InterUserEditController extends Controller {
         // 1.4: existence in Reset DB => if yes check timeout
         $isDuplicated = UserResetPhone::where('userId', $user->id)->count();
 
-        
+
         if ($isDuplicated >= 1) {
 
             $userPhoneLead = UserResetPhone::where('userId', $user->id)->first();
@@ -920,7 +973,7 @@ class InterUserEditController extends Controller {
 
 
 
-        
+
 
 
 
@@ -933,7 +986,7 @@ class InterUserEditController extends Controller {
         if (!empty($otpResponse->errors)) {
 
             $response->errors = $otpResponse->errors;
-                
+
         } else {
 
 
@@ -950,7 +1003,7 @@ class InterUserEditController extends Controller {
 
 
 
-        
+
     } // end function
 
 
@@ -970,7 +1023,7 @@ class InterUserEditController extends Controller {
 
 
 
-    
+
 
 
     public function resendChangeNumberOTP(Request $request) {
@@ -1034,7 +1087,7 @@ class InterUserEditController extends Controller {
             if ($minutes > $expireTime) {
 
                 UserResetPhone::where('phone', $newPhone)->delete();
-                
+
                 $response->errors[0] = 12;
                 return response()->json($response);
 
@@ -1078,7 +1131,7 @@ class InterUserEditController extends Controller {
         if (!empty($otpResponse->errors)) {
 
             $response->errors = $otpResponse->errors;
-                
+
         } else {
 
 
@@ -1123,7 +1176,7 @@ class InterUserEditController extends Controller {
         $response->errors = array();
         $isOtpConfirmed = false;
         $expireTime = 1;
-        
+
 
         // ::root - convert array to objects
         $request = (object) $request->all();
@@ -1160,10 +1213,10 @@ class InterUserEditController extends Controller {
 
             if ($minutes > $expireTime) {
 
-                
+
                 // :: remove from-db
                 UserResetPhone::where('phone', $newPhone)->delete();
-                
+
                 $response->errors[0] = 12;
                 return response()->json($response);
 
@@ -1248,6 +1301,9 @@ class InterUserEditController extends Controller {
 
         // :: root
         $otpResponse = new stdClass();
+        $token = env('SMS_TOKEN');
+        $otpMessage = GlobalMessage::where('isFor', 'PHONE')->first();
+
 
         $otpCode = mt_rand(1000, 9999);
 
@@ -1268,9 +1324,33 @@ class InterUserEditController extends Controller {
 
 
 
-        
-        // 2.1 - english message
-        
+
+
+        // 2: Otp Provider EN / AR
+        if ($lang == "english") {
+
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Basic ' . $token
+            ])->post('https://api.bulksms.com/v1/messages?auto-unicode=true&longMessageMaxParts=30', [
+                'from' => 'Nasra', // 11 char max
+                'to' => '+' . $newPhone, // +44 99 959 0002
+                'body' => $otpMessage->content . ' ' . $otpCode, // 70 char per message - 160 (latin)
+            ]);
+
+        } else {
+
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Basic ' . $token
+            ])->post('https://api.bulksms.com/v1/messages?auto-unicode=true&longMessageMaxParts=30', [
+                'from' => 'Nasra', // 11 char max
+                'to' => '+' . $newPhone, // +44 99 959 0002
+                'body' => $otpMessage->contentAr . ' ' . $otpCode, // 70 char per message - 160 (latin)
+            ]);
+
+        } // end if
+
 
 
 
@@ -1330,17 +1410,44 @@ class InterUserEditController extends Controller {
 
         // :: root
         $otpResponse = new stdClass();
+        $token = env('SMS_TOKEN');
+        $otpMessage = GlobalMessage::where('isFor', 'PHONE')->first();
+
 
         $userPhoneLead = UserResetPhone::where('phone', $newPhone)->first();
         $otpCode = $userPhoneLead->otp;
 
 
 
-     
 
-        
-        // 2.1 - english message
-        
+
+
+
+        // 2: Otp Provider EN / AR
+        if ($lang == "english") {
+
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Basic ' . $token
+            ])->post('https://api.bulksms.com/v1/messages?auto-unicode=true&longMessageMaxParts=30', [
+                'from' => 'Nasra', // 11 char max
+                'to' => '+' . $newPhone, // +44 99 959 0002
+                'body' => $otpMessage->content . ' ' . $otpCode, // 70 char per message - 160 (latin)
+            ]);
+
+        } else {
+
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Basic ' . $token
+            ])->post('https://api.bulksms.com/v1/messages?auto-unicode=true&longMessageMaxParts=30', [
+                'from' => 'Nasra', // 11 char max
+                'to' => '+' . $newPhone, // +44 99 959 0002
+                'body' => $otpMessage->contentAr . ' ' . $otpCode, // 70 char per message - 160 (latin)
+            ]);
+
+        } // end if
+
 
 
 
@@ -1381,7 +1488,7 @@ class InterUserEditController extends Controller {
         // ::root
         $response = new stdClass();
         $response->errors = array();
-        
+
 
 
         // ::root - convert array to objects
@@ -1419,7 +1526,7 @@ class InterUserEditController extends Controller {
 
 
 
-        
+
 
 
 
@@ -1464,7 +1571,7 @@ class InterUserEditController extends Controller {
         // ::root
         $response = new stdClass();
         $response->errors = array();
-        
+
 
 
         // ::root - convert array to objects
@@ -1493,7 +1600,7 @@ class InterUserEditController extends Controller {
         // 1.3: isPasswordMatched
         if (Hash::check($oldPassword, $user->password)) {
 
-            
+
             // 1.3.1: update user-password
             $user->password = Hash::make($newPassword);
             $user->save();
@@ -1542,7 +1649,7 @@ class InterUserEditController extends Controller {
         // ::root
         $response = new stdClass();
         $response->errors = array();
-        
+
 
 
         // ::root - convert array to objects
@@ -1560,11 +1667,11 @@ class InterUserEditController extends Controller {
 
             $user->addressFirstLine = $request->addressFirstLine;
             $user->addressSecondLine = $request->addressSecondLine ? $request->addressSecondLine : null; // optional
-            
+
             $user->addressThirdLine = $request->addressThirdLine ? $request->addressThirdLine : null; // optional
             $user->townCity = $request->townCity;
             $user->postcode = $request->postcode;
-            
+
         } // end if
 
 
@@ -1573,11 +1680,11 @@ class InterUserEditController extends Controller {
 
             $user->addressFirstLine = $request->addressFirstLine;
             $user->addressSecondLine = $request->addressSecondLine ? $request->addressSecondLine : null; // optional
-            
+
             $user->postTown = $request->postTown;
             $user->county = $request->county ? $request->county : null; // optional
             $user->eircode = $request->eircode ? $request->eircode : null; // optional
-            
+
         } // end if
 
 
@@ -1633,7 +1740,7 @@ class InterUserEditController extends Controller {
         // ::root
         $response = new stdClass();
         $response->errors = array();
-        
+
 
 
         // ::root - convert array to objects
@@ -1672,12 +1779,12 @@ class InterUserEditController extends Controller {
 
 
 
-        
+
 
         // 2: create receiver
         $receiver = new UserReceiver();
 
-        
+
         $receiver->name = $request->receiverName;
         $receiver->phone = $request->phoneNumber;
         $receiver->phoneAlt = $request->secondPhoneNumber ? $request->secondPhoneNumber : null;
@@ -1710,7 +1817,7 @@ class InterUserEditController extends Controller {
 
         $content->receiverAddress->receiverStateId = $receiver->stateId;
         $content->receiverAddress->receiverRegionId = $receiver->deliveryAreaId;
-        
+
         $content->receiverAddress->addressDescription = $receiver->address;
 
         $content->receiverAddress->deliveryEstimatedTime = $receiver->deliveryArea->deliveryTime->content;
@@ -1758,7 +1865,7 @@ class InterUserEditController extends Controller {
         // ::root
         $response = new stdClass();
         $response->errors = array();
-        
+
 
 
         // ::root - convert array to objects
@@ -1772,7 +1879,7 @@ class InterUserEditController extends Controller {
         // 1: get receiver
         $receiver = UserReceiver::find($request->receiverId);
 
-        
+
 
 
 
@@ -1806,7 +1913,7 @@ class InterUserEditController extends Controller {
 
 
 
-        
+
 
 
 
@@ -1863,14 +1970,14 @@ class InterUserEditController extends Controller {
         // ::root
         $response = new stdClass();
         $response->errors = array();
-        
+
 
 
         // ::root - convert array to objects
         $request = (object) $request->all();
 
 
-        
+
         // 1: get receiver
         $receiver = UserReceiver::find($request->receiverId);
 
@@ -1946,7 +2053,7 @@ class InterUserEditController extends Controller {
         $userPhone = strval($userPhone);
 
 
-        
+
         // 1: check length => (must be 12 - eg : 249 99 959 0002)
         if (strlen($userPhone) != 12) return false; else return true;
 
@@ -1958,7 +2065,7 @@ class InterUserEditController extends Controller {
 
 
 
-    
+
 
 
 

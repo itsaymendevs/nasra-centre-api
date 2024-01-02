@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Message;
 use App\Models\User;
 use App\Models\UserResetPassword;
 use App\Models\UserResetPhone;
@@ -14,7 +15,7 @@ use stdClass;
 
 class UserEditController extends Controller {
 
-    
+
 
 
 
@@ -48,7 +49,7 @@ class UserEditController extends Controller {
         // :1.3: check existence / isActive
         if (!$user) {
 
-            $response->errors[0] = 18; 
+            $response->errors[0] = 18;
             return response()->json($response);
 
         } // end if
@@ -126,7 +127,7 @@ class UserEditController extends Controller {
         if (!empty($otpResponse->errors)) {
 
             $response->errors = $otpResponse->errors;
-                
+
         } else {
 
 
@@ -190,7 +191,7 @@ class UserEditController extends Controller {
         // :1.3: check existence / isActive
         if (!$user) {
 
-            $response->errors[0] = 18; 
+            $response->errors[0] = 18;
             return response()->json($response);
 
         } // end if
@@ -238,7 +239,7 @@ class UserEditController extends Controller {
             if ($minutes > $expireTime) {
 
                 UserResetPassword::where('phone', $userPhone)->delete();
-                
+
                 $response->errors[0] = 12;
                 return response()->json($response);
 
@@ -263,7 +264,7 @@ class UserEditController extends Controller {
         // ==================================
         // ==================================
 
-        
+
 
 
 
@@ -278,7 +279,7 @@ class UserEditController extends Controller {
         if (!empty($otpResponse->errors)) {
 
             $response->errors = $otpResponse->errors;
-                
+
         } else {
 
 
@@ -342,7 +343,7 @@ class UserEditController extends Controller {
         $otpCode = $request->enteredVerificationCode;
 
 
-        
+
 
 
 
@@ -368,10 +369,10 @@ class UserEditController extends Controller {
 
             // :: if expired
             if ($minutes > $expireTime) {
-                
+
                 // :: remove from-db
                 UserResetPassword::where('phone', $userPhone)->delete();
-                
+
                 $response->errors[0] = 12;
                 return response()->json($response);
 
@@ -379,7 +380,7 @@ class UserEditController extends Controller {
 
 
 
-        
+
 
         // 2.2: Not Found
         } else {
@@ -389,7 +390,7 @@ class UserEditController extends Controller {
             return response()->json($response);
 
         } // end if
-        
+
 
 
 
@@ -405,13 +406,13 @@ class UserEditController extends Controller {
 
 
 
-        
+
         // 3: check if confirmed-already
         if (boolval($userPasswordLead->isConfirmed) === true) {
 
 
             $response = new stdClass();
-            $response->validOTP = true; 
+            $response->validOTP = true;
 
             return response()->json($response);
 
@@ -420,12 +421,12 @@ class UserEditController extends Controller {
 
 
 
-        
+
         // 3.2: => check otp-match - update DB
         if ($otpCode == $userPasswordLead->otp) {
 
             $response = new stdClass();
-            $response->validOTP = true; 
+            $response->validOTP = true;
 
             UserResetPassword::where('phone', $userPhone)->update([
                 'confirmed'=> true
@@ -438,7 +439,7 @@ class UserEditController extends Controller {
         // 3.3: not-valid
         } else {
 
-            $response->errors[0] = 13; 
+            $response->errors[0] = 13;
 
             return response()->json($response);
 
@@ -487,10 +488,10 @@ class UserEditController extends Controller {
         $userPhone = $request->phoneNumber;
         $newPassword = $request->newPassword;
 
-        
 
 
-        // 2: check expiry - 30 minutes 
+
+        // 2: check expiry - 30 minutes
         $userPasswordLead = UserResetPassword::where('phone', $userPhone)->first();
 
 
@@ -513,7 +514,7 @@ class UserEditController extends Controller {
             if ($minutes > $expireTime) {
 
                 UserResetPassword::where('phone', $userPhone)->delete();
-                
+
                 $response->errors[0] = 20;
                 return response()->json($response);
 
@@ -527,7 +528,7 @@ class UserEditController extends Controller {
 
             // 3: Update Password
             $user = User::where('phone', $userPhone)->first();
-    
+
             $user->password = Hash::make($newPassword);
             $user->save();
 
@@ -535,7 +536,7 @@ class UserEditController extends Controller {
             // 4: remove Old-data
             UserResetPassword::where('phone', $userPhone)->delete();
 
-            
+
 
 
             // 5: return User Modal
@@ -543,19 +544,19 @@ class UserEditController extends Controller {
             $content->id = $user->id;
 
 
-            
+
             $content->firstName = $user->firstName;
             $content->lastName = $user->lastName;
             $content->emailAddress = $user->email;
             $content->phoneNumber = intval($user->phone);
-            
+
 
 
             $content->userAddress = new stdClass();
 
             $content->userAddress->userStateId = $user->stateId;
             $content->userAddress->userRegionId = $user->deliveryAreaId;
-            
+
             $content->userAddress->addressDescription = $user->address;
             $content->userAddress->deliveryEstimatedTime = $user->deliveryArea->deliveryTime->content;
             $content->userAddress->deliveryEstimatedTimeAr = $user->deliveryArea->deliveryTime->contentAr;
@@ -569,7 +570,7 @@ class UserEditController extends Controller {
             // ::prepare response
             $response = new stdClass();
             $response->user = $content;
-        
+
 
 
             // return response in json
@@ -579,7 +580,7 @@ class UserEditController extends Controller {
 
 
 
-        
+
 
     } // end of function
 
@@ -611,6 +612,9 @@ class UserEditController extends Controller {
 
         // :: root
         $otpResponse = new stdClass();
+        $token = env('SMS_TOKEN');
+        $otpMessage = Message::where('isFor', 'PHONE')->first();
+
 
         $otpCode = mt_rand(1000, 9999);
 
@@ -629,28 +633,33 @@ class UserEditController extends Controller {
 
 
 
-        // 2.1 - english message
-        // if ($lang == "english") {
 
-        //     $response = Http::get('https://www.airtel.sd/bulksms/webacc.aspx', [
-        //         'user' => 'nasra',
-        //         'pwd' => '540125',
-        //         'Sender' => 'Nasra', // 11 char max
-        //         'Nums' => $userPhone, // 249 99 959 0002 - separate by (;) no space
-        //         'smstext' => 'Your Verification Code : ' . $otpCode, //70 char per message - 160 (latin)
-        //     ]);
 
-        // } else {
 
-        //     $response = Http::get('https://www.airtel.sd/bulksms/webacc.aspx', [
-        //         'user' => 'nasra',
-        //         'pwd' => '540125',
-        //         'Sender' => 'Nasra', // 11 char max
-        //         'Nums' => $userPhone, // 249 99 959 0002 - separate by (;) no space
-        //         'smstext' => 'رقم التأكيد الخاص بك : ' . $otpCode, // 70 char per message - 160 (latin)
-        //     ]);
+        // 2: Otp Provider EN / AR
+        if ($lang == "english") {
 
-        // } // end if
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Basic ' . $token
+            ])->post('https://api.bulksms.com/v1/messages?auto-unicode=true&longMessageMaxParts=30', [
+                'from' => 'Nasra', // 11 char max
+                'to' => '+' . $userPhone, // +249 99 959 0002
+                'body' => $otpMessage->content . ' ' . $otpCode, // 70 char per message - 160 (latin)
+            ]);
+
+        } else {
+
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Basic ' . $token
+            ])->post('https://api.bulksms.com/v1/messages?auto-unicode=true&longMessageMaxParts=30', [
+                'from' => 'Nasra', // 11 char max
+                'to' => '+' . $userPhone, // +249 99 959 0002
+                'body' => $otpMessage->contentAr . ' ' . $otpCode, // 70 char per message - 160 (latin)
+            ]);
+
+        } // end if
 
 
 
@@ -704,6 +713,9 @@ class UserEditController extends Controller {
 
         // :: root
         $otpResponse = new stdClass();
+        $token = env('SMS_TOKEN');
+        $otpMessage = Message::where('isFor', 'PHONE')->first();
+
 
         $userPasswordLead = UserResetPassword::where('phone', $userPhone)->first();
         $otpCode = $userPasswordLead->otp;
@@ -712,28 +724,32 @@ class UserEditController extends Controller {
 
 
 
-        // 2.1 - english message
-        // if ($lang == "english") {
+        // 2: Otp Provider EN / AR
+        if ($lang == "english") {
 
-        //     $response = Http::get('https://www.airtel.sd/bulksms/webacc.aspx', [
-        //         'user' => 'nasra',
-        //         'pwd' => '540125',
-        //         'Sender' => 'Nasra', // 11 char max
-        //         'Nums' => $userPhone, // 249 99 959 0002 - separate by (;) no space
-        //         'smstext' => 'Your Verification Code : ' . $otpCode, //70 char per message - 160 (latin)
-        //     ]);
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Basic ' . $token
+            ])->post('https://api.bulksms.com/v1/messages?auto-unicode=true&longMessageMaxParts=30', [
+                'from' => 'Nasra', // 11 char max
+                'to' => '+' . $userPhone, // +249 99 959 0002
+                'body' => $otpMessage->content . ' ' . $otpCode, // 70 char per message - 160 (latin)
+            ]);
 
-        // } else {
+        } else {
 
-        //     $response = Http::get('https://www.airtel.sd/bulksms/webacc.aspx', [
-        //         'user' => 'nasra',
-        //         'pwd' => '540125',
-        //         'Sender' => 'Nasra', // 11 char max
-        //         'Nums' => $userPhone, // 249 99 959 0002 - separate by (;) no space
-        //         'smstext' => 'رقم التأكيد الخاص بك : ' . $otpCode, // 70 char per message - 160 (latin)
-        //     ]);
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Basic ' . $token
+            ])->post('https://api.bulksms.com/v1/messages?auto-unicode=true&longMessageMaxParts=30', [
+                'from' => 'Nasra', // 11 char max
+                'to' => '+' . $userPhone, // +249 99 959 0002
+                'body' => $otpMessage->contentAr . ' ' . $otpCode, // 70 char per message - 160 (latin)
+            ]);
 
-        // } // end if
+        } // end if
+
+
 
 
 
@@ -857,7 +873,7 @@ class UserEditController extends Controller {
         // 1.4: existence in Reset DB => if yes check timeout
         $isDuplicated = UserResetPhone::where('userId', $user->id)->count();
 
-        
+
         if ($isDuplicated >= 1) {
 
             $userPhoneLead = UserResetPhone::where('userId', $user->id)->first();
@@ -902,7 +918,7 @@ class UserEditController extends Controller {
 
 
 
-        
+
 
 
 
@@ -915,7 +931,7 @@ class UserEditController extends Controller {
         if (!empty($otpResponse->errors)) {
 
             $response->errors = $otpResponse->errors;
-                
+
         } else {
 
 
@@ -932,7 +948,7 @@ class UserEditController extends Controller {
 
 
 
-        
+
     } // end function
 
 
@@ -952,7 +968,7 @@ class UserEditController extends Controller {
 
 
 
-    
+
 
 
     public function resendChangeNumberOTP(Request $request) {
@@ -1016,7 +1032,7 @@ class UserEditController extends Controller {
             if ($minutes > $expireTime) {
 
                 UserResetPhone::where('phone', $newPhone)->delete();
-                
+
                 $response->errors[0] = 12;
                 return response()->json($response);
 
@@ -1060,7 +1076,7 @@ class UserEditController extends Controller {
         if (!empty($otpResponse->errors)) {
 
             $response->errors = $otpResponse->errors;
-                
+
         } else {
 
 
@@ -1105,7 +1121,7 @@ class UserEditController extends Controller {
         $response->errors = array();
         $isOtpConfirmed = false;
         $expireTime = 1;
-        
+
 
         // ::root - convert array to objects
         $request = (object) $request->all();
@@ -1142,10 +1158,10 @@ class UserEditController extends Controller {
 
             if ($minutes > $expireTime) {
 
-                
+
                 // :: remove from-db
                 UserResetPhone::where('phone', $newPhone)->delete();
-                
+
                 $response->errors[0] = 12;
                 return response()->json($response);
 
@@ -1228,8 +1244,12 @@ class UserEditController extends Controller {
 
     public function sendPhoneOTP($newPhone, $lang, $expireDelete, $userId) {
 
+
         // :: root
         $otpResponse = new stdClass();
+        $token = env('SMS_TOKEN');
+        $otpMessage = Message::where('isFor', 'PHONE')->first();
+
 
         $otpCode = mt_rand(1000, 9999);
 
@@ -1250,30 +1270,31 @@ class UserEditController extends Controller {
 
 
 
-        
-        // 2.1 - english message
-        // if ($lang == "english") {
 
-        //     $response = Http::get('https://www.airtel.sd/bulksms/webacc.aspx', [
-        //         'user' => 'nasra',
-        //         'pwd' => '540125',
-        //         'Sender' => 'Nasra', // 11 char max
-        //         'Nums' => $userPhone, // 249 99 959 0002 - separate by (;) no space
-        //         'smstext' => 'Your Verification Code : ' . $otpCode, //70 char per message - 160 (latin)
-        //     ]);
+        // 2: Otp Provider EN / AR
+        if ($lang == "english") {
 
-        // } else {
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Basic ' . $token
+            ])->post('https://api.bulksms.com/v1/messages?auto-unicode=true&longMessageMaxParts=30', [
+                'from' => 'Nasra', // 11 char max
+                'to' => '+' . $newPhone, // +249 99 959 0002
+                'body' => $otpMessage->content . ' ' . $otpCode, // 70 char per message - 160 (latin)
+            ]);
 
-        //     $response = Http::get('https://www.airtel.sd/bulksms/webacc.aspx', [
-        //         'user' => 'nasra',
-        //         'pwd' => '540125',
-        //         'Sender' => 'Nasra', // 11 char max
-        //         'Nums' => $userPhone, // 249 99 959 0002 - separate by (;) no space
-        //         'smstext' => 'رقم التأكيد الخاص بك : ' . $otpCode, // 70 char per message - 160 (latin)
-        //     ]);
+        } else {
 
-        // } // end if
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Basic ' . $token
+            ])->post('https://api.bulksms.com/v1/messages?auto-unicode=true&longMessageMaxParts=30', [
+                'from' => 'Nasra', // 11 char max
+                'to' => '+' . $newPhone, // +249 99 959 0002
+                'body' => $otpMessage->contentAr . ' ' . $otpCode, // 70 char per message - 160 (latin)
+            ]);
 
+        } // end if
 
 
 
@@ -1332,37 +1353,44 @@ class UserEditController extends Controller {
 
         // :: root
         $otpResponse = new stdClass();
+        $token = env('SMS_TOKEN');
+        $otpMessage = Message::where('isFor', 'PHONE')->first();
+
 
         $userPhoneLead = UserResetPhone::where('phone', $newPhone)->first();
         $otpCode = $userPhoneLead->otp;
 
 
 
-     
 
-        
-        // 2.1 - english message
-        // if ($lang == "english") {
 
-        //     $response = Http::get('https://www.airtel.sd/bulksms/webacc.aspx', [
-        //         'user' => 'nasra',
-        //         'pwd' => '540125',
-        //         'Sender' => 'Nasra', // 11 char max
-        //         'Nums' => $userPhone, // 249 99 959 0002 - separate by (;) no space
-        //         'smstext' => 'Your Verification Code : ' . $otpCode, //70 char per message - 160 (latin)
-        //     ]);
 
-        // } else {
 
-        //     $response = Http::get('https://www.airtel.sd/bulksms/webacc.aspx', [
-        //         'user' => 'nasra',
-        //         'pwd' => '540125',
-        //         'Sender' => 'Nasra', // 11 char max
-        //         'Nums' => $userPhone, // 249 99 959 0002 - separate by (;) no space
-        //         'smstext' => 'رقم التأكيد الخاص بك : ' . $otpCode, // 70 char per message - 160 (latin)
-        //     ]);
 
-        // } // end if
+        // 2: Otp Provider EN / AR
+        if ($lang == "english") {
+
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Basic ' . $token
+            ])->post('https://api.bulksms.com/v1/messages?auto-unicode=true&longMessageMaxParts=30', [
+                'from' => 'Nasra', // 11 char max
+                'to' => '+' . $newPhone, // +249 99 959 0002
+                'body' => $otpMessage->content . ' ' . $otpCode, // 70 char per message - 160 (latin)
+            ]);
+
+        } else {
+
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Basic ' . $token
+            ])->post('https://api.bulksms.com/v1/messages?auto-unicode=true&longMessageMaxParts=30', [
+                'from' => 'Nasra', // 11 char max
+                'to' => '+' . $newPhone, // +249 99 959 0002
+                'body' => $otpMessage->contentAr . ' ' . $otpCode, // 70 char per message - 160 (latin)
+            ]);
+
+        } // end if
 
 
 
@@ -1403,7 +1431,7 @@ class UserEditController extends Controller {
         // ::root
         $response = new stdClass();
         $response->errors = array();
-        
+
 
 
         // ::root - convert array to objects
@@ -1441,7 +1469,7 @@ class UserEditController extends Controller {
 
 
 
-        
+
 
 
 
@@ -1486,7 +1514,7 @@ class UserEditController extends Controller {
         // ::root
         $response = new stdClass();
         $response->errors = array();
-        
+
 
 
         // ::root - convert array to objects
@@ -1515,7 +1543,7 @@ class UserEditController extends Controller {
         // 1.3: isPasswordMatched
         if (Hash::check($oldPassword, $user->password)) {
 
-            
+
             // 1.3.1: update user-password
             $user->password = Hash::make($newPassword);
             $user->save();
@@ -1564,7 +1592,7 @@ class UserEditController extends Controller {
         // ::root
         $response = new stdClass();
         $response->errors = array();
-        
+
 
 
         // ::root - convert array to objects
@@ -1659,7 +1687,7 @@ class UserEditController extends Controller {
         $userPhone = strval($userPhone);
 
 
-        
+
         // 1: check length => (must be 12 - eg : 249 99 959 0002)
         if (strlen($userPhone) != 12) return false; else return true;
 
@@ -1677,7 +1705,7 @@ class UserEditController extends Controller {
 
 
 
-    
+
 
 
 

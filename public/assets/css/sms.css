@@ -1,0 +1,30 @@
+.form--label.with-counter {
+  position: relative;
+}
+
+.form--label.with-counter small {
+  position: absolute;
+  top: 4px;
+  right: 12%;
+  color: var(--bg-theme-dark);
+  font-weight: 600 !important;
+}
+
+.sms--indicator {
+  font-size: 14px;
+  padding: 1px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  background-color: var(--bg-theme-dark);
+  color: white;
+}
+
+.sms--indicator.inactive {
+  background-color: var(--delete-color);
+  color: white;
+}
+
+.sms--indicator:last-of-type {
+  margin-left: 15px;
+}
+

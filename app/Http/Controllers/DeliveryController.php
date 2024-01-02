@@ -56,7 +56,7 @@ class DeliveryController extends Controller {
 
         // 1: toggle Receiving pickups
         $generalBlock = GeneralBlock::all()->first();
-        
+
         $generalBlock->stopDelivery = !boolval($generalBlock->stopDelivery);
         $generalBlock->save();
 
@@ -174,7 +174,7 @@ class DeliveryController extends Controller {
 
         // 1: get area
         $area = DeliveryArea::find($id);
-        
+
         $area->isActive = !boolval($area->isActive);
         $area->save();
 
@@ -206,7 +206,7 @@ class DeliveryController extends Controller {
 
 
 
-    
+
 
 
     // ===============================================================================
@@ -240,7 +240,7 @@ class DeliveryController extends Controller {
     public function storeCondition(Request $request) {
 
         // :: validator
-        $validator = $this->validationTrait($request, 
+        $validator = $this->validationTrait($request,
         ['title' => 'required', 'titleAr' => 'required', 'content' => 'required', 'contentAr' => 'required']);
 
         // ! if validation not passed
@@ -293,7 +293,7 @@ class DeliveryController extends Controller {
 
         $condition->save();
 
-        
+
         return response()->json(['status' => true, 'message' => 'Condition has been updated!'], 200);
 
     } // end function
@@ -316,6 +316,123 @@ class DeliveryController extends Controller {
         return response()->json(['status' => true, 'message' => 'Condition has been removed!'], 200);
 
     } // end function
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // ===============================================================================
+    // ===============================================================================
+    // ===============================================================================
+    // ===============================================================================
+    // ===============================================================================
+
+
+
+
+
+
+
+
+
+    public function times() {
+
+        // ::get items
+        $times = DeliveryTime::all();
+
+        return response()->json($times, 200);
+
+    } // end function
+
+
+    // ----------------------------------------------------------
+
+
+
+    public function storeTime(Request $request) {
+
+
+        // 1: create item
+        $time = new DeliveryTime();
+
+        $time->serial = $this->createSerial('DT', DeliveryTime::latest()->first() ? DeliveryTime::latest()->first()->id : 0);
+        $time->title = $request->title;
+        $time->titleAr = $request->titleAr;
+
+        $time->content = $request->content;
+        $time->contentAr = $request->contentAr;
+
+
+        $time->save();
+
+        return response()->json(['status' => true, 'message' => 'Time has been added!'], 200);
+
+    } // end function
+
+
+
+
+
+
+
+
+    // ----------------------------------------------------------
+
+
+
+    public function updateTime(Request $request) {
+
+
+        // 1: create item
+        $time = DeliveryTime::find($request->id);
+
+
+
+        $time->title = $request->title;
+        $time->titleAr = $request->titleAr;
+
+        $time->content = $request->content;
+        $time->contentAr = $request->contentAr;
+
+        $time->save();
+
+
+        return response()->json(['status' => true, 'message' => 'Time has been updated!'], 200);
+
+    } // end function
+
+
+
+
+
+
+    // ----------------------------------------------------------
+
+
+
+    public function deleteTime(Request $request, $id) {
+
+        // 1: delete item / image
+        $time = DeliveryTime::find($id);
+        $time->delete();
+
+        return response()->json(['status' => true, 'message' => 'Time has been removed!'], 200);
+
+    } // end function
+
+
 
 
 

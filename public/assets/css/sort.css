@@ -1,0 +1,28 @@
+/* sorting */
+
+.sort--item {
+  transition: initial;
+}
+
+.sort-drag {
+  background-color: #8abab0 !important;
+}
+
+.btn--sort-alt {
+  width: 36px !important;
+  height: 36px !important;
+  align-items: center;
+  border-radius: 50% !important;
+  justify-content: center !important;
+  font-size: 23px !important;
+  padding: 6px;
+}
+
+.btn--sort {
+  height: 52px !important;
+  align-items: center;
+  justify-content: center !important;
+  font-size: 25px !important;
+  padding: 10px !important;
+}
+
