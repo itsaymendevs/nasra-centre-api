@@ -4,12 +4,11 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up() : void
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
@@ -83,7 +82,16 @@ return new class extends Migration
             $table->bigInteger('paymentId')->unsigned()->nullable();
             $table->foreign('paymentId')->references('id')->on('payments')->onDelete('cascade');
             $table->text('paymentNote')->nullable();
+
+
+
+            // ::DIRECTPAYMENT - International - Stripe
+            $table->text('paymentIntent')->nullable();
+            $table->text('paymentURL')->nullable();
+
+
             $table->boolean('isPaymentDone')->nullable()->default(0);
+
 
             $table->bigInteger('paymentEmployeeId')->unsigned()->nullable();
             $table->foreign('paymentEmployeeId')->references('id')->on('employees')->onDelete('cascade');
@@ -128,7 +136,7 @@ return new class extends Migration
     /**
      * Reverse the migrations.
      */
-    public function down(): void
+    public function down() : void
     {
         Schema::dropIfExists('orders');
     }

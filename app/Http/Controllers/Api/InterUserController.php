@@ -24,12 +24,14 @@ ini_set('max_execution_time', 180); // 180 (seconds) = 3 Minutes
 
 
 
-class InterUserController extends Controller {
+class InterUserController extends Controller
+{
 
 
 
 
-    public function login (Request $request) {
+    public function login(Request $request)
+    {
 
 
         // 1: get use -> phone
@@ -67,7 +69,7 @@ class InterUserController extends Controller {
 
 
         // 2.3: Credit Incorrect
-        if (!$user || !Hash::check($request->password, $user->password)) {
+        if (! $user || ! Hash::check($request->password, $user->password)) {
 
             $response->errors[0] = 10;
             return response()->json($response);
@@ -97,7 +99,8 @@ class InterUserController extends Controller {
 
             $user->tokens()->delete();
 
-        } catch (Throwable $event) {}
+        } catch (Throwable $event) {
+        }
 
 
 
@@ -179,7 +182,7 @@ class InterUserController extends Controller {
             $item->receiverAddress->deliveryEstimatedTimeAr = $receiver->deliveryArea->deliveryTime->contentAr;
 
             $item->receiverAddress->regionDeliveryPrice = intval($receiver->deliveryArea->price);
-            $item->receiverAddress->isDeliveryBlocked = !boolval($receiver->deliveryArea->isActive);
+            $item->receiverAddress->isDeliveryBlocked = ! boolval($receiver->deliveryArea->isActive);
 
 
 
@@ -216,7 +219,7 @@ class InterUserController extends Controller {
 
         // 4: fetch productsID List / Save Device (if New)
         $isDuplicated = UserDevice::where('userId', $user->id)
-        ->where('serial', $request->deviceID)->count();
+            ->where('serial', $request->deviceID)->count();
 
 
         // 4.1: fetch products
@@ -408,7 +411,8 @@ class InterUserController extends Controller {
 
 
 
-    public function register (Request $request) {
+    public function register(Request $request)
+    {
 
 
         // :: root
@@ -514,7 +518,7 @@ class InterUserController extends Controller {
 
 
         // 4.2: handle otp - errors / success response
-        if (!empty($otpResponse->errors)) {
+        if (! empty($otpResponse->errors)) {
 
             $response->errors = $otpResponse->errors;
 
@@ -559,7 +563,8 @@ class InterUserController extends Controller {
 
 
 
-    public function registerResend(Request $request) {
+    public function registerResend(Request $request)
+    {
 
 
 
@@ -647,7 +652,7 @@ class InterUserController extends Controller {
 
 
         // 4: handle Otp Response
-        if (!empty($otpResponse->errors)) {
+        if (! empty($otpResponse->errors)) {
 
             $response->errors = $otpResponse->errors;
 
@@ -685,7 +690,8 @@ class InterUserController extends Controller {
 
 
 
-    public function confirmRegister(Request $request) {
+    public function confirmRegister(Request $request)
+    {
 
 
         // :: root
@@ -748,7 +754,7 @@ class InterUserController extends Controller {
 
 
 
-        // 1.5: not found
+            // 1.5: not found
         } else {
 
             $response->errors[0] = 12;
@@ -916,7 +922,7 @@ class InterUserController extends Controller {
                 $item->receiverAddress->deliveryEstimatedTimeAr = $receiver->deliveryArea->deliveryTime->contentAr;
 
                 $item->receiverAddress->regionDeliveryPrice = intval($receiver->deliveryArea->price);
-                $item->receiverAddress->isDeliveryBlocked = !boolval($receiver->deliveryArea->isActive);
+                $item->receiverAddress->isDeliveryBlocked = ! boolval($receiver->deliveryArea->isActive);
 
 
                 array_push($content->receivers, $item);
@@ -1024,7 +1030,8 @@ class InterUserController extends Controller {
 
 
 
-    public function logout (Request $request) {
+    public function logout(Request $request)
+    {
 
         $request->user()->currentAccessToken()->delete();
 
@@ -1057,7 +1064,8 @@ class InterUserController extends Controller {
 
 
 
-    protected function registerFilters($request, $isDuplicated, $isDuplicatedTemp, $isPhoneValid) {
+    protected function registerFilters($request, $isDuplicated, $isDuplicatedTemp, $isPhoneValid)
+    {
 
         $counter = 0;
         $errorKeys = new stdClass();
@@ -1067,7 +1075,8 @@ class InterUserController extends Controller {
         // 1: firstName
         if (empty($request->newUserData->firstName)) {
 
-            $errorKeys->errors[$counter] = 1; $counter++;
+            $errorKeys->errors[$counter] = 1;
+            $counter++;
 
         } // end if
 
@@ -1076,7 +1085,8 @@ class InterUserController extends Controller {
         // 2: lastName
         if (empty($request->newUserData->lastName)) {
 
-            $errorKeys->errors[$counter] = 2; $counter++;
+            $errorKeys->errors[$counter] = 2;
+            $counter++;
 
         } // end if
 
@@ -1087,21 +1097,25 @@ class InterUserController extends Controller {
         // 3: Phone / Phone match
         if (empty($request->newUserData->phoneNumber)) {
 
-            $errorKeys->errors[$counter] = 3; $counter++;
+            $errorKeys->errors[$counter] = 3;
+            $counter++;
 
 
         } elseif ($isPhoneValid === false) {
 
-            $errorKeys->errors[$counter] = 3; $counter++;
+            $errorKeys->errors[$counter] = 3;
+            $counter++;
 
 
         } elseif ($isDuplicated >= 1) {
 
-            $errorKeys->errors[$counter] = 4; $counter++;
+            $errorKeys->errors[$counter] = 4;
+            $counter++;
 
         } elseif ($isDuplicatedTemp >= 1) {
 
-            $errorKeys->errors[$counter] = 14; $counter++;
+            $errorKeys->errors[$counter] = 14;
+            $counter++;
 
         } // end if
 
@@ -1110,7 +1124,8 @@ class InterUserController extends Controller {
         // 4: Email
         if (empty($request->newUserData->emailAddress)) {
 
-            $errorKeys->errors[$counter] = 5; $counter++;
+            $errorKeys->errors[$counter] = 5;
+            $counter++;
 
         } // end if
 
@@ -1118,7 +1133,8 @@ class InterUserController extends Controller {
         // 5: Password + regionId + stateId
         if (empty($request->newUserData->password)) {
 
-            $errorKeys->errors[$counter] = 17; $counter++;
+            $errorKeys->errors[$counter] = 17;
+            $counter++;
 
         } // end if
 
@@ -1147,7 +1163,8 @@ class InterUserController extends Controller {
 
 
 
-    protected function checkPhone($userPhone) {
+    protected function checkPhone($userPhone)
+    {
 
         // ::root
         $userPhone = strval($userPhone);
@@ -1182,7 +1199,8 @@ class InterUserController extends Controller {
 
 
 
-    public function sendOTP($userPhone, $lang, $expireDelete) {
+    public function sendOTP($userPhone, $lang, $expireDelete)
+    {
 
 
         // :: root
@@ -1195,12 +1213,15 @@ class InterUserController extends Controller {
 
 
         // 1: check if otp unique
-        while(true) {
+        while (true) {
 
             $otpDuplicated = UserLead::where('otp', $otpCode)->count();
 
             // 1.2: re-generate
-            if ($otpDuplicated  > 0) $otpCode = mt_rand(1000, 9999); else break;
+            if ($otpDuplicated > 0)
+                $otpCode = mt_rand(1000, 9999);
+            else
+                break;
 
         } // end while
 
@@ -1217,10 +1238,10 @@ class InterUserController extends Controller {
                 'Content-Type' => 'application/json',
                 'Authorization' => 'Basic ' . $token
             ])->post('https://api.bulksms.com/v1/messages?auto-unicode=true&longMessageMaxParts=30', [
-                'from' => 'Nasra', // 11 char max
-                'to' => '+' . $userPhone, // +44 99 959 0002
-                'body' => $otpMessage->content . ' ' . $otpCode, // 70 char per message - 160 (latin)
-            ]);
+                        'from' => 'Nasra', // 11 char max
+                        'to' => '00' . $userPhone, // +44 99 959 0002
+                        'body' => $otpMessage->content . ' ' . $otpCode, // 70 char per message - 160 (latin)
+                    ]);
 
         } else {
 
@@ -1228,10 +1249,10 @@ class InterUserController extends Controller {
                 'Content-Type' => 'application/json',
                 'Authorization' => 'Basic ' . $token
             ])->post('https://api.bulksms.com/v1/messages?auto-unicode=true&longMessageMaxParts=30', [
-                'from' => 'Nasra', // 11 char max
-                'to' => '+' . $userPhone, // +44 99 959 0002
-                'body' => $otpMessage->contentAr . ' ' . $otpCode, // 70 char per message - 160 (latin)
-            ]);
+                        'from' => 'Nasra', // 11 char max
+                        'to' => '00' . $userPhone, // +44 99 959 0002
+                        'body' => $otpMessage->contentAr . ' ' . $otpCode, // 70 char per message - 160 (latin)
+                    ]);
 
         } // end if
 
@@ -1291,7 +1312,8 @@ class InterUserController extends Controller {
 
 
 
-    public function resendOTP($userPhone, $lang) {
+    public function resendOTP($userPhone, $lang)
+    {
 
         // ::root
         $otpResponse = new stdClass();
@@ -1314,10 +1336,10 @@ class InterUserController extends Controller {
                 'Content-Type' => 'application/json',
                 'Authorization' => 'Basic ' . $token
             ])->post('https://api.bulksms.com/v1/messages?auto-unicode=true&longMessageMaxParts=30', [
-                'from' => 'Nasra', // 11 char max
-                'to' => '+' . $userPhone, // +44 99 959 0002
-                'body' => $otpMessage->content . ' ' . $otpCode, // 70 char per message - 160 (latin)
-            ]);
+                        'from' => 'Nasra', // 11 char max
+                        'to' => '00' . $userPhone, // +44 99 959 0002
+                        'body' => $otpMessage->content . ' ' . $otpCode, // 70 char per message - 160 (latin)
+                    ]);
 
         } else {
 
@@ -1325,10 +1347,10 @@ class InterUserController extends Controller {
                 'Content-Type' => 'application/json',
                 'Authorization' => 'Basic ' . $token
             ])->post('https://api.bulksms.com/v1/messages?auto-unicode=true&longMessageMaxParts=30', [
-                'from' => 'Nasra', // 11 char max
-                'to' => '+' . $userPhone, // +44 99 959 0002
-                'body' => $otpMessage->contentAr . ' ' . $otpCode, // 70 char per message - 160 (latin)
-            ]);
+                        'from' => 'Nasra', // 11 char max
+                        'to' => '00' . $userPhone, // +44 99 959 0002
+                        'body' => $otpMessage->contentAr . ' ' . $otpCode, // 70 char per message - 160 (latin)
+                    ]);
 
         } // end if
 

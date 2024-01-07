@@ -17,15 +17,17 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use stdClass;
 
-class OrderController extends Controller {
+class OrderController extends Controller
+{
 
 
 
-    public function index() {
+    public function index()
+    {
 
         // 1: currentOrders
         $orders = Order::with(['user', 'user.country', 'country', 'state', 'deliveryArea', 'store', 'receiver', 'payment', 'orderEmployee', 'paymentEmployee', 'refundEmployee'])
-        ->where('orderStatus', '!=', 'COMPLETED')->where('orderStatus', '!=', 'CANCELED')->get();
+            ->where('orderStatus', '!=', 'COMPLETED')->where('orderStatus', '!=', 'CANCELED')->get();
 
         // ::dependencies
         $countries = Country::all();
@@ -55,11 +57,12 @@ class OrderController extends Controller {
 
 
 
-    public function previousOrders() {
+    public function previousOrders()
+    {
 
         // 1: currentOrders
         $orders = Order::with(['user', 'user.country', 'country', 'state', 'deliveryArea', 'store', 'receiver', 'payment', 'orderEmployee', 'paymentEmployee', 'refundEmployee'])
-        ->where('orderStatus', 'COMPLETED')->orWhere('orderStatus', 'CANCELED')->get();
+            ->where('orderStatus', 'COMPLETED')->orWhere('orderStatus', 'CANCELED')->get();
 
         // ::dependencies
         $countries = Country::all();
@@ -101,7 +104,8 @@ class OrderController extends Controller {
 
 
 
-    public function toggleOrdering(Request $request) {
+    public function toggleOrdering(Request $request)
+    {
 
 
         // 1: get country
@@ -139,7 +143,8 @@ class OrderController extends Controller {
 
 
 
-    public function toggleGlobalOrdering(Request $request) {
+    public function toggleGlobalOrdering(Request $request)
+    {
 
 
         // 1: get generalBlocks
@@ -168,22 +173,23 @@ class OrderController extends Controller {
 
 
 
-    public function singleOrder(Request $request, $id) {
+    public function singleOrder(Request $request, $id)
+    {
 
         // 1: singleOrder
         $order = Order::with(['user.country', 'user.state', 'country', 'state', 'deliveryArea', 'store', 'receiver', 'payment', 'orderEmployee', 'paymentEmployee', 'refundEmployee', 'products', 'receiver.state', 'receiver.deliveryArea'])
-        ->where('id', $id)->first();
+            ->where('id', $id)->first();
 
 
 
         // 2: messages / global
         $messages = Message::where('isFor', $order->receivingOption)
-        ->where('type', $order->orderStatus)->get();
+            ->where('type', $order->orderStatus)->get();
 
 
         if ($order->country->code != 'SD') {
             $messages = GlobalMessage::where('isFor', $order->receivingOption)
-            ->where('type', $order->orderStatus)->get();
+                ->where('type', $order->orderStatus)->get();
         } // end if
 
 
@@ -232,7 +238,8 @@ class OrderController extends Controller {
 
 
 
-    public function processOrder(Request $request, $id) {
+    public function processOrder(Request $request, $id)
+    {
 
         // 1: updateOrder
         $order = Order::find($id);
@@ -263,7 +270,7 @@ class OrderController extends Controller {
 
 
 
-        // 1.3.2: PREVIOUS
+            // 1.3.2: PREVIOUS
         } else {
 
 
@@ -307,14 +314,15 @@ class OrderController extends Controller {
 
 
 
-    public function cancelOrder(Request $request, $id) {
+    public function cancelOrder(Request $request, $id)
+    {
 
         // 1: updateOrder
         $order = Order::find($id);
 
 
         // 1.2: update cancellation / refund / orderStatus / orderStatusDateTime
-        $order->refundInvoiceNumber = !empty($request->refundInvoiceNumber) ? $request->refundInvoiceNumber : null;
+        $order->refundInvoiceNumber = ! empty($request->refundInvoiceNumber) ? $request->refundInvoiceNumber : null;
         $order->orderCancellationNote = $request->orderCancellationNote;
 
         $order->refundEmployeeId = 1; // TODO: EMPLOYEE SESSION
@@ -345,7 +353,8 @@ class OrderController extends Controller {
 
 
 
-    public function confirmPayment(Request $request, $id) {
+    public function confirmPayment(Request $request, $id)
+    {
 
         // 1: updateOrder
         $order = Order::find($id);
@@ -391,7 +400,8 @@ class OrderController extends Controller {
 
 
 
-    public function cancelPayment(Request $request, $id) {
+    public function cancelPayment(Request $request, $id)
+    {
 
         // 1: updateOrder
         $order = Order::find($id);
@@ -433,14 +443,15 @@ class OrderController extends Controller {
 
 
 
-    public function sendOTP(Request $request, $id) {
+    public function sendOTP(Request $request, $id)
+    {
 
         // 1: getOrder
         $order = Order::find($id);
 
 
         // 1.2: check if local / global
-        $otpType = !empty($order->receiverId) ? 'global' : 'local';
+        $otpType = ! empty($order->receiverId) ? 'global' : 'local';
 
 
         // 1.2.1: local
@@ -469,10 +480,10 @@ class OrderController extends Controller {
                 'Content-Type' => 'application/json',
                 'Authorization' => 'Basic ' . $token
             ])->post('https://api.bulksms.com/v1/messages?auto-unicode=true&longMessageMaxParts=30', [
-                'from' => 'Nasra', // 11 char max
-                'to' => '+' . $userPhone, // +249 99 959 0002
-                'body' => $otpMessage, // 70 char per message - 160 (latin)
-            ]);
+                        'from' => 'Nasra', // 11 char max
+                        'to' => '00' . $userPhone, // +249 99 959 0002
+                        'body' => $otpMessage, // 70 char per message - 160 (latin)
+                    ]);
 
 
 
@@ -481,7 +492,7 @@ class OrderController extends Controller {
 
 
 
-        // 1.2.2: global
+            // 1.2.2: global
         } else {
 
 
@@ -519,10 +530,10 @@ class OrderController extends Controller {
                 'Content-Type' => 'application/json',
                 'Authorization' => 'Basic ' . $token
             ])->post('https://api.bulksms.com/v1/messages?auto-unicode=true&longMessageMaxParts=30', [
-                'from' => 'Nasra', // 11 char max
-                'to' => '+' . $userPhone, // +249 99 959 0002 or +44
-                'body' => $otpMessage, // 70 char per message - 160 (latin)
-            ]);
+                        'from' => 'Nasra', // 11 char max
+                        'to' => '00' . $userPhone, // +249 99 959 0002 or +44
+                        'body' => $otpMessage, // 70 char per message - 160 (latin)
+                    ]);
 
 
 
@@ -557,7 +568,8 @@ class OrderController extends Controller {
 
 
 
-    public function updateOrderNote(Request $request, $id) {
+    public function updateOrderNote(Request $request, $id)
+    {
 
         // 1: updateOrder
         $order = Order::find($id);

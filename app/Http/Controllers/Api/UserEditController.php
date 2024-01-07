@@ -644,7 +644,7 @@ class UserEditController extends Controller {
                 'Authorization' => 'Basic ' . $token
             ])->post('https://api.bulksms.com/v1/messages?auto-unicode=true&longMessageMaxParts=30', [
                 'from' => 'Nasra', // 11 char max
-                'to' => '+' . $userPhone, // +249 99 959 0002
+                'to' => '00' . $userPhone, // +249 99 959 0002
                 'body' => $otpMessage->content . ' ' . $otpCode, // 70 char per message - 160 (latin)
             ]);
 
@@ -655,7 +655,7 @@ class UserEditController extends Controller {
                 'Authorization' => 'Basic ' . $token
             ])->post('https://api.bulksms.com/v1/messages?auto-unicode=true&longMessageMaxParts=30', [
                 'from' => 'Nasra', // 11 char max
-                'to' => '+' . $userPhone, // +249 99 959 0002
+                'to' => '00' . $userPhone, // +249 99 959 0002
                 'body' => $otpMessage->contentAr . ' ' . $otpCode, // 70 char per message - 160 (latin)
             ]);
 
@@ -732,7 +732,7 @@ class UserEditController extends Controller {
                 'Authorization' => 'Basic ' . $token
             ])->post('https://api.bulksms.com/v1/messages?auto-unicode=true&longMessageMaxParts=30', [
                 'from' => 'Nasra', // 11 char max
-                'to' => '+' . $userPhone, // +249 99 959 0002
+                'to' => '00' . $userPhone, // +249 99 959 0002
                 'body' => $otpMessage->content . ' ' . $otpCode, // 70 char per message - 160 (latin)
             ]);
 
@@ -743,7 +743,7 @@ class UserEditController extends Controller {
                 'Authorization' => 'Basic ' . $token
             ])->post('https://api.bulksms.com/v1/messages?auto-unicode=true&longMessageMaxParts=30', [
                 'from' => 'Nasra', // 11 char max
-                'to' => '+' . $userPhone, // +249 99 959 0002
+                'to' => '00' . $userPhone, // +249 99 959 0002
                 'body' => $otpMessage->contentAr . ' ' . $otpCode, // 70 char per message - 160 (latin)
             ]);
 
@@ -1279,7 +1279,7 @@ class UserEditController extends Controller {
                 'Authorization' => 'Basic ' . $token
             ])->post('https://api.bulksms.com/v1/messages?auto-unicode=true&longMessageMaxParts=30', [
                 'from' => 'Nasra', // 11 char max
-                'to' => '+' . $newPhone, // +249 99 959 0002
+                'to' => '00' . $newPhone, // +249 99 959 0002
                 'body' => $otpMessage->content . ' ' . $otpCode, // 70 char per message - 160 (latin)
             ]);
 
@@ -1290,7 +1290,7 @@ class UserEditController extends Controller {
                 'Authorization' => 'Basic ' . $token
             ])->post('https://api.bulksms.com/v1/messages?auto-unicode=true&longMessageMaxParts=30', [
                 'from' => 'Nasra', // 11 char max
-                'to' => '+' . $newPhone, // +249 99 959 0002
+                'to' => '00' . $newPhone, // +249 99 959 0002
                 'body' => $otpMessage->contentAr . ' ' . $otpCode, // 70 char per message - 160 (latin)
             ]);
 
@@ -1375,7 +1375,7 @@ class UserEditController extends Controller {
                 'Authorization' => 'Basic ' . $token
             ])->post('https://api.bulksms.com/v1/messages?auto-unicode=true&longMessageMaxParts=30', [
                 'from' => 'Nasra', // 11 char max
-                'to' => '+' . $newPhone, // +249 99 959 0002
+                'to' => '00' . $newPhone, // +249 99 959 0002
                 'body' => $otpMessage->content . ' ' . $otpCode, // 70 char per message - 160 (latin)
             ]);
 
@@ -1386,7 +1386,7 @@ class UserEditController extends Controller {
                 'Authorization' => 'Basic ' . $token
             ])->post('https://api.bulksms.com/v1/messages?auto-unicode=true&longMessageMaxParts=30', [
                 'from' => 'Nasra', // 11 char max
-                'to' => '+' . $newPhone, // +249 99 959 0002
+                'to' => '00' . $newPhone, // +249 99 959 0002
                 'body' => $otpMessage->contentAr . ' ' . $otpCode, // 70 char per message - 160 (latin)
             ]);
 
