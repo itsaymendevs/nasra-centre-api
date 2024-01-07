@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\OrderExport;
 use App\Models\Country;
 use App\Models\DeliveryArea;
 use App\Models\Employee;
@@ -9,6 +10,7 @@ use App\Models\GeneralBlock;
 use App\Models\GlobalMessage;
 use App\Models\Message;
 use App\Models\Order;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Payment;
 use App\Models\PickupStore;
 use App\Models\State;
@@ -49,6 +51,27 @@ class OrderController extends Controller
         return response()->json($combine, 200);
 
     } // end function
+
+
+
+
+
+
+    // ----------------------------------------------------------
+
+
+
+    public function exportPreviousOrders()
+    {
+
+        return Excel::download(new OrderExport, 'previousOrders.xlsx');
+
+
+    } // end function
+
+
+
+
 
 
     // ----------------------------------------------------------

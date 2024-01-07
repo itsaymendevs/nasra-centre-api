@@ -212,6 +212,9 @@ Route::group(['middleware' => 'cors'], function () {
 
     // 12: products
     Route::get("/products", [ProductController::class, 'index']);
+    Route::get("/products/export", [ProductController::class, 'exportProducts']);
+
+
 
     // global edits - prices / quantity
     Route::get("/products/shorthand", [ProductController::class, 'shorthand']);
@@ -242,8 +245,10 @@ Route::group(['middleware' => 'cors'], function () {
 
 
 
-    // 13: users
+    // 13: users - export
     Route::get("/users", [UserController::class, 'index']);
+    Route::get("/users/export", [UserController::class, 'exportUsers']);
+
 
 
 
@@ -279,8 +284,10 @@ Route::group(['middleware' => 'cors'], function () {
     // ========================================================
 
 
-    // 15: orders
+    // 15: orders - export
     Route::get("/previousOrders", [LocalOrderController::class, 'previousOrders']);
+    Route::get("/previousOrders/export", [LocalOrderController::class, 'exportPreviousOrders']);
+
     Route::get("/orders", [LocalOrderController::class, 'index']);
 
 
@@ -309,7 +316,7 @@ Route::group(['middleware' => 'cors'], function () {
 
 
     // 1: employee middleware
-    Route::middleware(['auth:sanctum', 'auth.employee'])->group(function() {
+    Route::middleware(['auth:sanctum', 'auth.employee'])->group(function () {
 
         // categories - covers
         Route::post("/categories/update", [MainCategoryController::class, 'updateCovers']);
@@ -816,7 +823,7 @@ Route::group(['middleware' => 'cors'], function () {
     // 4.2: reset-password
     Route::post("/app/user/resetPassword/getOTP", [UserEditController::class, 'resetPasswordOTP']);
     Route::post("/app/user/resetPassword/resendOTP", [UserEditController::class, 'resendResetPasswordOTP']);
-    Route::post("/app/user/resetPassword/confirmOTP",  [UserEditController::class, 'confirmResetPasswordOTP']);
+    Route::post("/app/user/resetPassword/confirmOTP", [UserEditController::class, 'confirmResetPasswordOTP']);
     Route::post("/app/user/resetPassword", [UserEditController::class, 'resetPassword']);
 
 
@@ -867,7 +874,7 @@ Route::group(['middleware' => 'cors'], function () {
     // 5.2: reset-password
     Route::post("/app/user/resetInterPassword/getOTP", [InterUserEditController::class, 'resetPasswordOTP']);
     Route::post("/app/user/resetInterPassword/resendOTP", [InterUserEditController::class, 'resendResetPasswordOTP']);
-    Route::post("/app/user/resetInterPassword/confirmOTP",  [InterUserEditController::class, 'confirmResetPasswordOTP']);
+    Route::post("/app/user/resetInterPassword/confirmOTP", [InterUserEditController::class, 'confirmResetPasswordOTP']);
     Route::post("/app/user/resetInterPassword", [InterUserEditController::class, 'resetPassword']);
 
 

@@ -10,14 +10,16 @@ use App\Traits\AppTrait;
 use stdClass;
 
 
-class PickupController extends Controller {
-    
+class PickupController extends Controller
+{
+
 
     // :: use trait
     use AppTrait;
 
 
-    public function index() {
+    public function index()
+    {
 
         // ::get items
         $pickups = PickupStore::all();
@@ -41,13 +43,14 @@ class PickupController extends Controller {
 
 
 
-    public function toggleReceiving(Request $request) {
+    public function toggleReceiving(Request $request)
+    {
 
 
         // 1: toggle Receiving pickups
         $generalBlock = GeneralBlock::all()->first();
-        
-        $generalBlock->stopPickup = !boolval($generalBlock->stopPickup);
+
+        $generalBlock->stopPickup = ! boolval($generalBlock->stopPickup);
         $generalBlock->save();
 
 
@@ -65,7 +68,8 @@ class PickupController extends Controller {
 
 
 
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
 
 
         // 1: create item
@@ -74,7 +78,7 @@ class PickupController extends Controller {
         $pickup->serial = $this->createSerial('PS', PickupStore::latest()->first() ? PickupStore::latest()->first()->id : 0);
         $pickup->title = $request->title;
         $pickup->titleAr = $request->titleAr;
-        
+
         $pickup->desc = $request->desc;
         $pickup->descAr = $request->descAr;
         $pickup->receivingTimes = $request->receivingTimes;
@@ -89,7 +93,7 @@ class PickupController extends Controller {
 
         // 1.2: upload image if exits
         if ($request->hasFile('image')) {
-            
+
             $fileName = $this->uploadFile($request, 'image', 'pickups/');
             $pickup->image = $fileName;
 
@@ -115,7 +119,8 @@ class PickupController extends Controller {
 
 
 
-    public function edit(Request $request, $id) {
+    public function edit(Request $request, $id)
+    {
 
 
         // 1: get pickup
@@ -131,11 +136,12 @@ class PickupController extends Controller {
 
 
 
-    public function update(Request $request, $id) {
+    public function update(Request $request, $id)
+    {
 
         // :: validator
-        $validator = $this->validationTrait($request, 
-        ['title' => 'required', 'titleAr' => 'required', 'desc' => 'required', 'descAr' => 'required', 'latitude' => 'required', 'longitude' => 'required']);
+        $validator = $this->validationTrait($request,
+            ['title' => 'required', 'titleAr' => 'required', 'desc' => 'required', 'descAr' => 'required', 'latitude' => 'required', 'longitude' => 'required']);
 
         // ! if validation not passed
         if ($validator != false) {
@@ -150,7 +156,7 @@ class PickupController extends Controller {
 
         $pickup->title = $request->title;
         $pickup->titleAr = $request->titleAr;
-        
+
         $pickup->desc = $request->desc;
         $pickup->descAr = $request->descAr;
         $pickup->receivingTimes = $request->receivingTimes;
@@ -166,7 +172,7 @@ class PickupController extends Controller {
 
         // 1.2: upload image if exits / remove
         if ($request->hasFile('image')) {
-            
+
             $this->deleteFile($pickup->image, 'pickups/');
             $fileName = $this->uploadFile($request, 'image', 'pickups/');
             $pickup->image = $fileName;
@@ -192,13 +198,14 @@ class PickupController extends Controller {
 
 
 
-    public function toggleActive(Request $request, $id) {
+    public function toggleActive(Request $request, $id)
+    {
 
 
         // 1: get pickup
         $pickup = PickupStore::find($id);
-        
-        $pickup->isActive = !boolval($pickup->isActive);
+
+        $pickup->isActive = ! boolval($pickup->isActive);
         $pickup->save();
 
 
@@ -216,7 +223,8 @@ class PickupController extends Controller {
 
 
 
-    public function delete(Request $request, $id) {
+    public function delete(Request $request, $id)
+    {
 
         // 1: delete item / image
         $pickup = PickupStore::find($id);
@@ -250,7 +258,8 @@ class PickupController extends Controller {
 
 
 
-    public function conditions() {
+    public function conditions()
+    {
 
         // ::get items
         $conditions = PickupCondition::all();
@@ -264,11 +273,12 @@ class PickupController extends Controller {
 
 
 
-    public function storeCondition(Request $request) {
+    public function storeCondition(Request $request)
+    {
 
         // :: validator
-        $validator = $this->validationTrait($request, 
-        ['title' => 'required', 'titleAr' => 'required', 'content' => 'required', 'contentAr' => 'required']);
+        $validator = $this->validationTrait($request,
+            ['title' => 'required', 'titleAr' => 'required', 'content' => 'required', 'contentAr' => 'required']);
 
         // ! if validation not passed
         if ($validator != false) {
@@ -306,7 +316,8 @@ class PickupController extends Controller {
 
 
 
-    public function updateCondition(Request $request) {
+    public function updateCondition(Request $request)
+    {
 
 
         // 1: create item
@@ -333,7 +344,8 @@ class PickupController extends Controller {
 
 
 
-    public function deleteCondition(Request $request, $id) {
+    public function deleteCondition(Request $request, $id)
+    {
 
         // 1: delete item / image
         $condition = PickupCondition::find($id);

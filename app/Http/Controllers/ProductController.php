@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ProductExport;
 use App\Models\Company;
 use App\Models\MainCategory;
 use App\Models\Product;
@@ -10,16 +11,19 @@ use App\Models\Type;
 use App\Models\Unit;
 use Illuminate\Http\Request;
 use App\Traits\AppTrait;
+use Maatwebsite\Excel\Facades\Excel;
 use stdClass;
 
-class ProductController extends Controller {
-    
+class ProductController extends Controller
+{
+
 
     // :: use trait
     use AppTrait;
 
 
-    public function index() {
+    public function index()
+    {
 
         // ::get items
         $products = Product::all();
@@ -28,12 +32,25 @@ class ProductController extends Controller {
         $types = Type::all();
         $companies = Company::all();
 
+
+        // :: make classifications
+        $classifications = array();
+        array_push($classifications, 'Home Products');
+        array_push($classifications, 'Hidden Products');
+        array_push($classifications, 'Quantity Shortage');
+        array_push($classifications, 'Offers & Discounts');
+
+
+
+
+
         $combine = new stdClass();
         $combine->mainCategories = $mainCategories;
         $combine->subCategories = $subCategories;
         $combine->types = $types;
         $combine->products = $products;
         $combine->companies = $companies;
+        $combine->classifications = $classifications;
 
 
         return response()->json($combine, 200);
@@ -48,10 +65,27 @@ class ProductController extends Controller {
 
 
 
+    public function exportProducts()
+    {
+
+        return Excel::download(new ProductExport, 'products.xlsx');
+
+
+    } // end function
 
 
 
-    public function create() {
+
+
+    // ----------------------------------------------------------
+
+
+
+
+
+
+    public function create()
+    {
 
         // ::get items
         $mainCategories = MainCategory::all();
@@ -82,7 +116,8 @@ class ProductController extends Controller {
 
 
 
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
 
 
         // 1: create item
@@ -91,7 +126,7 @@ class ProductController extends Controller {
         $product->serial = $this->createSerial('P', Product::latest()->first() ? Product::latest()->first()->id : 0);
         $product->name = $request->name;
         $product->nameAr = $request->nameAr;
-        
+
         $product->buyPrice = $request->buyPrice;
         $product->sellPrice = $request->sellPrice;
         $product->offerPrice = $request->offerPrice;
@@ -104,7 +139,7 @@ class ProductController extends Controller {
         $product->weightOption = $request->weightOption;
 
         if ($request->weightOption == 'FIXED' || $request->weightOption == 'DYNAMIC') {
-            
+
             $product->weight = $request->weight;
             $product->unitId = $request->unitId;
 
@@ -114,17 +149,17 @@ class ProductController extends Controller {
         $product->quantityPerUnit = $request->quantityPerUnit;
         $product->quantity = $request->units * $request->quantityPerUnit;
         $product->maxQuantityPerOrder = $request->maxQuantityPerOrder;
-        
+
         $product->isHidden = $request->isHidden == 'true' ? true : false;
-        $product->isMainPage = $request->isMainPage == 'true' ? true: false;
+        $product->isMainPage = $request->isMainPage == 'true' ? true : false;
 
         $product->companyId = $request->companyId;
         $product->mainCategoryId = $request->mainCategoryId;
         $product->subCategoryId = $request->subCategoryId;
         $product->typeId = $request->typeId;
-        
 
-       
+
+
 
         // 1.4: upload image if exits
         if ($request->hasFile('image')) {
@@ -180,7 +215,7 @@ class ProductController extends Controller {
             // 1.6.1: loop thru to sort all again
             $indexCounter = 1;
             $sortProducts = Product::where('isMainPage', true)
-            ->orderBy('indexMainPage','asc')->get();
+                ->orderBy('indexMainPage', 'asc')->get();
 
             foreach ($sortProducts as $item) {
 
@@ -198,7 +233,7 @@ class ProductController extends Controller {
         } else {
 
             $product->indexMainPage = null;
-            
+
         } // end if
 
 
@@ -214,7 +249,7 @@ class ProductController extends Controller {
             // 1.7.1: loop thru to sort all again
             $indexCounter = 1;
             $sortProducts = Product::where('typeId', $request->typeId)
-            ->orderBy('index','asc')->get();
+                ->orderBy('index', 'asc')->get();
 
             foreach ($sortProducts as $item) {
 
@@ -238,13 +273,13 @@ class ProductController extends Controller {
 
 
         // 1.8: indexOffers - reindex items
-        if (!empty($request->offerPrice)) {
+        if (! empty($request->offerPrice)) {
 
 
             // 1.8.1: loop thru to sort all again
             $indexCounter = 1;
             $sortProducts = Product::whereNotNull('offerPrice')
-            ->orderBy('indexOffers','asc')->get();
+                ->orderBy('indexOffers', 'asc')->get();
 
             foreach ($sortProducts as $item) {
 
@@ -282,7 +317,8 @@ class ProductController extends Controller {
 
 
 
-    public function edit($id) {
+    public function edit($id)
+    {
 
         // ::get items
         $product = Product::find($id);
@@ -291,7 +327,7 @@ class ProductController extends Controller {
         $types = Type::all();
         $companies = Company::all();
         $units = Unit::all();
-        
+
 
         $combine = new stdClass();
         $combine->product = $product;
@@ -318,28 +354,29 @@ class ProductController extends Controller {
 
 
 
-    public function updateShorthand(Request $request) {
+    public function updateShorthand(Request $request)
+    {
 
 
         // 1: update item
         $product = Product::find($request[0]['id']);
 
-        $product->sellPrice = !empty($request[0]['sellPrice']) ? $request[0]['sellPrice'] : 1;
-        $product->offerPrice = !empty($request[0]['offerPrice']) ? $request[0]['offerPrice'] : null;
-        $product->quantity =  !empty($request[0]['quantity']) ? $request[0]['quantity'] : 0;
+        $product->sellPrice = ! empty($request[0]['sellPrice']) ? $request[0]['sellPrice'] : 1;
+        $product->offerPrice = ! empty($request[0]['offerPrice']) ? $request[0]['offerPrice'] : null;
+        $product->quantity = ! empty($request[0]['quantity']) ? $request[0]['quantity'] : 0;
 
 
 
 
 
         // 1.2: indexOffers - reindex items
-        if (!empty($request[0]['offerPrice']) && empty($product->indexOffers)) {
+        if (! empty($request[0]['offerPrice']) && empty($product->indexOffers)) {
 
 
             // 1.8.1: loop thru to sort all again
             $indexCounter = 1;
             $sortProducts = Product::whereNotNull('offerPrice')
-            ->orderBy('indexOffers','asc')->get();
+                ->orderBy('indexOffers', 'asc')->get();
 
             foreach ($sortProducts as $item) {
 
@@ -359,7 +396,7 @@ class ProductController extends Controller {
         } elseif (empty($request[0]['offerPrice'])) {
 
             $product->indexOffers = null;
-            
+
         } // end if
 
 
@@ -370,7 +407,7 @@ class ProductController extends Controller {
 
 
     } //end function
-    
+
 
 
 
@@ -378,9 +415,10 @@ class ProductController extends Controller {
 
 
 
-    public function update(Request $request, $id) {
+    public function update(Request $request, $id)
+    {
 
-        
+
 
 
         // 1: create item
@@ -393,7 +431,7 @@ class ProductController extends Controller {
 
         $product->name = $request->name;
         $product->nameAr = $request->nameAr;
-        
+
         $product->buyPrice = $request->buyPrice;
         $product->sellPrice = $request->sellPrice;
         $product->offerPrice = $request->offerPrice;
@@ -406,7 +444,7 @@ class ProductController extends Controller {
         $product->weightOption = $request->weightOption;
 
         if ($request->weightOption == 'FIXED' || $request->weightOption == 'DYNAMIC') {
-            
+
             $product->weight = $request->weight;
             $product->unitId = $request->unitId;
 
@@ -421,22 +459,22 @@ class ProductController extends Controller {
         $product->quantityPerUnit = $request->quantityPerUnit;
         $product->quantity = $request->units * $request->quantityPerUnit;
         $product->maxQuantityPerOrder = $request->maxQuantityPerOrder;
-        
+
         $product->isHidden = $request->isHidden == 'true' ? true : false;
-        $product->isMainPage = $request->isMainPage == 'true' ? true: false;
+        $product->isMainPage = $request->isMainPage == 'true' ? true : false;
 
         $product->companyId = $request->companyId;
         $product->mainCategoryId = $request->mainCategoryId;
         $product->subCategoryId = $request->subCategoryId;
         $product->typeId = $request->typeId;
-        
+
 
 
 
 
         // 1.2: upload image if exits
         if ($request->hasFile('image')) {
-            
+
             $this->deleteFile($product->image, 'products/');
 
             $fileName = $this->uploadFile($request, 'image', 'products/');
@@ -496,7 +534,7 @@ class ProductController extends Controller {
             // 1.6.1: loop thru to sort all again
             $indexCounter = 1;
             $sortProducts = Product::where('isMainPage', true)
-            ->orderBy('indexMainPage','asc')->get();
+                ->orderBy('indexMainPage', 'asc')->get();
 
             foreach ($sortProducts as $item) {
 
@@ -516,7 +554,7 @@ class ProductController extends Controller {
         } elseif ($product->isMainPage === false) {
 
             $product->indexMainPage = null;
-            
+
         } // end if
 
 
@@ -524,7 +562,7 @@ class ProductController extends Controller {
 
 
 
-        
+
         // 1.7: index - reindex items
         if ($oldTypeId != $request->typeId) {
 
@@ -532,7 +570,7 @@ class ProductController extends Controller {
             // 1.6.1: loop thru to sort all again
             $indexCounter = 1;
             $sortProducts = Product::where('typeId', $request->typeId)
-            ->orderBy('index','asc')->get();
+                ->orderBy('index', 'asc')->get();
 
             foreach ($sortProducts as $item) {
 
@@ -555,13 +593,13 @@ class ProductController extends Controller {
 
 
         // 1.8: indexOffers - reindex items
-        if (!empty($request->offerPrice) && empty($product->indexOffers)) {
+        if (! empty($request->offerPrice) && empty($product->indexOffers)) {
 
 
             // 1.8.1: loop thru to sort all again
             $indexCounter = 1;
             $sortProducts = Product::whereNotNull('offerPrice')
-            ->orderBy('indexOffers','asc')->get();
+                ->orderBy('indexOffers', 'asc')->get();
 
             foreach ($sortProducts as $item) {
 
@@ -581,10 +619,10 @@ class ProductController extends Controller {
         } elseif (empty($request->offerPrice)) {
 
             $product->indexOffers = null;
-            
+
         } // end if
 
-        
+
 
 
 
@@ -609,13 +647,14 @@ class ProductController extends Controller {
 
 
 
-    public function toggleHome(Request $request, $id) {
+    public function toggleHome(Request $request, $id)
+    {
 
 
         // 1: get item
         $product = Product::find($id);
-        
-        $product->isMainPage = !boolval($product->isMainPage);
+
+        $product->isMainPage = ! boolval($product->isMainPage);
 
 
         // 1.2: indexMainPage - reindex items / reset to null
@@ -625,7 +664,7 @@ class ProductController extends Controller {
             // 1.2.1: loop thru to sort all again
             $indexCounter = 1;
             $sortProducts = Product::where('isMainPage', true)
-            ->orderBy('indexMainPage','asc')->get();
+                ->orderBy('indexMainPage', 'asc')->get();
 
             foreach ($sortProducts as $item) {
 
@@ -645,7 +684,7 @@ class ProductController extends Controller {
         } elseif ($product->isMainPage === false) {
 
             $product->indexMainPage = null;
-            
+
         } // end if
 
 
@@ -672,13 +711,14 @@ class ProductController extends Controller {
 
 
 
-    public function toggleHidden(Request $request, $id) {
+    public function toggleHidden(Request $request, $id)
+    {
 
 
         // 1: get item
         $product = Product::find($id);
-        
-        $product->isHidden = !boolval($product->isHidden);
+
+        $product->isHidden = ! boolval($product->isHidden);
         $product->save();
 
 
@@ -692,10 +732,11 @@ class ProductController extends Controller {
 
 
 
-    public function mainPageSort() {
+    public function mainPageSort()
+    {
 
         // 1: get sorted items
-        $product = Product::where('isMainPage', true)->orderBy('indexMainPage','asc')->get();
+        $product = Product::where('isMainPage', true)->orderBy('indexMainPage', 'asc')->get();
 
         return response()->json($product, 200);
 
@@ -712,7 +753,8 @@ class ProductController extends Controller {
 
 
 
-    public function updateMainPageSort(Request $request) {
+    public function updateMainPageSort(Request $request)
+    {
 
         // 1: get sortedItems => Ids
         $sortedItems = $request->sortedItems;
@@ -731,7 +773,7 @@ class ProductController extends Controller {
 
         return response()->json(['message' => 'Items has been sorted!'], 200);
 
-        
+
     } // end function
 
 
@@ -739,17 +781,18 @@ class ProductController extends Controller {
 
 
 
-    
+
 
     // ----------------------------------------------------------
 
 
 
-    public function typeSort($typeId) {
+    public function typeSort($typeId)
+    {
 
         // 1: get sorted items
         $product = Product::where('typeId', $typeId)
-        ->orderBy('index','asc')->get();
+            ->orderBy('index', 'asc')->get();
 
         return response()->json($product, 200);
 
@@ -762,14 +805,15 @@ class ProductController extends Controller {
 
 
 
-    public function delete(Request $request, $id) {
+    public function delete(Request $request, $id)
+    {
 
         // 1: delete item / image
         $product = Product::find($id);
 
         // 1.2: remove image if exits
         if ($product->image) {
-            
+
             $this->deleteFile($product->image, 'products/');
 
         } // end if
@@ -777,7 +821,7 @@ class ProductController extends Controller {
 
         // 1.3: remove firstExtraImage if exits
         if ($product->firstExtraImage) {
-            
+
             $this->deleteFile($product->firstExtraImage, 'products/');
 
         } // end if
@@ -785,7 +829,7 @@ class ProductController extends Controller {
 
         // 1.2: remove secExtraImage if exits
         if ($product->secExtraImage) {
-            
+
             $this->deleteFile($product->secExtraImage, 'products/');
 
         } // end if
@@ -793,7 +837,7 @@ class ProductController extends Controller {
 
         // 1.2: remove thirdExtraImage if exits
         if ($product->thirdExtraImage) {
-            
+
             $this->deleteFile($product->thirdExtraImage, 'products/');
 
         } // end if
@@ -816,7 +860,8 @@ class ProductController extends Controller {
 
 
 
-    public function updateTypeSort(Request $request, $typeId) {
+    public function updateTypeSort(Request $request, $typeId)
+    {
 
         // 1: get sortedItems => Ids
         $sortedItems = $request->sortedItems;
