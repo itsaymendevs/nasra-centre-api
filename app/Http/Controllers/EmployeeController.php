@@ -8,19 +8,21 @@ use Illuminate\Support\Facades\Hash;
 use App\Traits\AppTrait;
 
 
-class EmployeeController extends Controller {
-    
+class EmployeeController extends Controller
+{
+
     // :: use trait
     use AppTrait;
 
 
-    public function index() {
+    public function index()
+    {
 
         // ::dependencies
         $employees = Employee::all();
 
         return response()->json($employees, 200);
-        
+
     } // end function
 
 
@@ -28,13 +30,14 @@ class EmployeeController extends Controller {
 
 
 
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
 
 
         // :: validator
-        $validator = $this->validationTrait($request, 
-        ['name' => 'required', 'nameAr' => 'required', 'password' => 'required', 'permission' => 'required']);
-        
+        $validator = $this->validationTrait($request,
+            ['name' => 'required', 'nameAr' => 'required', 'password' => 'required', 'permission' => 'required']);
+
         // ! if validation not passed
         if ($validator != false) {
             return response()->json($validator->original);
@@ -60,7 +63,7 @@ class EmployeeController extends Controller {
 
         return response()->json(['status' => true, 'message' => 'employee has been added!'], 200);
 
-        
+
     } // end function
 
 
@@ -71,13 +74,14 @@ class EmployeeController extends Controller {
 
 
 
-    public function update(Request $request) {
+    public function update(Request $request)
+    {
 
 
         // :: validator
-        $validator = $this->validationTrait($request, 
-        ['name' => 'required', 'nameAr' => 'required', 'permission' => 'required']);
-        
+        $validator = $this->validationTrait($request,
+            ['name' => 'required', 'nameAr' => 'required', 'permission' => 'required']);
+
         // ! if validation not passed
         if ($validator != false) {
             return response()->json($validator->original);
@@ -100,7 +104,7 @@ class EmployeeController extends Controller {
 
         return response()->json(['status' => true, 'message' => 'employee has been updated!'], 200);
 
-        
+
     } // end function
 
 
@@ -113,13 +117,14 @@ class EmployeeController extends Controller {
 
 
 
-    public function resetPassword(Request $request) {
+    public function resetPassword(Request $request)
+    {
 
 
         // :: validator
-        $validator = $this->validationTrait($request, 
-        ['password' => 'required']);
-        
+        $validator = $this->validationTrait($request,
+            ['password' => 'required']);
+
         // ! if validation not passed
         if ($validator != false) {
             return response()->json($validator->original);
@@ -131,9 +136,9 @@ class EmployeeController extends Controller {
 
         // 1: check if admin password is correct
         $admin = Employee::all()->first();
-        if (!Hash::check($request->adminPassword, $admin->password)) {    
+        if (! Hash::check($request->adminPassword, $admin->password)) {
 
-            return response()->json(['status'=> false,'message'=> 'Password Incorrect!'], 200);
+            return response()->json(['status' => false, 'message' => 'Password Incorrect!'], 200);
 
         } // end if
 
@@ -148,7 +153,7 @@ class EmployeeController extends Controller {
 
         return response()->json(['status' => true, 'message' => 'Password has been updated!'], 200);
 
-        
+
     } // end function
 
 
@@ -164,18 +169,19 @@ class EmployeeController extends Controller {
 
 
 
-    public function toggleActive(Request $request, $id) {
+    public function toggleActive(Request $request, $id)
+    {
 
 
         // 1: update employee password
         $employee = Employee::find($id);
 
-        $employee->isActive = !boolval($employee->isActive);
+        $employee->isActive = ! boolval($employee->isActive);
         $employee->save();
 
         return response()->json(['status' => true, 'message' => 'Status has been updated!'], 200);
 
-        
+
     } // end function
 
 
@@ -189,7 +195,8 @@ class EmployeeController extends Controller {
 
 
 
-    public function delete(Request $request, $id) {
+    public function delete(Request $request, $id)
+    {
 
 
         // 1: remove employee
@@ -198,7 +205,7 @@ class EmployeeController extends Controller {
 
         return response()->json(['status' => true, 'message' => 'Employee has been removed!'], 200);
 
-        
+
     } // end function
 
 
@@ -215,7 +222,8 @@ class EmployeeController extends Controller {
 
 
 
-    public function login(Request $request) {
+    public function login(Request $request)
+    {
 
 
         // 1: remove employee
@@ -236,11 +244,11 @@ class EmployeeController extends Controller {
         // 1.3: incorrect
         return response()->json(['error' => 'Incorrect Credit'], 200);
 
-        
+
     } // end function
 
 
-    
+
 
 
 } // end function

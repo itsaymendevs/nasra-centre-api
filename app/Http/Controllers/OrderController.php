@@ -10,6 +10,7 @@ use App\Models\GeneralBlock;
 use App\Models\GlobalMessage;
 use App\Models\Message;
 use App\Models\Order;
+use App\Models\Product;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Payment;
 use App\Models\PickupStore;
@@ -315,7 +316,7 @@ class OrderController extends Controller
 
         // 1.4: update DateTime / orderEmployee
         $order->orderStatusDateTime = Carbon::now()->addHours(2);
-        $order->orderEmployeeId = 1; // TODO: EMPLOYEE SESSION
+        $order->orderEmployeeId = auth()->user()->id; // TODO: EMPLOYEE SESSION
 
 
         $order->save();
@@ -351,10 +352,34 @@ class OrderController extends Controller
         $order->refundInvoiceNumber = ! empty($request->refundInvoiceNumber) ? $request->refundInvoiceNumber : null;
         $order->orderCancellationNote = $request->orderCancellationNote;
 
-        $order->refundEmployeeId = 1; // TODO: EMPLOYEE SESSION
+        $order->refundEmployeeId = auth()->user()->id; // TODO: EMPLOYEE SESSION
         $order->refundDateTime = Carbon::now()->addHours(2);
 
         $order->orderStatus = 'CANCELED';
+
+
+
+
+        // -------------------------------------------
+        // -------------------------------------------
+
+
+
+
+        // 2: return quantity back!
+        foreach ($order->products as $orderProduct) {
+
+
+            // 2.1: get product
+            $product = Product::find($orderProduct->productId);
+
+
+            $product->quantity += doubleval($orderProduct->orderProductQuantity);
+            $product->save();
+
+        } // end loop
+
+
 
 
 
@@ -395,7 +420,7 @@ class OrderController extends Controller
         $order->paymentId = $request->paymentId;
         $order->invoiceNumber = $request->invoiceNumber;
         $order->isPaymentDone = true;
-        $order->paymentEmployeeId = 1; // TODO: EMPLOYEE SESSION
+        $order->paymentEmployeeId = auth()->user()->id; // TODO: EMPLOYEE SESSION
         $order->paymentDateTime = Carbon::now()->addHours(2);
         $order->paymentType = $payment->paymentType;
 
@@ -438,7 +463,7 @@ class OrderController extends Controller
         $order->paymentId = null;
         $order->invoiceNumber = null;
         $order->isPaymentDone = false;
-        $order->paymentEmployeeId = 1; // TODO: EMPLOYEE SESSION
+        $order->paymentEmployeeId = auth()->user()->id; // TODO: EMPLOYEE SESSION
         $order->paymentDateTime = Carbon::now()->addHours(2);
         $order->paymentType = null;
 

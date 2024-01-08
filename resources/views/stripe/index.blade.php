@@ -28,47 +28,42 @@ Payment Details
 
                         {{-- logo --}}
                         <div class="col-12 col-lg-5">
-                            <img data-aos="fade-left" data-aos-duration="600" data-aos-delay="150" class="w-100 of-contain" src="{{asset('assets/img/Logo/logo.png')}}" style="height: 180px;">
+                            <img data-aos="fade-down" data-aos-duration="1200" data-aos-delay="150" data-aos-once='true'
+                                class="w-100 of-contain mb-3" src="{{asset('assets/img/Logo/logo.png')}}"
+                                style="height: 160px;">
                         </div>
 
-                        {{-- title / hr --}}
-                        {{-- <div class="col-12 mb-5">
-                            <h4 class="text-center font--cour mb-0" data-aos="fade-down" data-aos-duration="600" data-aos-delay="150">Payment Details</h4>
-                            <div class="d-flex align-items-center justify-content-center text-center">
-                                <hr class="login--hr mb-0">
-                                <hr class="login--hr mb-0">
-                                <hr class="login--hr mb-0">
-                                <hr class="login--hr mb-0">
-                                <hr class="login--hr mb-0">
-                                <hr class="login--hr black mb-0">
-                                <hr class="login--hr black mb-0">
-                                <hr class="login--hr black mb-0">
-                            </div>
-                        </div> --}}
 
 
                         {{-- content --}}
-                        <div class="col-11 col-lg-5" data-aos="fade-right" data-aos-duration="600" data-aos-delay="150">
-
-                            {{-- <label class="form-label form--label">Credit / Debit Card</label>
-                            <input type="text" class="form--input mb-4 w-100"> --}}
+                        <div class="col-11 col-lg-5">
 
                             <div id="payment-element">
                                 <!-- A Stripe Element will be inserted here. -->
                             </div>
 
 
-                            <p class="mt-3 fs-12 text-danger d-flex align-baseline justify-content-center d-none" style="width: 90%;">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-exclamation-circle-fill error--icon me-2">
-                                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"></path>
+                            <p class="mt-3 fs-12 text-danger d-flex align-baseline justify-content-center d-none"
+                                style="width: 90%;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor"
+                                    viewBox="0 0 16 16" class="bi bi-exclamation-circle-fill error--icon me-2">
+                                    <path
+                                        d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z">
+                                    </path>
                                 </svg><span id="payment-message"></span>
                             </p>
 
 
                             {{-- submit --}}
-                            <div class="text-center d-block mt-4 pt-2">
-                                <button id='submit' class="btn btn--theme btn--submit btn--sm rounded-1 fw-semibold" type="submit">
-                                    Pay 20,500
+                            <div class="text-center d-block mt-4 pt-2" data-aos="fade-up" data-aos-duration="1200"
+                                data-aos-delay="150" data-aos-once='true'>
+                                <button id='submit' class="btn btn--theme btn--submit btn--sm rounded-1 fw-semibold"
+                                    type="submit"
+                                    style="width: 300px; height:50px; background-color: black; border-color: black !important; color: white;">
+                                    Pay<span
+                                        class='text-decoration-underline text-warning d-inline-block ms-2 text-white'
+                                        style="letter-spacing:1px; font-size:18px;">
+                                        {{number_format($amount) . ' ' . $currency}}</span>
                                 </button>
                             </div>
                         </div>
@@ -103,7 +98,6 @@ Payment Details
 
 
 <script>
-
     const publicKey = '{{ $publicKey }}';
     const secretKey = '{{ $secretKey }}';
     const clientSecret = '{{ $clientSecret }}';
@@ -180,8 +174,6 @@ Payment Details
 
 
 
-
-
     // 2: create payment-elements
     async function initialize() {
         elements = stripe.elements({clientSecret, appearance});
@@ -207,7 +199,7 @@ Payment Details
         const { error } = await stripe.confirmPayment({
             elements,
             confirmParams: {
-                return_url: "http://localhost:8000/",
+                return_url: "{{route('stripe.confirmPayment', [$orderNumber])}}",
             },
         });
 
@@ -252,14 +244,10 @@ Payment Details
     // ------- UI helpers -------
 
     function showMessage(messageText) {
-        const messageContainer = document.querySelector("#payment-message");
+        $("#payment-message").text(messageText);
 
-        messageContainer.classList.remove("hidden");
-        messageContainer.textContent = messageText;
-
+        console.log(messageText);
         setTimeout(function () {
-            messageContainer.classList.add("hidden");
-            messageContainer.textContent = "";
         }, 4000);
     }
 

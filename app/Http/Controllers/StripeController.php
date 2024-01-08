@@ -2,15 +2,31 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Order;
+use App\Models\StripePayment;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Stripe\StripeClient;
 
-class StripeController extends Controller {
+class StripeController extends Controller
+{
 
 
 
 
-    public function create(Request $request) {
+    public function makePayment(Request $request, $orderNumber)
+    {
+
+
+        // ::root
+        // $order = Order::where('orderNumber', $orderNumber)->first();
+        // $amount = doubleval($order->orderTotalPrice);
+        // $currency = $order->country->currency;
+
+        // ::root - fake
+        $amount = doubleval('15200');
+        $currency = 'GBP';
+
 
 
         // 1: init stripe
@@ -20,8 +36,9 @@ class StripeController extends Controller {
 
         // 1.2: init intent
         $paymentIntent = $stripe->paymentIntents->create([
-            'amount' => 100 * 100,
-            'currency' => 'EGP',
+
+            'amount' => doubleval($amount) * 100,
+            'currency' => $currency,
             'automatic_payment_methods' => [
                 'enabled' => true,
             ],
@@ -36,9 +53,63 @@ class StripeController extends Controller {
         $secretKey = env('STRIPE_SECRET');
 
 
-        return view('stripe.index', compact('clientSecret', 'publicKey', 'secretKey'));
+        return view('stripe.index', compact('clientSecret', 'publicKey', 'secretKey', 'amount', 'currency', 'orderNumber'));
 
 
     } // end function
+
+
+
+
+
+
+    // ---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
+
+
+
+
+
+
+    public function confirmPayment(Request $request, $orderNumber)
+    {
+
+
+
+        // :: check params
+        if (! empty($request->payment_intent) && ! empty($request->payment_intent_client_secret)) {
+
+
+            // 1: updateOrder
+            $order = Order::where('orderNumber', $orderNumber)->first();
+
+            $order->isPaymentDone = true;
+            $order->paymentDateTime = Carbon::now()->addHours(2);
+            $order->save();
+
+
+
+            // 2: save StripePayment
+            $stripePayment = new StripePayment();
+
+            $stripePayment->orderId = $order->id;
+            $stripePayment->paymentIntent = $request->payment_intent;
+            $stripePayment->clientSecret = $request->payment_intent_client_secret;
+            $stripePayment->save();
+
+
+        } // end if
+
+
+
+
+        return view('stripe.success', compact('order'));
+
+
+    } // end function
+
+
+
+
 
 } // end controller
