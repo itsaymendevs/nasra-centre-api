@@ -64,8 +64,11 @@ class OrderController extends Controller
     public function exportPreviousOrders()
     {
 
-        return Excel::download(new OrderExport, 'previousOrders.xlsx');
+        Excel::store(new OrderExport, 'previousOrders.xlsx', 'previousOrderExcel');
 
+
+        // :: response
+        return response()->json('success', 200);
 
     } // end function
 

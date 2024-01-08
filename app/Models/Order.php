@@ -5,53 +5,63 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Order extends Model {
+class Order extends Model
+{
 
     use HasFactory;
 
 
-    public function user() {
+    public function user()
+    {
         return $this->belongsTo(User::class, 'userId');
     }
 
-    public function receiver() {
+    public function receiver()
+    {
         return $this->belongsTo(UserReceiver::class, 'receiverId');
     }
 
 
 
 
-    public function country() {
+    public function country()
+    {
         return $this->belongsTo(Country::class, 'countryId');
     }
 
-    public function state() {
+    public function state()
+    {
         return $this->belongsTo(State::class, 'stateId');
     }
 
-    public function deliveryArea() {
+    public function deliveryArea()
+    {
         return $this->belongsTo(DeliveryArea::class, 'deliveryAreaId');
     }
 
 
 
-    
-    public function store() {
+
+    public function store()
+    {
         return $this->belongsTo(PickupStore::class, 'storeId');
     }
 
 
 
 
-    public function orderEmployee() {
+    public function orderEmployee()
+    {
         return $this->belongsTo(Employee::class, 'orderEmployeeId');
     }
 
-    public function paymentEmployee () {
+    public function paymentEmployee()
+    {
         return $this->belongsTo(Employee::class, 'paymentEmployeeId');
     }
 
-    public function refundEmployee () {
+    public function refundEmployee()
+    {
         return $this->belongsTo(Employee::class, 'refundEmployeeId');
     }
 
@@ -59,14 +69,16 @@ class Order extends Model {
 
 
 
-    public function payment() {
+    public function payment()
+    {
         return $this->belongsTo(Payment::class, 'paymentId');
     }
 
 
 
 
-    public function products() {
+    public function products()
+    {
         return $this->hasMany(OrderProduct::class, 'orderId', 'id');
     }
 

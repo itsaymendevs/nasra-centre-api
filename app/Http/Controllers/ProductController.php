@@ -11,6 +11,7 @@ use App\Models\Type;
 use App\Models\Unit;
 use Illuminate\Http\Request;
 use App\Traits\AppTrait;
+use Illuminate\Support\Facades\Response;
 use Maatwebsite\Excel\Facades\Excel;
 use stdClass;
 
@@ -68,9 +69,11 @@ class ProductController extends Controller
     public function exportProducts()
     {
 
-        return Excel::download(new ProductExport, 'products.xlsx');
+        Excel::store(new ProductExport, 'products.xlsx', 'productExcel');
 
 
+        // :: response
+        return response()->json('success', 200);
     } // end function
 
 

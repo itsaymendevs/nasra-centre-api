@@ -6,13 +6,15 @@ use Illuminate\Http\Request;
 use App\Models\Unit;
 use App\Traits\AppTrait;
 
-class UnitController extends Controller {
+class UnitController extends Controller
+{
 
     // :: use trait
     use AppTrait;
 
 
-    public function index() {
+    public function index()
+    {
 
         // ::get items
         $units = Unit::all();
@@ -26,11 +28,12 @@ class UnitController extends Controller {
 
 
 
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
 
         // :: validator
-        $validator = $this->validationTrait($request, 
-        ['name' => 'required', 'nameAr' => 'required', 'abbr' => 'required', 'abbrAr' => 'required']);
+        $validator = $this->validationTrait($request,
+            ['name' => 'required', 'nameAr' => 'required', 'abbr' => 'required', 'abbrAr' => 'required']);
 
         // ! if validation not passed
         if ($validator != false) {
@@ -68,11 +71,12 @@ class UnitController extends Controller {
 
 
 
-    public function update(Request $request) {
+    public function update(Request $request)
+    {
 
         // :: validator
-        $validator = $this->validationTrait($request, 
-        ['name' => 'required', 'nameAr' => 'required', 'abbr' => 'required', 'abbrAr' => 'required']);
+        $validator = $this->validationTrait($request,
+            ['name' => 'required', 'nameAr' => 'required', 'abbr' => 'required', 'abbrAr' => 'required']);
 
         // ! if validation not passed
         if ($validator != false) {
@@ -89,7 +93,7 @@ class UnitController extends Controller {
 
         $unit->name = $request->name;
         $unit->nameAr = $request->nameAr;
-        
+
         $unit->abbr = $request->abbr;
         $unit->abbrAr = $request->abbrAr;
 
@@ -109,7 +113,8 @@ class UnitController extends Controller {
 
 
 
-    public function delete(Request $request, $id) {
+    public function delete(Request $request, $id)
+    {
 
         // 1: delete item / image
         $unit = Unit::find($id);

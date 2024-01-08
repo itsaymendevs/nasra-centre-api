@@ -11,11 +11,8 @@ use stdClass;
 use App\Traits\AppTrait;
 
 
-
-class UserExport implements FromCollection, WithHeadings
+class InterUserExport implements FromCollection, WithHeadings
 {
-
-
 
 
     // :: use trait
@@ -36,9 +33,20 @@ class UserExport implements FromCollection, WithHeadings
             "Disabled Account",
 
             "Country",
-            "State",
-            "Region",
-            "Address Description",
+
+            // UK
+            "address First-Line",
+            "address Second-Line",
+            "address Third-Line",
+            "town City",
+            "PostCode",
+
+
+
+            // IRL
+            "Post Town",
+            "County",
+            "Eircode",
 
 
             "no. of Orders",
@@ -69,7 +77,8 @@ class UserExport implements FromCollection, WithHeadings
 
         // 1: get User
         $combineUsers = array();
-        $users = User::where('countryId', 1)->get();
+        $users = User::where('countryId', '!=', 1)->get();
+
 
 
         foreach ($users as $user) {
@@ -85,12 +94,27 @@ class UserExport implements FromCollection, WithHeadings
 
 
 
-            // 2: local Address
+            // 2: country
             $content->country = $user->country->name;
 
-            $content->state = $user->country->code == 'SD' ? $user->state->name : '';
-            $content->region = $user->country->code == 'SD' ? $user->deliveryArea->name : '';
-            $content->address = $user->country->code == 'SD' ? $user->address : '';
+
+            // 2.1: UK Address
+            $content->addressFirstLine = $user->addressFirstLine;
+            $content->addressSecondLine = $user->addressSecondLine;
+            $content->addressThirdLine = $user->addressThirdLine;
+
+            $content->townCity = $user->townCity;
+            $content->postcode = $user->postcode;
+
+
+
+
+            // 2.3: IRL Address
+            $content->postTown = $user->postTown;
+            $content->County = $user->County;
+            $content->eircode = $user->eircode;
+
+
 
 
 
@@ -116,3 +140,4 @@ class UserExport implements FromCollection, WithHeadings
 
 
 } // end export
+

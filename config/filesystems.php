@@ -75,9 +75,9 @@ return [
         ],
 
 
-        'orderExcel' => [
+        'previousOrderExcel' => [
             'driver' => 'local',
-            'root' => storage_path('app/public/excel/orders/'),
+            'root' => storage_path('app/public/excel/previousOrders/'),
             'url' => env('APP_URL') . '/storage',
             'visibility' => 'public',
             'throw' => false,

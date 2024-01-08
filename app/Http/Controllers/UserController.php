@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\InterUserExport;
 use App\Exports\UserExport;
 use App\Models\Country;
 use App\Models\DeliveryArea;
@@ -83,6 +84,8 @@ class UserController extends Controller
     {
 
         Excel::store(new UserExport, 'users.xlsx', 'userExcel');
+        Excel::store(new InterUserExport, 'interUsers.xlsx', 'userExcel');
+
         return response()->json('success', 200);
 
 

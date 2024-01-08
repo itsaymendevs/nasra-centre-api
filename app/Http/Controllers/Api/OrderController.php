@@ -17,10 +17,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use stdClass;
 
-class OrderController extends Controller {
+class OrderController extends Controller
+{
 
 
-    public function makeOrder(Request $request) {
+    public function makeOrder(Request $request)
+    {
 
         // ::root - initials / response / objecting request
         $countryLettersCode = 'SD';
@@ -69,7 +71,7 @@ class OrderController extends Controller {
         // 1.1 - user-active
         $isAccountDeactivated = auth()->user()->deactivated;
 
-        if (!$user->isActive) {
+        if (! $user->isActive) {
 
             $response->errors[0] = "Unauthorized Access";
             return response()->json($response);
@@ -121,7 +123,7 @@ class OrderController extends Controller {
 
 
         // 2.1: Pickup Order
-        if (!empty($request->pickupOrder)) {
+        if (! empty($request->pickupOrder)) {
 
             // ::root
             $receivingOption = 'PICKUP';
@@ -144,7 +146,7 @@ class OrderController extends Controller {
             // 2.1.2: get pickupStore / check isActive
             $pickupStore = PickupStore::find($request->pickupOrder->storeId);
 
-            if (!$pickupStore->isActive) {
+            if (! $pickupStore->isActive) {
 
                 $response = new stdClass();
                 $response->unMatchedInformation = new stdClass();
@@ -160,7 +162,7 @@ class OrderController extends Controller {
 
 
 
-        // 2.2: Delivery Order
+            // 2.2: Delivery Order
         } else {
 
 
@@ -183,7 +185,7 @@ class OrderController extends Controller {
 
 
             // 2.2.2: DeliveryAreaBlocked || deliveryPrice != Match
-            if (!$user->deliveryArea->isActive || ($user->deliveryArea->price != $request->deliveryOrder->deliveryPrice)) {
+            if (! $user->deliveryArea->isActive || ($user->deliveryArea->price != $request->deliveryOrder->deliveryPrice)) {
 
 
                 // :: return userAddress
@@ -199,7 +201,7 @@ class OrderController extends Controller {
                 $response->unMatchedInformation->userAddress->deliveryEstimatedTimeAr = $user->deliveryArea->deliveryTime->contentAr;
 
                 $response->unMatchedInformation->userAddress->regionDeliveryPrice = intval($user->deliveryArea->price);
-                $response->unMatchedInformation->userAddress->isDeliveryBlocked = !boolval($user->deliveryArea->isActive);
+                $response->unMatchedInformation->userAddress->isDeliveryBlocked = ! boolval($user->deliveryArea->isActive);
 
 
                 return response()->json($response);
@@ -240,7 +242,7 @@ class OrderController extends Controller {
         // 3.2.1: For Delivery
         if ($receivingOption == 'DELIVERY') {
 
-            if (!$paymentMethod->isForDelivery) {
+            if (! $paymentMethod->isForDelivery) {
 
                 $response = new stdClass();
                 $response->unMatchedInformation = new stdClass();
@@ -252,10 +254,10 @@ class OrderController extends Controller {
 
 
 
-        // 3.2.2: For Pickup
+            // 3.2.2: For Pickup
         } else {
 
-            if (!$paymentMethod->isForPickup) {
+            if (! $paymentMethod->isForPickup) {
 
                 $response = new stdClass();
                 $response->unMatchedInformation = new stdClass();
@@ -326,7 +328,7 @@ class OrderController extends Controller {
                 $hiddenProducts[$counter]->quantityAvailable = doubleval($product->quantity);
 
                 $hiddenProducts[$counter]->originalPrice = doubleval($product->sellPrice);
-                $hiddenProducts[$counter]->offerPrice = $product->offerPrice ? doubleval($product->offerPrice) : null ;
+                $hiddenProducts[$counter]->offerPrice = $product->offerPrice ? doubleval($product->offerPrice) : null;
 
                 $hiddenProducts[$counter]->isHidden = boolval($product->isHidden);
 
@@ -454,7 +456,7 @@ class OrderController extends Controller {
         // 4.3: OutOfStock Products
         $outOfStockProducts = array();
 
-        for ($i=0; $i < count($orderProducts); $i++) {
+        for ($i = 0; $i < count($orderProducts); $i++) {
 
 
             // 4.3.1: Product Not-Flagged
@@ -521,7 +523,7 @@ class OrderController extends Controller {
         // 4.4: invalidPrice Products
         $invalidPriceProducts = array();
 
-        for ($i=0; $i < count($orderProducts); $i++) {
+        for ($i = 0; $i < count($orderProducts); $i++) {
 
 
             // 4.3.1: Product Not-Flagged
@@ -536,7 +538,7 @@ class OrderController extends Controller {
                 // :: get CurrentPrice
                 $currentProductPrice = $product->sellPrice;
 
-                if (!empty($product->offerPrice)) {
+                if (! empty($product->offerPrice)) {
 
                     $currentProductPrice = $product->offerPrice;
 
@@ -666,7 +668,7 @@ class OrderController extends Controller {
         // 1: Generate Serial
         $orderNumber = $this->generateSerial();
 
-        while(true) {
+        while (true) {
 
             $isDuplicated = Order::where('orderNumber', $orderNumber)->count();
 
@@ -731,13 +733,14 @@ class OrderController extends Controller {
 
 
 
-            // 2.1.1: InterOrder
-            } else {} // end if
+                // 2.1.1: InterOrder
+            } else {
+            } // end if
 
 
 
 
-        // 2.1: PICKUP
+            // 2.1: PICKUP
         } else {
 
 
@@ -839,6 +842,8 @@ class OrderController extends Controller {
             $newOrderProduct->name = $product->name;
             $newOrderProduct->nameAr = $product->nameAr;
             $newOrderProduct->sellPrice = $product->sellPrice;
+            $newOrderProduct->buyPrice = $product->buyPrice;
+
 
             $newOrderProduct->weight = $product->weight;
             $newOrderProduct->weightOption = $product->weightOption;
@@ -846,7 +851,7 @@ class OrderController extends Controller {
 
 
 
-            if (!empty($product->offerPrice)) {
+            if (! empty($product->offerPrice)) {
 
                 $newOrderProduct->sellPrice = $product->offerPrice;
 
@@ -864,14 +869,20 @@ class OrderController extends Controller {
 
                 $newOrderProduct->orderProductPrice = ($newOrderProduct->sellPrice * $newOrderProduct->orderProductQuantity) / $product->weight;
 
+                $newOrderProduct->orderBuyProductPrice = ($newOrderProduct->buyPrice * $newOrderProduct->orderProductQuantity) / $product->weight;
+
+
                 $productsTotalPrice += $newOrderProduct->orderProductPrice;
 
 
 
-            // => Fixed / byName
+                // => Fixed / byName
             } else {
 
                 $newOrderProduct->orderProductPrice = ($newOrderProduct->sellPrice * $newOrderProduct->orderProductQuantity);
+
+                $newOrderProduct->orderBuyProductPrice = ($newOrderProduct->buyPrice * $newOrderProduct->orderProductQuantity);
+
 
                 $productsTotalPrice += $newOrderProduct->orderProductPrice;
 
@@ -905,7 +916,7 @@ class OrderController extends Controller {
 
             $content->quantityAvailable = $product->quantity;
             $content->originalPrice = $product->sellPrice;
-            $content->offerPrice =$product->offerPrice;
+            $content->offerPrice = $product->offerPrice;
 
             array_push($updateProducts, $content);
 
@@ -1073,7 +1084,7 @@ class OrderController extends Controller {
 
 
 
-        // 4.4.2: pickupOrder
+            // 4.4.2: pickupOrder
         } else {
 
             $previousOrder->pickupPreviousOrder = new stdClass();
@@ -1122,7 +1133,8 @@ class OrderController extends Controller {
 
 
 
-    protected function generateSerial() {
+    protected function generateSerial()
+    {
 
         // 1: make 7-Digits
         $serial = mt_rand(1000000, 9999999);
@@ -1141,7 +1153,8 @@ class OrderController extends Controller {
 
 
 
-    protected function generatePickupSerial() {
+    protected function generatePickupSerial()
+    {
 
 
         // 1: Formula
@@ -1179,7 +1192,8 @@ class OrderController extends Controller {
 
 
 
-    public function mainCall() {
+    public function mainCall()
+    {
 
         // ::root
         $response = new stdClass();
@@ -1209,7 +1223,8 @@ class OrderController extends Controller {
 
 
 
-    protected function paymentMethodDetails($response) {
+    protected function paymentMethodDetails($response)
+    {
 
         // ::root
         $response->PickupAndDeliveryAndPaymentInfo->paymentInfo = new stdClass();
@@ -1374,7 +1389,8 @@ class OrderController extends Controller {
 
 
 
-    protected function PickupDeliveryOrdersDetails($response) {
+    protected function PickupDeliveryOrdersDetails($response)
+    {
 
         // 1.2: pickup information
         $response->PickupAndDeliveryAndPaymentInfo->pickupInfo = new stdClass();
@@ -1400,7 +1416,7 @@ class OrderController extends Controller {
             $content->collectingWorkingHours = $store->receivingTimes;
             $content->collectingWorkingHoursAr = $store->receivingTimesAr;
 
-            $content->isPickupAtStoreBlocked = !boolval($store->isActive);
+            $content->isPickupAtStoreBlocked = ! boolval($store->isActive);
 
             array_push($contentArray, $content);
 

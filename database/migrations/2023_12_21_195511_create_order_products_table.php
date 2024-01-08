@@ -4,21 +4,21 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up() : void
     {
         Schema::create('order_products', function (Blueprint $table) {
             $table->id();
 
 
-            
+
             // General
             $table->double('orderProductQuantity', 10, 2)->nullable();
             $table->double('orderProductPrice', 10, 2)->nullable();
+            $table->double('orderBuyProductPrice', 10, 2)->nullable();
 
 
             // ::Product
@@ -28,16 +28,18 @@ return new class extends Migration
             $table->string('serial', 255)->nullable();
             $table->string('name', 255)->nullable();
             $table->string('nameAr', 255)->nullable();
-            $table->double('sellPrice', 10,2)->nullable();
+            $table->double('sellPrice', 10, 2)->nullable();
+            $table->double('buyPrice', 10, 2)->nullable();
+
 
             $table->string('weightOption', 100)->nullable();
-            $table->double('weight', 10,2)->nullable();
+            $table->double('weight', 10, 2)->nullable();
             $table->bigInteger('unitId')->unsigned()->nullable();
             $table->foreign('unitId')->references('id')->on('units')->onDelete('set null');
 
 
 
-            
+
             // ::Foreign Keys
             $table->bigInteger('orderId')->unsigned()->nullable();
             $table->foreign('orderId')->references('id')->on('orders')->onDelete('cascade');
@@ -56,7 +58,7 @@ return new class extends Migration
     /**
      * Reverse the migrations.
      */
-    public function down(): void
+    public function down() : void
     {
         Schema::dropIfExists('order_products');
     }
