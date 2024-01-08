@@ -8,9 +8,9 @@ use App\Models\DeliveryArea;
 use App\Models\Order;
 use App\Models\State;
 use App\Models\User;
-use Maatwebsite\Excel\Facades\Excel;
 use App\Models\UserReceiver;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 use stdClass;
 
 class UserController extends Controller
@@ -82,7 +82,8 @@ class UserController extends Controller
     public function exportUsers()
     {
 
-        return Excel::download(new UserExport, 'users.xlsx');
+        Excel::store(new UserExport, 'users.xlsx', 'userExcel');
+        return response()->json('success', 200);
 
 
     } // end function
