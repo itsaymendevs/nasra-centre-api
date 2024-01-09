@@ -13,15 +13,16 @@ use App\Models\PickupCondition;
 use App\Models\PickupStore;
 use App\Models\Product;
 use App\Models\User;
+use App\Models\UserReceiver;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use stdClass;
 
-class OrderController extends Controller
+class InterOrderController extends Controller
 {
 
 
-    public function makeOrder(Request $request)
+    public function makeInterOrder(Request $request)
     {
 
         // ::root - initials / response / objecting request
@@ -49,7 +50,7 @@ class OrderController extends Controller
         $user = User::find(auth()->user()->id);
 
         if ($user->country->code != 'SD') {
-            $toSDG = $user->country->toSDG;
+            $toSDG = doubleval($user->country->toSDG);
             $countryId = $user->country->id;
             $countryLettersCode = $user->country->countryLettersCode;
         } // end if
@@ -101,6 +102,37 @@ class OrderController extends Controller
 
         } // end if
 
+
+
+
+
+
+
+
+        // 1.4: invalid receiverId
+        $receiver = UserReceiver::find($request->generalInfo->receiverId);
+        if (empty($receiver)) {
+
+            $response->errors[0] = "Invalid Receiver";
+            return response()->json($response);
+
+        } // end if
+
+
+
+
+
+
+        // 1.5: invalid toSDG
+        if (doubleval($request->generalInfo->toSDG) != $toSDG) {
+
+            $response = new stdClass();
+            $response->unMatchedInformation = new stdClass();
+            $response->unMatchedInformation->toSDG = $toSDG;
+
+            return response()->json($response);
+
+        } // end if
 
 
 
@@ -183,7 +215,7 @@ class OrderController extends Controller
 
 
             // 2.2.2: DeliveryAreaBlocked || deliveryPrice != Match
-            if (! boolval($user->deliveryArea->isActive) || ($user->deliveryArea->price != $request->deliveryOrder->deliveryPrice)) {
+            if (! boolval($receiver->deliveryArea->isActive) || ($receiver->deliveryArea->price != $request->deliveryOrder->deliveryPrice)) {
 
 
                 // :: return userAddress
@@ -191,15 +223,15 @@ class OrderController extends Controller
                 $response->unMatchedInformation = new stdClass();
                 $response->unMatchedInformation->userAddress = new stdClass();
 
-                $response->unMatchedInformation->userAddress->userStateId = $user->stateId;
-                $response->unMatchedInformation->userAddress->userRegionId = $user->deliveryAreaId;
-                $response->unMatchedInformation->userAddress->addressDescription = $user->address;
+                $response->unMatchedInformation->userAddress->userStateId = $receiver->stateId;
+                $response->unMatchedInformation->userAddress->userRegionId = $receiver->deliveryAreaId;
+                $response->unMatchedInformation->userAddress->addressDescription = $receiver->address;
 
-                $response->unMatchedInformation->userAddress->deliveryEstimatedTime = $user->deliveryArea->deliveryTime->content;
-                $response->unMatchedInformation->userAddress->deliveryEstimatedTimeAr = $user->deliveryArea->deliveryTime->contentAr;
+                $response->unMatchedInformation->userAddress->deliveryEstimatedTime = $receiver->deliveryArea->deliveryTime->content;
+                $response->unMatchedInformation->userAddress->deliveryEstimatedTimeAr = $receiver->deliveryArea->deliveryTime->contentAr;
 
-                $response->unMatchedInformation->userAddress->regionDeliveryPrice = intval($user->deliveryArea->price);
-                $response->unMatchedInformation->userAddress->isDeliveryBlocked = ! boolval($user->deliveryArea->isActive);
+                $response->unMatchedInformation->userAddress->regionDeliveryPrice = intval($receiver->deliveryArea->price);
+                $response->unMatchedInformation->userAddress->isDeliveryBlocked = ! boolval($receiver->deliveryArea->isActive);
 
 
                 return response()->json($response);
@@ -708,21 +740,29 @@ class OrderController extends Controller
 
 
 
+        // :: receiverInformation
+        $newOrder->receiverId = $receiver->id;
+        $newOrder->receiverName = $receiver->name;
+        $newOrder->receiverPhone = $receiver->phone;
+        $newOrder->receiverPhoneAlt = $receiver->phoneAlt;
+
+
+
 
 
         // 2.1: DELIVERY / PICKUP
         if ($receivingOption == 'DELIVERY') {
 
 
-            // 2.1.1: LocalUser
-            $newOrder->address = $user->address;
-            $newOrder->stateId = $user->stateId;
-            $newOrder->deliveryAreaId = $user->deliveryAreaId;
+            // 2.1.1: local Receiver
+            $newOrder->address = $receiver->address;
+            $newOrder->stateId = $receiver->stateId;
+            $newOrder->deliveryAreaId = $receiver->deliveryAreaId;
 
 
-            $newOrder->deliveryPrice = $user->deliveryArea->price;
-            $newOrder->deliveryEstimatedTime = $user->deliveryArea->deliveryTime->content;
-            $newOrder->deliveryEstimatedTimeAr = $user->deliveryArea->deliveryTime->contentAr;
+            $newOrder->deliveryPrice = $receiver->deliveryArea->price;
+            $newOrder->deliveryEstimatedTime = $receiver->deliveryArea->deliveryTime->content;
+            $newOrder->deliveryEstimatedTimeAr = $receiver->deliveryArea->deliveryTime->contentAr;
 
 
 
@@ -779,6 +819,9 @@ class OrderController extends Controller
 
 
 
+
+        // 2.4: isConfirmed [Confirmed After Payment]
+        $newOrder->isConfirmed = false;
 
 
         // ::Save Order
@@ -987,104 +1030,6 @@ class OrderController extends Controller
 
 
 
-        // 4: PreviousOrder
-        $previousOrder = new stdClass();
-        $previousOrder->generalInfo = new stdClass();
-        $previousOrder->previousOrderProducts = array();
-
-
-
-
-        // 4.1: General Info
-        $previousOrder->generalInfo->orderLang = $newOrder->orderLang;
-        $previousOrder->generalInfo->orderNumber = $newOrder->orderNumber;
-        $previousOrder->generalInfo->orderDate = date('d-m-Y', strtotime($newOrder->orderDateTime));
-        $previousOrder->generalInfo->orderTime = date('h:i A', strtotime($newOrder->orderDateTime));
-        $previousOrder->generalInfo->orderStatus = 'WAITING';
-        $previousOrder->generalInfo->paymentType = $newOrder->paymentType;
-        $previousOrder->generalInfo->paymentId = $newOrder->paymentId;
-        $previousOrder->generalInfo->isPaymentDone = boolval($newOrder->isPaymentDone);
-
-
-
-        // 4.2: Products
-        $previousOrderProducts = OrderProduct::where('orderId', $newOrder->id)->get();
-
-
-        foreach ($previousOrderProducts as $previousOrderProduct) {
-
-
-            $content = new stdClass();
-
-            $content->id = $previousOrderProduct->id;
-            $content->name = $previousOrderProduct->name;
-            $content->nameAr = $previousOrderProduct->nameAr;
-
-            $content->productType = $previousOrderProduct->weightOption;
-            $content->packSize = $previousOrderProduct->weight;
-            $content->measuringUnitId = $previousOrderProduct->unitId;
-
-            $content->orderProductQuantity = $previousOrderProduct->orderProductQuantity;
-            $content->orderProductPrice = $previousOrderProduct->orderProductPrice;
-
-
-
-            array_push($previousOrder->previousOrderProducts, $content);
-
-
-        } // end loop
-
-
-
-
-
-
-
-
-
-
-
-        // 4.3: General Info Part.2
-        $previousOrder->generalInfo->productsPrice = doubleval($newOrder->productsPrice);
-        $previousOrder->generalInfo->orderTotalPrice = doubleval($newOrder->orderTotalPrice);
-
-
-
-
-
-        // 4.4: Receiving Option
-        $previousOrder->receivingOption = $receivingOption;
-
-
-        // 4.4.1: deliveryOrder
-        if ($receivingOption == "DELIVERY") {
-
-
-            $previousOrder->deliveryPreviousOrder = new stdClass();
-
-            $previousOrder->deliveryPreviousOrder->stateDeliveryId = $newOrder->stateId;
-            $previousOrder->deliveryPreviousOrder->regionDeliveryId = $newOrder->deliveryAreaId;
-
-            $previousOrder->deliveryPreviousOrder->deliveryEstimatedTime = $newOrder->deliveryEstimatedTime;
-            $previousOrder->deliveryPreviousOrder->deliveryEstimatedTimeAr = $newOrder->deliveryEstimatedTimeAr;
-            $previousOrder->deliveryPreviousOrder->deliveryPrice = doubleval($newOrder->deliveryPrice);
-
-
-
-
-            // 4.4.2: pickupOrder
-        } else {
-
-            $previousOrder->pickupPreviousOrder = new stdClass();
-
-            $previousOrder->pickupPreviousOrder->storeId = $newOrder->storeId;
-            $previousOrder->pickupPreviousOrder->pickupCode = $newOrder->pickupCode;
-
-
-        } // end if
-
-
-
 
 
 
@@ -1092,8 +1037,10 @@ class OrderController extends Controller
         // ::prepare response
         $response = new stdClass();
 
-        $response->previousOrder = $previousOrder;
-        $response->updateProducts = $updateProducts;
+        $response->orderNumber = $newOrder->orderNumber;
+        $response->paymentURL = route('stripe.makePayment', [$newOrder->serial]);
+
+
 
         return response()->json($content);
 

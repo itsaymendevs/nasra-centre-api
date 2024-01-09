@@ -30,7 +30,8 @@ class OrderController extends Controller
 
         // 1: currentOrders
         $orders = Order::with(['user', 'user.country', 'country', 'state', 'deliveryArea', 'store', 'receiver', 'payment', 'orderEmployee', 'paymentEmployee', 'refundEmployee'])
-            ->where('orderStatus', '!=', 'COMPLETED')->where('orderStatus', '!=', 'CANCELED')->get();
+            ->where('orderStatus', '!=', 'COMPLETED')->where('orderStatus', '!=', 'CANCELED')
+            ->where('isConfirmed', 1)->get();
 
         // ::dependencies
         $countries = Country::all();

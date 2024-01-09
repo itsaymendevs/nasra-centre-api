@@ -6,6 +6,7 @@ use App\Models\Order;
 use App\Models\StripePayment;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 use Stripe\StripeClient;
 
 class StripeController extends Controller
@@ -77,33 +78,60 @@ class StripeController extends Controller
 
 
         // :: check params
-        if (! empty($request->payment_intent) && ! empty($request->payment_intent_client_secret)) {
+        // if (! empty($request->payment_intent) && ! empty($request->payment_intent_client_secret)) {
 
 
-            // 1: updateOrder
-            $order = Order::where('orderNumber', $orderNumber)->first();
+        //     // 1: updateOrder
+        //     $order = Order::where('orderNumber', $orderNumber)->first();
 
-            $order->isPaymentDone = true;
-            $order->paymentDateTime = Carbon::now()->addHours(2);
-            $order->save();
-
-
-
-            // 2: save StripePayment
-            $stripePayment = new StripePayment();
-
-            $stripePayment->orderId = $order->id;
-            $stripePayment->paymentIntent = $request->payment_intent;
-            $stripePayment->clientSecret = $request->payment_intent_client_secret;
-            $stripePayment->save();
-
-
-        } // end if
+        //     $order->isPaymentDone = true;
+        //     $order->isConfirmed = true;
+        //     $order->paymentDateTime = Carbon::now()->addHours(2);
+        //     $order->save();
 
 
 
+        //     // 2: save StripePayment
+        //     $stripePayment = new StripePayment();
 
-        return view('stripe.success', compact('order'));
+        //     $stripePayment->orderId = $order->id;
+        //     $stripePayment->paymentIntent = $request->payment_intent;
+        //     $stripePayment->clientSecret = $request->payment_intent_client_secret;
+        //     $stripePayment->save();
+
+
+        // } // end if
+
+
+
+
+        return redirect()->route('stripe.success');
+
+
+    } // end function
+
+
+
+
+
+
+
+
+
+
+    // ---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
+
+
+
+
+
+
+    public function success(Request $request)
+    {
+
+
+        return view('stripe.success');
 
 
     } // end function

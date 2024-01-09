@@ -13,6 +13,8 @@ return new class extends Migration {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
 
+            $table->boolean('isConfirmed')->nullable()->default(1);
+
             $table->text('userToken')->nullable();
             $table->string('orderLang', 100)->nullable()->default('EN');
             $table->integer('orderNumber')->nullable();

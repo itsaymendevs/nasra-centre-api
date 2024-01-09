@@ -19,6 +19,7 @@ Route::get('/stripe/{orderNumber}/makePayment', [StripeController::class, 'makeP
 Route::get('/stripe/{orderNumber}/confirmPayment', [StripeController::class, 'confirmPayment'])->name('stripe.confirmPayment');
 
 
+Route::get('/stripe/success', [StripeController::class, 'success'])->name('stripe.success');
 
 
 // --------------------------------------------------------------------------------------

@@ -1,10 +1,12 @@
 <?php
 
 use App\Http\Controllers\Api\InfoController;
+use App\Http\Controllers\Api\InterOrderController;
 use App\Http\Controllers\Api\InterUserController;
 use App\Http\Controllers\Api\LaunchController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\OrderPaymentController;
+use App\Http\Controllers\Api\PreviousInterOrderController;
 use App\Http\Controllers\Api\PreviousOrderController;
 use App\Http\Controllers\Api\ProductController as ProductControllerApp;
 use App\Http\Controllers\Api\UserController as UserControllerApp;
@@ -931,18 +933,17 @@ Route::group(['middleware' => 'cors'], function () {
     // ========================================================
 
 
-    // 7: makeOrder / Previous Orders (auth)
+    // 7: makeOrder / makeInterOrder / Previous Orders (auth)
     Route::post("/app/user/makeOrder", [OrderController::class, 'makeOrder']);
+
+    Route::post("/app/user/makeInterOrder", [InterOrderController::class, 'makeInterOrder']);
+    Route::post("/app/user/confirmInterOrder", [PreviousInterOrderController::class, 'confirmInterOrder']);
+
+
     Route::post("/app/user/previousOrders", [PreviousOrderController::class, 'previousOrders']);
+    Route::post("/app/user/previousInterOrders", [PreviousInterOrderController::class, 'previousInterOrders']);
 
 
-
-
-
-
-
-    // ========================================================
-    // ========================================================
 
 
 

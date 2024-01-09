@@ -13,6 +13,7 @@ use App\Models\Product;
 use App\Models\State;
 use App\Models\Unit;
 use App\Models\UserDevice;
+use App\Models\UserFavorite;
 use Illuminate\Http\Request;
 use stdClass;
 
@@ -21,7 +22,7 @@ ini_set('max_execution_time', 180); // 180 (seconds) = 3 Minutes
 
 
 class LaunchController extends Controller {
-    
+
 
 
     public function launch(Request $request) {
@@ -72,7 +73,7 @@ class LaunchController extends Controller {
 
 
 
-        
+
 
 
         // 8: seventh action - favData
@@ -99,9 +100,9 @@ class LaunchController extends Controller {
             $content->mainPic = $product->image;
             $content->additionalPics = null;
 
-            
-            
-            
+
+
+
             // ::determine productType (byName - fixedSize - dynamicSize)
             $content->productType = $product->weightOption;
 
@@ -158,10 +159,10 @@ class LaunchController extends Controller {
                     $userFavorite->productId = $product->id;
 
                     $userFavorite->save();
-                    
+
                 } // end loop
 
-                
+
 
 
             } else {
@@ -183,7 +184,7 @@ class LaunchController extends Controller {
                 $favoriteProducts = Product::whereIn('id', $favoritesID)->get();
 
 
-                
+
 
 
                 // 4.2.5: ProductsIDs appended in favorites
@@ -194,7 +195,7 @@ class LaunchController extends Controller {
                     $userFavorite->productId = $product->id;
 
                     $userFavorite->save();
-                    
+
                 } // end loop
 
 
@@ -212,35 +213,35 @@ class LaunchController extends Controller {
                     $content->subCategoryId = $product->subCategoryId;
                     $content->typeId = $product->typeId;
                     $content->companyId = $product->companyId;
-        
-        
+
+
                     $content->name = $product->name;
                     $content->nameAr = $product->nameAr;
-        
+
                     $content->mainPic = $product->image;
                     $content->additionalPics = null;
-        
-                    
-                    
-                    
+
+
+
+
                     // ::determine productType (byName - fixedSize - dynamicSize)
                     $content->productType = $product->weightOption;
-        
-        
+
+
                     $content->measuringUnitId = $product->unitId;
                     $content->minQuantityToOrder = $product->weight;
-        
+
                     $content->quantityAvailable = $product->quantity;
                     $content->maxQuantityToOrder = $product->maxQuantityPerOrder;
                     $content->originalPrice = $product->sellPrice;
                     $content->offerPrice = $product->offerPrice;
-        
+
                     $content->desc = $product->desc;
                     $content->descAr = $product->descAr;
-        
-        
+
+
                     array_push($contentArray, $content);
-        
+
                 } // end loop
 
 
@@ -345,7 +346,7 @@ class LaunchController extends Controller {
                 $content->subCategories[$counterOne]->nameAr = $subCategory->nameAr;
 
                 $content->subCategories[$counterOne]->types = array();
-                
+
 
 
 
@@ -363,7 +364,7 @@ class LaunchController extends Controller {
                     $counterTwo++;
 
                 } // end loop
-                
+
 
 
                 // ::inc counterOne
@@ -411,7 +412,7 @@ class LaunchController extends Controller {
         ->orderBy('indexMainPage')
         ->get();
 
-        
+
 
         $contentArray = array();
         foreach ($products as $product) {
@@ -430,9 +431,9 @@ class LaunchController extends Controller {
             $content->mainPic = $product->image;
             $content->additionalPics = null;
 
-            
-            
-            
+
+
+
             // ::determine productType (byName - fixedSize - dynamicSize)
             $content->productType = $product->weightOption;
 
@@ -478,7 +479,7 @@ class LaunchController extends Controller {
 
         // 1: get data
         $countries = Country::where('id', '>', 1)->get();
-        
+
 
 
         $contentArray = array();
@@ -524,7 +525,7 @@ class LaunchController extends Controller {
 
             $content->contactInfo->emailAddress = $country->contact->email;
 
-            
+
 
 
 
@@ -572,7 +573,7 @@ class LaunchController extends Controller {
 
         $response->isSDNOrderingBlocked = !boolval($country->isOrderingActive);
 
-        
+
 
 
 
@@ -586,7 +587,7 @@ class LaunchController extends Controller {
 
         // 3.1: states / regions (areas)
         $states = State::all();
-        
+
 
         $contentArray = array();
 
@@ -629,7 +630,7 @@ class LaunchController extends Controller {
 
         // ::prepare response
         $response->states = $contentArray;
-        
+
         return $response;
 
     } // end function
@@ -640,7 +641,7 @@ class LaunchController extends Controller {
 
 
 
-    
+
 
 
 
@@ -656,7 +657,7 @@ class LaunchController extends Controller {
         // 1.1: companies / units
         $companies = Company::all();
         $units = Unit::all();
-        
+
 
         $contentArray = array();
         foreach ($companies as $company) {
@@ -680,7 +681,7 @@ class LaunchController extends Controller {
         // -----------------------------------------------------------------
         // -----------------------------------------------------------------
         // -----------------------------------------------------------------
-        
+
 
 
 
@@ -724,7 +725,7 @@ class LaunchController extends Controller {
 
 
 
-    
+
 
     public function seventhAction($response) {
 
@@ -774,7 +775,7 @@ class LaunchController extends Controller {
                 "titleEn" => "Invalid phone number",
                 "msgAr" => "يوجد مستخدم بنفس هذا الرقم، يرجى استخدام رقم آخر",
                 "msgEn" => "There is a user with this phone number, please use different number"
-            ], 
+            ],
 
 
             // Invalid Email - 5
@@ -842,7 +843,7 @@ class LaunchController extends Controller {
             ],
 
 
-            // otp expired (phone number is not on the waiting to verify list) - 12 
+            // otp expired (phone number is not on the waiting to verify list) - 12
             [
                 "id" => 12,
                 "titleAr" => "انتهت صلاحية رمز التحقق",
@@ -950,7 +951,7 @@ class LaunchController extends Controller {
             ],
 
 
-            
+
             // Invalid Receiver Id (mismatched) - 22
             [
                 "id" => 22,
@@ -968,7 +969,7 @@ class LaunchController extends Controller {
         $response->errorsList = $errorsList;
 
         return $response;
-        
+
     } // end function
 
 
@@ -1017,7 +1018,7 @@ class LaunchController extends Controller {
             ->get();
 
         } // end if
-        
+
 
         $contentArray = array();
         foreach ($products as $product) {
@@ -1036,9 +1037,9 @@ class LaunchController extends Controller {
             $content->mainPic = $product->image;
             $content->additionalPics = null;
 
-            
-            
-            
+
+
+
             // ::determine productType (byName - fixedSize - dynamicSize)
             $content->productType = $product->weightOption;
 
@@ -1118,9 +1119,9 @@ class LaunchController extends Controller {
             $content->mainPic = $product->image;
             $content->additionalPics = null;
 
-            
-            
-            
+
+
+
             // ::determine productType (byName - fixedSize - dynamicSize)
             $content->productType = $product->weightOption;
 

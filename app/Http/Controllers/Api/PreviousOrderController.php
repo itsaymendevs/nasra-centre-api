@@ -17,12 +17,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use stdClass;
 
-class PreviousOrderController extends Controller {
-    
+class PreviousOrderController extends Controller
+{
 
-    public function makeOrder(Request $request) {
 
-        
+    public function previousOrders(Request $request)
+    {
+
+
         // ::root
         $previousOrders = array();
         $user = User::find(auth()->user()->id);
@@ -31,7 +33,8 @@ class PreviousOrderController extends Controller {
 
 
         // 1: PreviousOrders
-        $orders = Order::where('userId', $user->id)->get();
+        $orders = Order::where('userId', $user->id)
+            ->where('isConfirmed', 1)->get();
 
 
         foreach ($orders as $order) {
@@ -41,17 +44,17 @@ class PreviousOrderController extends Controller {
             $previousOrder->generalInfo = new stdClass();
             $previousOrder->previousOrderProducts = array();
 
-            
+
 
 
             // 1.1: General Info
             $previousOrder->generalInfo->orderNumber = $order->orderNumber;
             $previousOrder->generalInfo->orderDate = date('d-m-Y', strtotime($order->orderDateTime));
-            $previousOrder->generalInfo->orderTime = date('h:m i A', strtotime($order->orderDateTime));
-            $previousOrder->generalInfo->orderStatus = 'WAITING';
+            $previousOrder->generalInfo->orderTime = date('h:i A', strtotime($order->orderDateTime));
+            $previousOrder->generalInfo->orderStatus = $order->orderStatus;
             $previousOrder->generalInfo->paymentType = $order->paymentType;
             $previousOrder->generalInfo->paymentId = $order->paymentId;
-            $previousOrder->generalInfo->isPaymentDone = $order->isPaymentDone;
+            $previousOrder->generalInfo->isPaymentDone = boolval($order->isPaymentDone);
 
 
 
@@ -65,7 +68,7 @@ class PreviousOrderController extends Controller {
 
 
                 $content = new stdClass();
-                
+
                 $content->id = $previousOrderProduct->id;
                 $content->name = $previousOrderProduct->name;
                 $content->nameAr = $previousOrderProduct->nameAr;
@@ -73,7 +76,7 @@ class PreviousOrderController extends Controller {
                 $content->productType = $previousOrderProduct->weightOption;
                 $content->packSize = $previousOrderProduct->weight;
                 $content->measuringUnitId = $previousOrderProduct->unitId;
-                
+
                 $content->orderProductQuantity = $previousOrderProduct->orderProductQuantity;
                 $content->orderProductPrice = $previousOrderProduct->orderProductPrice;
 
@@ -97,17 +100,17 @@ class PreviousOrderController extends Controller {
             // 1.3: General Info Part.2
             $previousOrder->generalInfo->productsPrice = doubleval($order->productsPrice);
             $previousOrder->generalInfo->orderTotalPrice = doubleval($order->orderTotalPrice);
-            
 
 
-            
+
+
 
             // 1.4: Receiving Option
-            $previousOrder->receivingOption = $receivingOption;
+            $previousOrder->receivingOption = $order->receivingOption;
 
 
             // 1.4.1: deliveryOrder
-            if ($receivingOption == "DELIVERY") {
+            if ($order->receivingOption == "DELIVERY") {
 
 
                 $previousOrder->deliveryPreviousOrder = new stdClass();
@@ -122,7 +125,7 @@ class PreviousOrderController extends Controller {
 
 
 
-            // 4.4.2: pickupOrder
+                // 4.4.2: pickupOrder
             } else {
 
                 $previousOrder->pickupPreviousOrder = new stdClass();
@@ -154,11 +157,13 @@ class PreviousOrderController extends Controller {
         $response = new stdClass();
         $response->previousOrders = $previousOrders;
 
-        
-        return response()->json($content); 
+
+        return response()->json($content);
 
 
     } // end function
+
+
 
 
 
